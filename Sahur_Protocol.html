@@ -800,11 +800,15 @@ const touch = { dx:0, dy:0, id:null };
   const ui = $("touchUI"), stick = $("stick"), knob = $("stickKnob"), atk = $("atkBtn");
   if(!matchMedia("(pointer:coarse)").matches) return;
   ui.classList.add("on");
-  function setKnob(x, y){ knob.style.left = (39+x) + "px"; knob.style.top = (39+y) + "px"; }
+  function setKnob(x, y){
+    const baseX = (stick.clientWidth - knob.clientWidth) / 2;
+    const baseY = (stick.clientHeight - knob.clientHeight) / 2;
+    knob.style.left = (baseX+x) + "px"; knob.style.top = (baseY+y) + "px";
+  }
   function stickMove(t){
     const r = stick.getBoundingClientRect();
     let vx = t.clientX - (r.left + r.width/2), vy = t.clientY - (r.top + r.height/2);
-    const m = Math.hypot(vx, vy) || 1, max = r.width/2 - 14;
+    const m = Math.hypot(vx, vy) || 1, max = r.width/2 - knob.clientWidth/2;
     if(m > max){ vx = vx/m*max; vy = vy/m*max; }
     touch.dx = vx/max; touch.dy = vy/max; setKnob(vx, vy);
   }
