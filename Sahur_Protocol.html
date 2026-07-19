@@ -29,6 +29,8 @@
     --ink:#07090f; --panel:#10141f; --line:#232a3d;
     --real:#ffb547; --wood:#b0743a; --glitch:#ff3df0; --cyan:#35e8ff;
     --text:#e8e4d8; --dim:#8b8fa3; --danger:#ff4d5e;
+    --stick-size:128px; --stick-knob:42px; --stick-left:8vw; --stick-bottom:8vh;
+    --attack-size:92px; --attack-right:6vw; --attack-bottom:8vh;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%; background:var(--ink); color:var(--text);
@@ -70,7 +72,10 @@
   .menuInfo{max-width:600px; font-size:16px; line-height:1.85; text-align:left;
     color:var(--text); font-weight:500;}
   .menuInfo b{color:var(--real);}
-  #volumeSlider{width:min(320px,80vw); accent-color:var(--real);}
+  #volumeSlider,.ctrlSlider{width:min(320px,80vw); accent-color:var(--real);}
+  .controlGrid{display:grid; gap:10px; width:min(460px,86vw);}
+  .controlGrid label{display:grid; gap:6px; color:var(--text); font-size:14px; line-height:1.4;}
+  .controlGrid span{color:var(--dim); font-size:12px;}
   .menuFoot{color:var(--dim); font-size:13px; margin-top:6px; letter-spacing:.2em;}
   .titleBig{font-family:"Press Start 2P", monospace; font-size:clamp(20px,4.2vw,42px);
     letter-spacing:.12em; color:var(--real); line-height:1.6;
@@ -130,7 +135,7 @@
   @keyframes rollPulse{from{transform:translateY(0) scale(1);} to{transform:translateY(-3px) scale(1.025);}}
   /* end screens */
   #endOv{background:rgba(7,9,15,.96); text-align:center;}
-  #pauseOv{background:rgba(7,9,15,.72); text-align:center; gap:16px;}
+  #pauseOv{background:rgba(7,9,15,.72); text-align:center; gap:16px; padding:18px; overflow:auto;}
   #pauseOv .menuInfo{text-align:center;}
   #rotateOv{display:none; background:rgba(7,9,15,.96); text-align:center; z-index:9; padding:24px;}
   .endBig{font-family:"Press Start 2P", monospace; font-size:clamp(16px,3vw,30px);
@@ -140,12 +145,12 @@
   /* ---------- touch controls (coarse pointers only) ---------- */
   #touchUI{display:none;}
   #touchUI.on{display:block;}
-  #stick{position:absolute; left:max(4vw, env(safe-area-inset-left)); bottom:max(6vh, env(safe-area-inset-bottom)); width:118px; height:118px;
+  #stick{position:absolute; left:max(var(--stick-left), env(safe-area-inset-left)); bottom:max(var(--stick-bottom), env(safe-area-inset-bottom)); width:var(--stick-size); height:var(--stick-size);
     border:1px solid var(--line); border-radius:50%; background:rgba(16,20,31,.45);
     z-index:4; touch-action:none;}
-  #stickKnob{position:absolute; left:39px; top:39px; width:40px; height:40px;
+  #stickKnob{position:absolute; left:calc((var(--stick-size) - var(--stick-knob)) / 2); top:calc((var(--stick-size) - var(--stick-knob)) / 2); width:var(--stick-knob); height:var(--stick-knob);
     border-radius:50%; background:rgba(232,228,216,.35); pointer-events:none;}
-  #atkBtn{position:absolute; right:max(5vw, env(safe-area-inset-right)); bottom:max(7vh, env(safe-area-inset-bottom)); width:92px; height:92px;
+  #atkBtn{position:absolute; right:max(var(--attack-right), env(safe-area-inset-right)); bottom:max(var(--attack-bottom), env(safe-area-inset-bottom)); width:var(--attack-size); height:var(--attack-size);
     border-radius:50%; border:1px solid var(--real); background:rgba(255,181,71,.14);
     color:var(--real); font-family:inherit; font-weight:700;
     font-size:15px; letter-spacing:.08em; z-index:4; touch-action:none; -webkit-user-select:none; user-select:none;}
@@ -156,9 +161,7 @@
   @media (orientation:landscape) and (pointer:coarse){
     #game{width:min(100vw, calc(100dvh * 16 / 9)); max-height:100dvh;}
     #pauseBtn{width:38px; height:32px; font-size:16px;}
-    #stick{width:92px; height:92px; bottom:max(16px, env(safe-area-inset-bottom));}
-    #stickKnob{left:31px; top:31px; width:30px; height:30px;}
-    #atkBtn{width:76px; height:76px; bottom:max(18px, env(safe-area-inset-bottom)); font-size:12px;}
+    #atkBtn{font-size:12px;}
     #cutOv{padding:10px 0;}
     #sceneCanvas{width:min(54vw, calc((100dvh - 120px) * 1.6)); margin-bottom:8px;}
     #dialog{width:min(86vw, 760px); min-height:84px; padding:12px 16px;}
@@ -236,6 +239,21 @@
       <button class="btn menuBtn" id="muteBtn">Music and sound: On</button>
       <label class="menuInfo" for="volumeSlider"><b>Volume</b></label>
       <input id="volumeSlider" type="range" min="0" max="100" value="70">
+      <div class="menuInfo"><b>Mobile controls</b></div>
+      <div class="controlGrid">
+        <label for="stickSizeSlider">Joystick size <span id="stickSizeVal"></span>
+          <input class="ctrlSlider" id="stickSizeSlider" type="range" min="96" max="190" value="128">
+        </label>
+        <label for="stickLeftSlider">Joystick horizontal position <span id="stickLeftVal"></span>
+          <input class="ctrlSlider" id="stickLeftSlider" type="range" min="3" max="24" value="8">
+        </label>
+        <label for="stickBottomSlider">Joystick height from bottom <span id="stickBottomVal"></span>
+          <input class="ctrlSlider" id="stickBottomSlider" type="range" min="3" max="24" value="8">
+        </label>
+        <label for="attackSizeSlider">Swing button size <span id="attackSizeVal"></span>
+          <input class="ctrlSlider" id="attackSizeSlider" type="range" min="72" max="150" value="92">
+        </label>
+      </div>
       <div class="menuInfo">
         Cutscenes, levels, bosses, and finale beats use separate audio states. Starting a cutscene stops level music first.
       </div>
@@ -266,6 +284,20 @@
   <div id="pauseOv" class="overlay">
     <div class="endBig">PAUSED</div>
     <div class="menuInfo">Progress is saved at room, boss, and reward checkpoints.</div>
+    <div class="controlGrid">
+      <label for="pauseStickSizeSlider">Joystick size <span id="pauseStickSizeVal"></span>
+        <input class="ctrlSlider" id="pauseStickSizeSlider" type="range" min="96" max="190" value="128">
+      </label>
+      <label for="pauseStickLeftSlider">Joystick horizontal position <span id="pauseStickLeftVal"></span>
+        <input class="ctrlSlider" id="pauseStickLeftSlider" type="range" min="3" max="24" value="8">
+      </label>
+      <label for="pauseStickBottomSlider">Joystick height from bottom <span id="pauseStickBottomVal"></span>
+        <input class="ctrlSlider" id="pauseStickBottomSlider" type="range" min="3" max="24" value="8">
+      </label>
+      <label for="pauseAttackSizeSlider">Swing button size <span id="pauseAttackSizeVal"></span>
+        <input class="ctrlSlider" id="pauseAttackSizeSlider" type="range" min="72" max="150" value="92">
+      </label>
+    </div>
     <button class="btn" id="resumeBtn">RESUME</button>
     <button class="btn" id="restartBtn">RESTART RUN</button>
   </div>
@@ -504,6 +536,7 @@ let state = null;          // full run state
 let shake = 0, flash = 0;
 let last = performance.now();
 const SAVE_KEY = "sahurProtocolRunV1";
+const CONTROL_KEY = "sahurProtocolControlsV1";
 
 /* ---------- audio (tiny synth, no assets) ---------- */
 let AC = null;
@@ -779,6 +812,44 @@ function updateContinueButton(){
   const b = $("continueBtn");
   if(b) b.style.display = storageGet(SAVE_KEY) ? "" : "none";
 }
+const controlDefaults = {stickSize:128, stickLeft:8, stickBottom:8, attackSize:92};
+let controlSettings = {...controlDefaults};
+function loadControlSettings(){
+  try{
+    const raw = storageGet(CONTROL_KEY);
+    if(raw) controlSettings = {...controlDefaults, ...JSON.parse(raw)};
+  }catch(e){ controlSettings = {...controlDefaults}; }
+  applyControlSettings(false);
+}
+function saveControlSettings(){
+  storageSet(CONTROL_KEY, JSON.stringify(controlSettings));
+}
+function setSliderValue(id, value, suffix){
+  const el = $(id), out = $(id.replace("Slider","Val"));
+  if(el) el.value = String(value);
+  if(out) out.textContent = value + suffix;
+}
+function setControlSliderValues(ids, value, suffix){
+  ids.forEach(id=>setSliderValue(id, value, suffix));
+}
+function applyControlSettings(save=true){
+  const c = controlSettings;
+  c.stickSize = Math.max(96, Math.min(190, Number(c.stickSize)||controlDefaults.stickSize));
+  c.stickLeft = Math.max(3, Math.min(24, Number(c.stickLeft)||controlDefaults.stickLeft));
+  c.stickBottom = Math.max(3, Math.min(24, Number(c.stickBottom)||controlDefaults.stickBottom));
+  c.attackSize = Math.max(72, Math.min(150, Number(c.attackSize)||controlDefaults.attackSize));
+  const root = document.documentElement.style;
+  root.setProperty("--stick-size", c.stickSize + "px");
+  root.setProperty("--stick-knob", Math.round(c.stickSize * 0.34) + "px");
+  root.setProperty("--stick-left", c.stickLeft + "vw");
+  root.setProperty("--stick-bottom", c.stickBottom + "vh");
+  root.setProperty("--attack-size", c.attackSize + "px");
+  setControlSliderValues(["stickSizeSlider","pauseStickSizeSlider"], c.stickSize, " px");
+  setControlSliderValues(["stickLeftSlider","pauseStickLeftSlider"], c.stickLeft, " vw");
+  setControlSliderValues(["stickBottomSlider","pauseStickBottomSlider"], c.stickBottom, " vh");
+  setControlSliderValues(["attackSizeSlider","pauseAttackSizeSlider"], c.attackSize, " px");
+  if(save) saveControlSettings();
+}
 
 /* ---------- input ---------- */
 addEventListener("keydown", e=>{
@@ -825,6 +896,7 @@ const touch = { dx:0, dy:0, id:null };
   atk.addEventListener("touchend",   e=>{ e.preventDefault(); }, {passive:false});
   atk.addEventListener("touchcancel",e=>{ e.preventDefault(); }, {passive:false});
 })();
+loadControlSettings();
 $("titleOv").addEventListener("pointerdown", ()=> ChoirMusic.playMenu());
 $("game").addEventListener("pointerdown", e=>{
   if(!state) return;
@@ -846,6 +918,22 @@ $("resumeBtn").addEventListener("click", e=>{ e.target.blur(); audio(); resumeGa
 $("restartBtn").addEventListener("click", e=>{ e.target.blur(); audio(); $("pauseOv").classList.remove("show"); startGame(); });
 $("muteBtn").addEventListener("click", e=>{ e.target.blur(); audio(); Music.toggleMute(); updateMuteButton(); });
 $("volumeSlider").addEventListener("input", e=> updateVolume(Number(e.target.value)/100));
+[
+  ["stickSizeSlider","stickSize"],
+  ["pauseStickSizeSlider","stickSize"],
+  ["stickLeftSlider","stickLeft"],
+  ["pauseStickLeftSlider","stickLeft"],
+  ["stickBottomSlider","stickBottom"],
+  ["pauseStickBottomSlider","stickBottom"],
+  ["attackSizeSlider","attackSize"],
+  ["pauseAttackSizeSlider","attackSize"]
+].forEach(([id,key])=>{
+  const el = $(id);
+  if(el) el.addEventListener("input", e=>{
+    controlSettings[key] = Number(e.target.value);
+    applyControlSettings();
+  });
+});
 document.querySelectorAll("[data-menu]").forEach(btn=>{
   btn.addEventListener("click", e=>{
     e.currentTarget.blur();
