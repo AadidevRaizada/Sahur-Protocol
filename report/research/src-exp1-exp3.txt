@@ -1,0 +1,403 @@
+============================== Exp1_Manual_N152_E2.docx
+IMAGES: []
+SVKM’s NMIMS
+Mukesh Patel School of Technology Management & Engineering
+Computer Engineering Department
+Program: - Semester: 
+Course: Software Engineering 
+Experiment No.01
+PART A
+(PART A: TO BE REFFERED BY STUDENTS)
+A.1 Aim:  
+Conduct the literature survey to identify the case study and possible nature of problem. Shortlist at least five case study and shortlist one of them. Identify the scope of the problem selected. 
+Also perform the following tasks. 
+1.Identify the end user of the system 
+2.Identify the functional requirements of the project 
+3.Identify the non-functional requirements of the project 
+4.Identify the feasibility of the project 
+5.Finalize one problem out of five selected  
+6.Frame the final problem statement.  
+7.List down the list of user requirements, system requirements. 
+8.Identify the ambiguities, inconsistencies, incompleteness from the requirements gathered.  
+9.List down the development plan for the selected problem statement.   
+Finalize the problem statement and conduct the requirement gathering
+A.2 Prerequisite: - C, C++, Software Development Life Cycle /Literature survey
+A.3 Outcome: 
+             After successful completion of this experiment students will be able to
+Identify ambiguities, inconsistencies and incompleteness from a requirements specification
+Identify and state functional requirements
+Identify and state non-functional requirements
+Frame the problem statement for the MINI project 
+A.4 Theory:
+Requirements identification is the first step of any software development project. Until the requirements of a client have been clearly identified, and verified, no other task (design, coding, testing) could begin. Usually business analysts having domain knowledge on the subject matter discuss with clients and decide what features are to be implemented.
+In this experiment we will learn how to identify functional and non-functional requirements from a given problem statement. Functional and non-functional requirements are the primary components of a Software Requirements Specification.
+ Requirements
+Somerville defines "requirement"  as a specification of what should be implemented. Requirements specify how the target system should behave. It specifies what to do, but not how to do. Requirements engineering refers to the process of understanding what a customer expects from the system to be developed, and to document them in a standard and easily readable and understandable format. This documentation will serve as reference for the subsequent design, implementation and verification of the system.
+It is necessary and important that before we start planning, design and implementation of the software system for our client, we are clear about it's requirements. If we don't have a clear vision of what is to be developed and what all features are expected, there would be serious problems, and customer dissatisfaction as well.
+Characteristics of Requirements
+Requirements gathered for any new system to be developed should exhibit the following three properties:
+Unambiguity: There should not be any ambiguity what a system to be developed should do. For example, consider you are developing a web application for your client. The client requires that enough number of people should be able to access the application simultaneously. What's the "enough number of people"? That could mean 10 to you, but, perhaps, 100 to the client. There's an ambiguity.
+Consistency: To illustrate this, consider the automation of a nuclear plant. Suppose one of the clients say that if the radiation level inside the plant exceeds R1, all reactors should be shut down. However, another person from the client side suggests that the threshold radiation level should be R2. Thus, there is an inconsistency between the two end users regarding what they consider as threshold level of radiation.
+Completeness: A particular requirement for a system should specify what the system should do and also what it should not. For example, consider a software to be developed for ATM. If a customer enters an amount greater than the maximum permissible withdrawal amount, the ATM should display an error message, and it should not dispense any cash.
+Categorization of Requirements
+Based on the target audience or subject matter, requirements can be classified into different types, as stated below:
+User requirements: They are written in natural language so that both customers can verify their requirements have been correctly identified
+System requirements: They are written involving technical terms and/or specifications, and are meant for the development or testing teams
+Requirements can be classified into two groups based on what they describe:
+Functional requirements (FRs): These describe the functionality of a system -- how a system should react to a particular set of inputs and what should be the corresponding output.
+Non-functional requirements (NFRs): They are not directly related what functionalities are expected from the system. However, NFRs could typically define how the system should behave under certain situations. For example, a NFR could say that the system should work with 128MB RAM. Under such condition, a NFR could be more critical than a FR.
+Non-functional requirements could be further classified into different types like:
+Product requirements: For example, a specification that the web application should use only plain HTML, and no frames
+Performance requirements: For example, the system should remain available 24x7
+Organizational requirements: The development process should comply to SEI CMM level 4
+Functional Requirements: Identifying Functional Requirements
+Given a problem statement, the functional requirements could be identified by focusing on the following points:
+Identify the high level functional requirements simply from the conceptual understanding of the problem. For example, a Library Management System, apart from anything else, should be able to issue and return books.
+Identify the cases where an end user gets some meaningful work done by using the system. For example, in a digital library a user might use the "Search Book" functionality to obtain information about the books of his interest.
+If we consider the system as a black box, there would be some inputs to it, and some output in return. This black box defines the functionalities of the system. For example, to search for a book, user gives title of the book as input and get the book details and location as the output.
+Any high level requirement identified could have different sub-requirements. For example, "Issue Book" module could behave differently for different class of users, or for a particular user who has issued the book thrice consecutively.
+A.5 Task to be completed in PART B
+A.5.1. Task 1: 
+Every student needs to follow following steps and record the findings in appropriate section of PART B
+Conduct the literature survey 
+Shortlist at least 5 domain of project and possible nature of problem.
+Identify the scope of the problems selected 
+Identify the end user of the solution
+Identify the functional requirements of the project
+Identify the non-functional requirements of the project
+Identify the feasibility of the project
+Finalize one problem out of five selected 
+Frame the final problem statement. 
+List down the list of user requirements, system requirements.
+Identify the ambiguities, inconsistencies, incompleteness from the requirements gathered. 
+List down the development plan for the selected problem statements  
+******************
+PART B
+(PART B: TO BE COMPLETED BY STUDENTS)
+(Students must submit the soft copy as per following segments within two hours of the practical. The soft copy must be uploaded on the Blackboard or emailed to the concerned lab in charge faculties at the end of the practical in case the there is no Black board access available)
+Roll No. | Name:
+Program : | Division:
+Batch: | Date of Experiment: 
+Date of Submission:  | Grade :
+--endtable--
+B.1 Tasks given in PART A to be completed here 
+1. Literature Survey
+The following project domains were studied before selecting the final mini-project.
+Sr. No. | Domain | Nature of Problem | Scope
+1 | Library Management System | Manual book tracking | Small
+2 | Hospital Management System | Patient record management | Medium
+3 | Food Delivery System | Order management and delivery | Large
+4 | Student Attendance System | Attendance automation | Medium
+5 | 2D Action Game (SAHUR PROTOCOL) | Interactive gameplay with enemies, combat and levels | Medium
+--endtable--
+2. Selected Project Domain
+SAHUR PROTOCOL – A 2D Action Platformer Game
+The project is a Unity-based action game where the player controls the main character through different levels, defeats enemies, avoids obstacles, and reaches the objective while maintaining health.
+3. Scope of the Problem
+The game aims to provide an engaging platformer experience with smooth character controls and combat mechanics.
+The scope includes:
+Character movement 
+Jumping and attacking 
+Enemy AI 
+Health system 
+Collision detection 
+Multiple levels 
+Win/Lose conditions 
+Score tracking 
+Game menu 
+Pause functionality 
+Future enhancements may include multiplayer, achievements, cloud saves, and additional characters.
+4. End Users
+Casual gamers 
+Students 
+PC gamers 
+Game testers 
+Developers evaluating gameplay mechanics 
+5. Functional Requirements
+The system shall:
+Allow users to start a new game. 
+Allow movement in left and right directions. 
+Allow jumping. 
+Allow attacking enemies. 
+Detect collisions with enemies and obstacles. 
+Maintain player health. 
+Display score. 
+Load different game levels. 
+Pause and resume gameplay. 
+Save game progress (future enhancement). 
+Display Game Over screen. 
+Display Victory screen after level completion. 
+6. Non-Functional Requirements
+Performance
+Maintain at least 60 FPS. 
+Load levels within 5 seconds. 
+Reliability
+No unexpected crashes during gameplay. 
+Automatic handling of invalid game states. 
+Usability
+Easy-to-understand controls. 
+Simple user interface. 
+Maintainability
+Modular Unity scripts. 
+Reusable game objects. 
+Portability
+Compatible with Windows. 
+Can be extended for Android. 
+Security
+Save data should not be corrupted. 
+7. Feasibility Study
+Technical Feasibility
+The project can be developed using:
+Unity Engine 
+C# 
+Visual Studio 
+Unity Animator 
+Unity Physics 
+No specialized hardware is required.
+Economic Feasibility
+The project uses free tools.
+Unity Personal 
+Visual Studio Community 
+GitHub 
+Therefore, development cost is minimal.
+Operational Feasibility
+The game is simple to install and play.
+Users require only basic keyboard controls.
+Schedule Feasibility
+The project can be completed within the academic semester.
+8. Finalized Problem
+Development of SAHUR PROTOCOL – A 2D Action Platformer Game using Unity.
+9. Problem Statement
+Traditional 2D games often lack engaging mechanics and smooth player interaction in academic projects. The objective of this project is to develop SAHUR PROTOCOL, a 2D action platformer game that provides responsive controls, combat mechanics, enemy interaction, health management, scoring, and level progression using Unity and C#. The system should provide an enjoyable gameplay experience while demonstrating software engineering principles.
+10. User Requirements
+The user should be able to:
+Start the game 
+Move the player 
+Jump 
+Attack enemies 
+View health 
+View score 
+Pause the game 
+Resume gameplay 
+Restart after losing 
+Complete levels 
+11. System Requirements
+Hardware
+Intel Core i3 or above 
+4 GB RAM 
+1 GB Graphics Memory 
+Keyboard 
+Mouse 
+Software
+Windows 10/11 
+Unity 6 
+Visual Studio 
+.NET Framework 
+12. Ambiguities, Inconsistencies and Incompleteness
+Ambiguities
+Number of game levels is not defined. 
+Enemy difficulty is unspecified. 
+Maximum player health is not finalized. 
+Inconsistencies
+Different opinions may exist regarding game difficulty. 
+Scoring rules may change during development. 
+Incompleteness
+Sound effects are not fully specified. 
+Save game functionality is not finalized. 
+Future power-ups are yet to be defined. 
+13. Development Plan
+Phase | Activity
+1 | Requirement Gathering
+2 | Literature Survey
+3 | Software Requirement Specification
+4 | Game Design
+5 | Character Sprite Development
+6 | Player Controller Implementation
+7 | Enemy AI Development
+8 | Combat System
+9 | Health & Score System
+10 | UI Development
+11 | Testing
+12 | Bug Fixing
+13 | Documentation
+14 | Final Deployment
+--endtable--
+B.2 Observations and Learning: 
+Through this experiment, I learned the importance of gathering complete and accurate requirements before software development begins. I understood the difference between functional and non-functional requirements and how ambiguities or incomplete requirements can lead to implementation issues later in the development process. Conducting a literature survey also helped compare multiple project domains before selecting the most suitable mini-project. Preparing the development plan provided a clear roadmap for building the software systematically.
+B.3 Conclusion:
+The objectives of the experiment were successfully achieved. A literature survey was conducted, multiple project domains were analyzed, and SAHUR PROTOCOL was selected as the final mini-project. Functional requirements, non-functional requirements, feasibility analysis, user requirements, system requirements, ambiguities, and the overall development plan were identified successfully. This experiment established a strong foundation for the software development life cycle of the project.
+B.4 Question of curiosity:
+Justify the  statement, “ User requirements must be understood well before beginning the software development”
+User requirements define what the customer expects from the software. If they are misunderstood, the final product may fail to meet user expectations, resulting in increased development costs, delays, and rework. Proper requirement gathering ensures that the software is developed according to the customer's needs.
+What is SRS? Download sample SRS  format of any organization and prepare the relevant part of the same for this experiment
+Software Requirements Specification (SRS)
+An SRS is a formal document that describes all functional and non-functional requirements of a software system.
+Project Name
+SAHUR PROTOCOL
+Purpose
+To develop a 2D action platformer game with combat, enemy AI, health management, scoring, and level progression.
+Functional Requirements
+Player movement 
+Jumping 
+Combat system 
+Enemy AI 
+Health management 
+Score calculation 
+Pause menu 
+Level completion 
+Non-Functional Requirements
+60 FPS gameplay 
+Easy-to-use interface 
+Modular code 
+Windows compatibility 
+Reliable performance 
+What is feasibility study? When is the feasibility study done?
+A feasibility study evaluates whether a software project can be successfully completed considering technical, economic, operational, legal, and scheduling factors. It is performed during the initial planning phase before software design and development begin.
+Differentiate between functional requirements and nonfunctional requirements 
+Functional Requirements | Non-Functional Requirements
+Describe what the system should do | Describe how the system should perform
+Define features and functionalities | Define quality attributes
+Example: Player can jump | Example: Game should run at 60 FPS
+Focus on user interactions | Focus on performance, security, reliability, and usability
+--endtable--
+***************
+============================== EXP-3-USE_CASE-Sahur-Protocol.docx
+IMAGES: [('word/media/image1.png', 1696895)]
+EXPERIMENT - 3
+Aim: To perform the user’s view analysis for SAHUR PROTOCOL: Use case diagram.
+Theory:
+What is Scenario based modeling?
+How to list down the use cases and Actors in a use case diagram
+Guidelines for finding out the relationship between Use cases.
+Scenario-Based Modeling
+Makes use of use cases to capture the ways in which end-users will interact with the system
+UML requirements modeling begins with the creation of scenarios in the from of use cases, activity diagrams, and swim lane diagrams
+Developing Use Cases
+Use cases capture the interactions between actors (i.e. entities that consume or produce information)
+Begin by listing the activities performed by a single actor to accomplish a single function
+Continue this process for each actor and each system function
+Use-cases are written first in narrative form and then mapped to a template if more formality is required
+Each primary scenarios should be reviewed and refined to see if alternative interactions are possible
+Can the actor take some other action at this point?
+Is it possible that the actor will encounter an error condition at some point? If so, what?
+Is it possible that the actor will encounter some other behavior at some point? If so, what?
+Exceptions:
+Describe situations (failures or user choices) that cause the system to exhibit unusual behavior
+Brainstorming should be used to derive a reasonably complete set of exceptions for each use case
+Are there cases where a validation function occurs for the use case?
+Are there cases where a supporting function (actor) fails to respond appropriately?
+Can poor system performance result in unexpected or improper use actions?
+Handling exceptions may require the creation of additional use cases
+Procedure:
+Analyze the system to find out the various functionalities.
+List down the set of Use Cases and the various Actors in the system to be developed.
+Draw a Use Case diagram and draw the various associations between them.
+Output:A Use case diagram for the System.
+Case Study Considered: Sahur Protocol
+Sahur Protocol is a 2D top-down rhythm bullet-hell game with rogue-lite progression. The player moves with WASD or the arrow keys and dodges the projectile patterns thrown out by enemies. Attacks are bound to the spacebar and the left mouse button, but a swing only lands damage if it falls on the beat of the track that is playing, so the audio track and the combat loop are locked to each other. After each cleared round the game offers three randomised upgrades, for example Touch Grass, Wider Bat or Faster Rhythm, and the player keeps one of them for the rest of the run. A full run is built around four boss encounters: Echo the Engagement Wraith, The Scraper, The Valuation, and the final boss, The Bubble.
+1. Analysis of System Functionality
+Treating the game as a system rather than as a piece of entertainment, the functions the player can invoke fall into four groups. This grouping is what the use case list was derived from.
+•  Session control: begin a fresh run, resume a saved one, pause an active run, and leave the game.
+•  The run loop: move the character, attack on the beat, clear a room, fight a boss, pick an upgrade between rounds, and complete optional challenges.
+•  Story and instruction: the prologue cutscene, the cutscenes between boss phases, and the how-to-play screen.
+•  Configuration and persistence: volume and control settings, writing run progress to storage, and reading it back.
+2. Actors Identified
+One human actor drives the system. The other three are device-side actors that the game depends on but does not control, and each of them sits outside the system boundary in the diagram.
+Actor | Type | Responsibility in the system
+Player | Primary, human | Starts and continues runs, moves and attacks in time with the beat, selects upgrades, pauses, views the story, and changes settings.
+Audio System | Secondary, device | Plays the background track that the attack timing window is measured against, along with hit, miss and boss-phase sound effects.
+File System (Device) | Secondary, device | Stores run progress, unlocked upgrades and settings, and returns them when a saved run is continued.
+Display Device | Secondary, device | Renders the room, projectiles, health bar and beat indicator on every frame.
+--endtable--
+3. Use Cases Identified
+Ten use cases are directly invoked by the Player or by a device actor. These are the yellow ovals in the diagram.
+ID | Use Case | Actor | Description
+UC1 | Start New Game | Player | Begins a run from the first room with no carried-over upgrades.
+UC2 | Continue Game | Player | Resumes the last saved run at the room and upgrade set it was left at.
+UC3 | Play Game (Run) | Player | The active gameplay session, from the first room through to The Bubble or to the player dying.
+UC4 | Pause Game | Player | Freezes the run and the audio track, and opens the pause menu.
+UC5 | View Story (Cutscenes) | Player | Opens the cutscene gallery for scenes already unlocked.
+UC6 | View How to Play | Player | Shows the controls and the rule that damage is only dealt on the beat.
+UC7 | Configure Settings | Player | Opens the settings screen for audio and control changes.
+UC8 | Exit Game | Player | Closes the application from the main menu.
+UC9 | Save Progress | File System | Writes the current room, health, score and upgrade set to storage.
+UC10 | Load Progress | File System | Reads a stored run back into memory so it can be continued.
+--endtable--
+A further sixteen use cases exist only as part of, or as an optional branch off, the ten above. They are shown in green, purple and red in the diagram and are never started directly by the Player.
+Use Case | Category | Belongs to
+Play Prologue Cutscene | Included | Start New Game
+Enter First Room | Included | Start New Game
+Choose First Upgrade | Included | Enter First Room
+Move Character | Included | Play Game (Run)
+Attack Enemies | Included | Play Game (Run)
+Clear Room | Included | Play Game (Run)
+Fight Boss | Included | Play Game (Run)
+Choose Upgrade | Included | Play Game (Run)
+Complete Challenges | Included | Play Game (Run)
+Watch Cutscenes | Included | View Story (Cutscenes)
+Adjust Volume / Controls | Included | Configure Settings
+Resume Game | Extension | Pause Game
+Restart Run | Extension | Pause Game
+Return to Main Menu | Extension | Pause Game
+Play Music / Sound Effects | Supporting | Audio System
+Render Game Graphics | Supporting | Display Device
+--endtable--
+4. Relationships Between Use Cases
+The guideline followed was that a step which happens on every single execution of the base use case is modelled with «include», and a step the player may or may not take is modelled with «extend» pointing back at the base.
+Base Use Case | Relation | Related Use Case | Reason for the choice
+Start New Game | «include» | Play Prologue Cutscene | A fresh run always opens with the prologue, so it is not optional.
+Start New Game | «include» | Enter First Room | Control is always handed to the player in room one.
+Enter First Room | «include» | Choose First Upgrade | The starting upgrade is picked before the first enemy spawns.
+Continue Game | «include» | Load Progress | There is nothing to continue unless the save is read back first.
+Play Game (Run) | «include» | Move Character | Movement is the base mechanic of every frame of a run.
+Play Game (Run) | «include» | Attack Enemies | Beat-synced attacking is the only way to damage anything.
+Play Game (Run) | «include» | Clear Room | A run progresses only by emptying rooms one after another.
+Play Game (Run) | «include» | Fight Boss | Each of the four acts ends in a mandatory boss encounter.
+Play Game (Run) | «include» | Choose Upgrade | Three randomised upgrades are offered after every cleared round.
+Play Game (Run) | «include» | Complete Challenges | Challenge tracking runs during the session whether or not the player engages with it.
+View Story (Cutscenes) | «include» | Watch Cutscenes | Opening the gallery has no meaning without playing a scene.
+Configure Settings | «include» | Adjust Volume / Controls | The settings screen exists to change these values.
+Pause Game | «extend» | Resume Game | The player may resume, or may pick one of the other two options instead.
+Pause Game | «extend» | Restart Run | Restarting is one optional branch out of the pause menu.
+Pause Game | «extend» | Return to Main Menu | Quitting to the menu is the third optional branch.
+--endtable--
+5. Use Case Diagram
+[IMG] 
+Fig. 3.1  Use case diagram for the Sahur Protocol game system
+6. Expanded Use Case Descriptions
+The two use cases that carry the most behaviour are written out in narrative form below.
+6.1  Play Game (Run)
+Field | Detail
+Use case name | Play Game (Run)
+Primary actor | Player
+Secondary actors | Audio System, Display Device, File System
+Pre-condition | A run has been created by Start New Game, or restored by Continue Game, and the audio track is loaded.
+Main flow | 1. The system spawns the room layout and starts the track.2. The player moves the character and dodges incoming projectiles.3. The player swings on the beat; a swing inside the timing window deals damage, one outside it does not.4. When the last enemy in the room dies, the room is marked cleared.5. The system offers three randomised upgrades and the player keeps one.6. Steps 1 to 5 repeat until the act boss spawns.7. The player fights the boss through its phases and the act ends.8. Progress is written to the File System and the next act loads.
+Alternate flow | At step 3 the player may miss the beat repeatedly, in which case no damage is dealt and the enemies remain. At step 5 the player may take an upgrade that changes the timing window itself, such as Faster Rhythm, which alters how steps 2 and 3 behave for the rest of the run.
+Exception flow | If health reaches zero the run ends and the player is returned to the main menu with the run discarded. If the audio track fails to load, the beat reference is lost and the run cannot be scored, so the system aborts back to the menu.
+Post-condition | Either the run is saved at a further point of progress, or the run is over and no save is written.
+--endtable--
+6.2  Start New Game
+Field | Detail
+Use case name | Start New Game
+Primary actor | Player
+Secondary actors | Audio System, Display Device
+Pre-condition | The player is on the main menu and the game assets have finished loading.
+Main flow | 1. The player selects New Game.2. The system plays the prologue cutscene.3. The system loads the first room and hands control to the player.4. The player is shown three starting upgrades and picks one.5. Control passes to Play Game (Run).
+Alternate flow | At step 2 the player may skip the prologue, in which case the system jumps straight to step 3.
+Exception flow | If an existing save is present, the system warns that starting a new run will overwrite it and waits for confirmation before continuing to step 2.
+Post-condition | A run is active in the first room with one upgrade already applied.
+--endtable--
+7. Exceptions Considered While Refining the Model
+Following the exception brainstorming described in the theory, the following situations were checked against each primary use case.
+•  Validation: Continue Game is meaningless if no save file exists, so the menu option is greyed out rather than allowed to fail inside Load Progress.
+•  Supporting actor failure: if the Audio System does not respond, the beat reference disappears and Attack Enemies has no timing window to check against. The run is aborted instead of being allowed to continue in a broken state.
+•  Storage failure: a write error during Save Progress leaves the previous save intact, so the player loses the current act rather than the whole run.
+•  Performance: if the frame rate drops far enough for Render Game Graphics to lag behind the audio, the player sees the swing land late even though the input was on the beat. This is the one exception that produces wrong behaviour without an error message.
+8. Observations and Learnings
+Twenty-six use cases came out of the analysis, ten of them started directly by an actor and sixteen reachable only through an include or extend relationship. The split was not obvious at the start. The first draft of the list had Move Character and Attack Enemies sitting as top-level use cases with their own association lines to the Player, which looked reasonable because the player really does press those keys. It is wrong, though, because a use case has to deliver an outcome the actor cares about on its own, and pressing a movement key outside of a run delivers nothing. Both were pushed down into Play Game (Run) as included use cases.
+The include versus extend decision was the other thing that needed a second pass. Choose Upgrade was first drawn as an extension of Play Game (Run) on the reasoning that the player picks it, so it must be optional. The upgrade screen appears after every cleared round whether the player wants it or not, and only the choice within the screen is free, so it is an include. The three options hanging off Pause Game are the genuine extends, because after pausing the player may resume, restart or quit, and the base use case is complete without any of them.
+Load Progress appears twice in the diagram, once as the supporting use case included by Continue Game and once on the right associated with the File System actor. It is a single use case drawn in two places to keep the connector lines from crossing the whole width of the frame. Two gaps were also noticed while reviewing the drawing. Exit Game has no association line back to the Player, which it should have, and Save Progress is connected only to the File System with nothing inside the system triggering it. Clear Room is the natural trigger, so a «include» arrow from Clear Room to Save Progress would close that gap.
+Separating the three device actors from the Player also changed how the system boundary was drawn. The Audio System is not a passive output channel here the way it is in most games. Because damage depends on the beat, the audio track is a source of timing that the combat logic reads from, which is why Play Music / Sound Effects is modelled as a supporting use case rather than left out of the diagram entirely.
+9. Conclusion
+The user’s view analysis for Sahur Protocol was carried out and the use case diagram for the system was drawn. Scenario-based modelling was applied by starting from the activities a single actor performs, which produced the ten actor-facing use cases, and then refining each of them for alternate paths and error conditions, which produced the sixteen included and extending ones. Actors and use cases were listed before any drawing was attempted, and the include and extend relationships were assigned using the test of whether a step runs on every execution of the base use case or only on some. Exceptions were brainstormed against each primary use case, and two of them, audio failure and frame lag against the beat, turned out to be specific to the rhythm mechanic rather than generic game failures. The diagram in Fig. 3.1 is the output required by the sheet, and the review of it also surfaced two missing associations that will be corrected in the next revision.

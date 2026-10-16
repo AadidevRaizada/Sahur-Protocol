@@ -1,0 +1,166 @@
+============================== EXP-4-ACTIVITY-Sahur-Protocol-N152.docx
+IMAGES: [('word/media/image1.jpeg', 28018), ('word/media/image2.png', 211383)]
+EXPERIMENT – 4
+Aim: To create Activity Diagram for the Sahur Protocol game (gameplay loop)
+Name: Aadidev RaizadaRoll No.: N152
+Class: EBatch: E2
+Date of Experiment: 27/08/2026Date of Submission: 30/08/2026
+Prerequisite:
+Basic understanding of functionality for the system to be designed
+Outcome: After successful completion of this experiment students will be able to
+Understand the various activities in the system to be developed.
+Identify the actors who would be performing these activities.
+Theory:
+What is Scenario based modeling?
+How to find out the set of activities in a activity diagram
+Guidelines for finding out the usage of various symbols in an activity diagram.
+Activity diagram is another important diagram in UML to describe dynamic aspects of the system.
+Activity diagram is basically a flow chart to represent the flow form one activity to another activity. The activity can be described as an operation of the system.
+So the control flow is drawn from one operation to another. This flow can be sequential, branched or concurrent. Activity diagrams deals with all type of flow control by using different elements like fork, join etc.
+Purpose:
+The basic purposes of activity diagrams are similar to other four diagrams. It captures the dynamic behaviour of the system. Other four diagrams are used to show the message flow from one object to another but activity diagram is used to show message flow from one activity to another.
+Activity is a particular operation of the system. Activity diagrams are not only used for visualizing dynamic nature of a system but they are also used to construct the executable system by using forward and reverse engineering techniques. The only missing thing in activity diagram is the message part.
+It does not show any message flow from one activity to another. Activity diagram is some time considered as the flow chart. Although the diagrams looks like a flow chart but it is not. It shows different flow like parallel, branched, concurrent and single.
+So the purposes can be described as:
+Draw the activity flow of a system.
+Describe the sequence from one activity to another.
+Describe the parallel, branched and concurrent flow of the system.
+How to draw Activity Diagram?
+Activity diagrams are mainly used as a flow chart consists of activities performed by the system. But activity diagram are not exactly a flow chart as they have some additional capabilities. These additional capabilities include branching, parallel flow, swimlane etc.
+Before drawing an activity diagram we must have a clear understanding about the elements used in activity diagram. The main element of an activity diagram is the activity itself. An activity is a function performed by the system. After identifying the activities we need to understand how they are associated with constraints and conditions.
+So before drawing an activity diagram we should identify the following elements:
+Activities
+Association
+Conditions
+Constraints
+Once the above mentioned parameters are identified we need to make a mental layout of the entire flow. This mental layout is then transformed into an activity diagram.
+The following is an example of an activity diagram for order management system. In the diagram four activities are identified which are associated with conditions. One important point should be clearly understood that an activity diagram cannot be exactly matched with the code. The activity diagram is made to understand the flow of activities and mainly used by the business users.
+The following diagram is drawn with the four main activities:
+Send order by the customer
+Receipt of the order
+Confirm order
+Dispatch order
+After receiving the order request condition checks are performed to check if it is normal or special order. After the type of order is identified dispatch activity is performed and that is marked as the termination of the process.
+[IMG] 
+Where to use Activity Diagrams?
+The basic usage of activity diagram is similar to other four UML diagrams. The specific usage is to model the control flow from one activity to another. This control flow does not include messages.
+The activity diagram is suitable for modeling the activity flow of the system. An application can have multiple systems. Activity diagram also captures these systems and describes flow from one system to another. This specific usage is not available in other diagrams. These systems can be database, external queues or any other system.
+Now we will look into the practical applications of the activity diagram. From the above discussion it is clear that an activity diagram is drawn from a very high level. So it gives high level view of a system. This high level view is mainly for business users or any other person who is not a technical person.
+This diagram is used to model the activities which are nothing but business requirements. So the diagram has more impact on business understanding rather implementation details.
+Following are the main usages of activity diagram:
+Modeling work flow by using activities.
+Modeling business requirements.
+High level understanding of the system's functionalities.
+Investigate business requirements at a later stage.
+Procedure:
+Analyze the system to find out the various activities.
+List down the set of activities and the various Actors in the system who would be performing those set of activities.
+Draw a Activity diagram showing all the activities.
+Output:A Activity diagram for the System.
+Case Study: Sahur Protocol – Gameplay Loop
+Sahur Protocol is a single-file, retro 2D roguelike browser game (source: github.com/AadidevRaizada/Sahur-Protocol) in which the player survives a sequence of rooms, collects relics, and ultimately confronts a final boss called “The AI Bubble”, assisted by a companion character named Sahur. The activity diagram below models the gameplay loop of this system – from launching the game to reaching either the Game Over screen or the Victory / End screen – including the decision points, branching and looping behaviour that occur as the player moves through rooms and into the final boss fight.
+Activities Identified:
+– Launch Game / Main Menu – player starts the application and reaches the title screen
+– Start New Run – initializes a fresh roguelike run
+– Play Intro Cutscene – introduces the story and the companion, Sahur
+– Enter Next Room – player moves into the next room of the current run
+– Fight Enemies – combat encounter within a room
+– Choose a Relic – player selects a relic/power-up reward
+– Check Player HP – system checks whether the player has survived the room
+– Show Game Over Screen – displayed if the player's HP reaches zero
+– Enter Boss Room – reached once all regular rooms are cleared
+– Battle the AI Bubble – the final boss encounter, assisted by Sahur
+– Play Finale Cutscene – story resolution after the boss is defeated
+– Show Victory / End Screen – final screen shown at the end of a successful run
+Actors Identified:
+– Player – the primary actor who starts runs, moves between rooms, fights enemies and the boss, and chooses relics
+– Game System – secondary actor that evaluates HP/defeat conditions, tracks room progress, and triggers cutscenes and end screens
+Activity Diagram:
+[IMG] 
+Fig. Activity diagram for the Sahur Protocol gameplay loop, showing the initial node, room-type branch, HP and rooms-cleared decision points, the boss encounter, and the two possible final nodes (Game Over / Victory).
+Conclusion:
+The activity diagram successfully models the dynamic flow of the Sahur Protocol gameplay loop, capturing the sequential, branched and looping control flow between activities – from entering a room, through combat or relic choices, HP and clear-condition checks, up to the final boss battle against the AI Bubble and the two possible end states of the system.
+============================== EXP-5-CLASS_N152.docx
+IMAGES: [('word/media/image1.png', 522159)]
+EXPERIMENT - 5
+Name: Aadidev Raizada   |   Roll No.: N152   |   Class: E   |   Batch: E2   |   Date of Experiment: 02/09/2026   |   Date of Submission: 02/09/2026
+Aim: To create a Class Diagram for Sahur Protocol (a browser-based single-file roguelike game)
+Prerequisite:
+Basic understanding of functionality for the system to be designed
+Outcome: After successful completion of this experiment students will be able to
+Identify the various Classes and their association with each other.
+Identify the various attributes and functionality of individual classes.
+Theory:
+What is Data modeling?
+Data modeling in software engineering is the process of creating a data model for an information system by applying formal data modeling techniques.
+Data modeling is a process used to define and analyze data requirements needed to support the business processes within the scope of corresponding information systems in organizations. Therefore, the process of data modeling involves professional data modelers working closely with business stakeholders, as well as potential users of the information system.
+There are three different types of data models produced while progressing from requirements to the actual database to be used for the information system.[2] The data requirements are initially recorded as a conceptual data model which is essentially a set of technology independent specifications about the data and is used to discuss initial requirements with the business stakeholders. The conceptual model is then translated into a logical data model, which documents structures of the data that can be implemented in databases. Implementation of one conceptual data model may require multiple logical data models. The last step in data modeling is transforming the logical data model to a physical data model that organizes the data into tables, and accounts for access, performance and storage details. Data modeling defines not just data elements, but also their structures and the relationships between them.[3]
+Data modeling techniques and methodologies are used to model data in a standard, consistent, predictable manner in order to manage it as a resource. The use of data modeling standards is strongly recommended for all projects requiring a standard means of defining and analyzing data within an organization, e.g., using data modeling:
+to assist business analysts, programmers, testers, manual writers, IT package selectors, engineers, managers, related organizations and clients to understand and use an agreed semi-formal model the concepts of the organization and how they relate to one another
+to manage data as a resource
+for the integration of information systems
+for designing databases/data warehouses (aka data repositories)
+Data modeling may be performed during various types of projects and in multiple phases of projects. Data models are progressive; there is no such thing as the final data model for a business or application. Instead a data model should be considered a living document that will change in response to a changing business. The data models should ideally be stored in a repository so that they can be retrieved, expanded, and edited over time. Whitten (2004) determined two types of data modeling:
+Strategic data modeling: This is part of the creation of an information systems strategy, which defines an overall vision and architecture for information systems is defined. Information engineering is a methodology that embraces this approach.
+Data modeling during systems analysis: In systems analysis logical data models are created as part of the development of new databases.
+Data modeling is also used as a technique for detailing business requirements for specific databases. It is sometimes called database modeling because a data model is eventually implemented in a database.
+How to identify the Classes for a scenario.
+For a scenario, Classes can be identified using these six class selection characteristics
+Retained information
+Information must be remembered about the system over time
+Needed services
+Set of operations that can change the attributes of a class
+Multiple attributes
+Whereas, a single attribute may denote an atomic variable rather than a class
+Common attributes
+A set of attributes apply to all instances of a class
+Common operations
+A set of operations apply to all instances of a class
+Essential requirements
+Entities that produce or consume information
+Guidelines for selecting appropriate classes and deciding their attributes and functions.
+Attributes and operations can be selected using the following steps:
+Attributes of a class are those nouns from the grammatical parse that reasonably belong to a class
+Attributes hold the values that describe the current properties or state of a class
+An attribute may also appear initially as a potential class that is later rejected because of the class selection criteria
+In identifying attributes, the following question should be answered
+What data items (composite and/or elementary) will fully define a specific class in the context of the problem at hand?
+Usually an item is not an attribute if more than one of them is to be associated with a class
+Four categories of operations
+Operations that manipulate data in some way to change the state of an object (e.g., add, delete, modify)
+Operations that perform a computation
+Operations that inquire about the state of an object
+Operations that monitor an object for the occurrence of a controlling event
+An operation has knowledge about the state of a class and the nature of its associations
+The action performed by an operation is based on the current values of the attributes of a class
+Using a grammatical parse again, circle the verbs; then select the verbs that relate to the problem domain classes that were previously identified
+Procedure:
+List down the various classes for the system according to the guidelines provided.
+Decide the attributes for these Classes and the relationships between them.
+Prepare the Class diagram.
+Output:
+Class diagram for the system.
+Worked Example: Sahur Protocol
+Sahur Protocol is a single-file, browser-based 2D roguelike game. The player battles through three themed biomes with a companion character (Sahur), collects skills, and defeats each biome's boss before a final battle with “The AI Bubble”. Applying the class-selection characteristics from the Theory section to this system's own data and behaviour gives the design below.
+1. Classes identified for the system
+•  GameState – retains the run's overall progress (biome, room, unlocked skills) and provides the services needed to start rooms and end the run. [retained information + essential requirement]
+•  Player – common attributes (hp, speed, damage) and operations (attack, takeDamage) belonging to the central playable actor. [common attributes/operations]
+•  Companion (Sahur) – a distinct object with its own state (alive, cooldown, animation) and behaviour (TUNG slam), separate from Player. [multiple attributes + needed services]
+•  Enemy – a general type with attributes (hp, speed, colour, AI behaviour) common to all six enemy varieties (slopling, drone, wraith, hand, yes-man, golem). [common attributes/operations]
+•  Boss – specialises Enemy with extra attributes (attack patterns, cooldown) that only bosses have; modelled using inheritance. [needed services beyond Enemy]
+•  Bullet – short-lived projectile objects fired by enemies, tracked only while on screen. [retained information]
+•  Skill – an upgrade the player can unlock and level up, with its own rarity/family metadata and an apply() operation. [essential requirement]
+•  Biome – groups a set of rooms, an enemy mix and an assigned boss, driving level progression. [common attributes]
+•  Challenge – an optional objective tied to skill unlocks, e.g. defeating a boss under a time limit. [essential requirement]
+•  AudioManager – owns all sound/music playback so it is not duplicated across other classes. [needed services]
+2. Attributes and relationships between classes
+Each class's key attributes and operations are shown inside its box in the diagram below. The relationships used are:
+•  Composition (filled diamond) – GameState owns Player and Companion; neither exists without an active run.
+•  Aggregation (open diamond) – GameState collects Enemy, Bullet and Skill instances that are created and destroyed independently of the run itself.
+•  Association (plain arrow) – GameState is linked to Biome, Challenge and AudioManager, and Biome is linked to Boss.
+•  Generalization (hollow triangle) – Boss is a specialised Enemy, inheriting its base attributes/operations and adding attack patterns.
+•  Dependency (dashed arrow) – Enemy «fires» Bullet: Enemy uses Bullet transiently without holding a permanent reference to it.
+3. Class Diagram
+[IMG] 
+Conclusion
+The class diagram for Sahur Protocol was prepared by first identifying candidate classes using the six class-selection characteristics (retained information, needed services, multiple/common attributes, common operations and essential requirements), then defining each class's attributes and operations, and finally the associations, aggregations, compositions and the generalization between Enemy and Boss. The exercise shows how an existing system's own runtime state and data structures can be reverse-engineered into a structured, reusable class model.

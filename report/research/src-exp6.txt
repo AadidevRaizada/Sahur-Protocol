@@ -1,0 +1,58 @@
+============================== LAB-6-SE-E2-N152.docx
+IMAGES: [('word/media/image1.png', 221634), ('word/media/image2.png', 264945), ('word/media/image3.png', 246703), ('word/media/image4.png', 259362)]
+EXPERIMENT- 6
+Name: Aadidev Raizada
+Roll No.: N152      Class: E      Batch: E2
+Date of Experiment: 13/09/2026      Date of Submission: 13/09/2026
+Case Study: Sahur Protocol  (https://github.com/AadidevRaizada/Sahur-Protocol)
+Aim: To draw the behavioral view diagram for Sahur Protocol (a web-based 2D roguelike video game): Sequence diagram
+Theory:
+What is Behavioral modeling?
+All behavioural models really do is describe the control structure of a system. This can be things like:
+Sequence of operations
+Object states
+and Object interactions
+Furthermore, this modelling layer can also be called Dynamic Modelling. The activity of creating a behavioural model is commonly known as behavioural modelling. As well as this, a system should also only have one behavioural model – much like functional modelling.
+Two types of behavioral model are:
+Data processing models that show how data is processed as it moves through the system;
+State machine models that show the systems response to events.
+These models show different perspectives so both of them are required to describe the system’s behavior.
+How to draw Sequence diagrams?
+A sequence diagram is a kind of interaction diagram that shows how processes operate with one another and in what order. It is a construct of a Message Sequence Chart. A sequence diagram shows object interactions arranged in time sequence. It depicts the objects and classes involved in the scenario and the sequence of messages exchanged between the objects needed to carry out the functionality of the scenario. Sequence diagrams are typically associated with use case realizations in the Logical View of the system under development. Sequence diagrams are sometimes called event diagrams, event scenarios, and timing diagrams.A sequence diagram shows, as parallel vertical lines (lifelines), different processes or objects that live simultaneously, and, as horizontal
+arrows, the messages exchanged between them, in the order in which they occur. This allows the specification of simple runtime scenarios in a graphical manner.
+If the lifeline is that of an object, it demonstrates a role. Note that leaving the instance name blank can represent anonymous and unnamed instances.
+Messages, written with horizontal arrows with the message name written above them, display interaction. Solid arrows with full heads are asynchronous calls and dashed arrows with stick heads are return messages. This definition is true as of UML 2, considerably different from UML 1.x. a caller sends a synchronous message, it must wait until the message is done, such as invoking a subroutine. If a caller sends an asynchronous message, it can continue processing and doesn’t have to wait for a response. You see asynchronous calls in multithreaded applications and in message-oriented middleware. Activation boxes, or method-call boxes, are opaque rectangles drawn on top of lifelines to represent that processes are being performed in response to the message (ExecutionSpecifications in UML).
+Objects calling methods on themselves use messages and add new activation boxes on top of any others to indicate a further level of processing.When an object is destroyed (removed from memory), an X is drawn on top of the lifeline, and the dashed line ceases to be drawn below it (this is not the case in the first example though). It should be the result of a message, either from the object itself, or another.
+Procedure:
+Identify various elements such as controller class, objects, boundaries, messages etc. of the sequence diagram.
+Draw the sequence diagram as per the guidelines.
+Identify various elements needed for a collaboration diagram
+Identify the behavior of the systems element with the external interfaces.
+Draw the collaboration diagram and State chart diagram as per the guidelines.
+Output:A Sequence diagram of the system.
+System under study:
+Sahur Protocol is a single-file, browser-based 2D roguelike. The player fights through three biomes of rooms with Sahur as a companion, chooses a skill upgrade after every cleared room, defeats a biome boss, and finally confronts The AI Bubble. The whole run is driven by one animation loop whose mode variable moves between title, cutscene, play, choose, beats and end, while the run data is persisted to browser localStorage so that a run can be continued later.
+Elements identified for the sequence diagram:
+-  Actor - Player: supplies keyboard / touch-joystick input and menu clicks.
+-  :GameUI (boundary) - the title screen, cutscene panels, upgrade overlays and end screens.
+-  :GameCtrl (control) - the update / render loop and the mode manager of the run.
+-  :RoomMgr (control) - room set-up, enemy spawning, boss spawning and clear detection.
+-  :Enemy / :Boss / :Bubble (entity) - the opponents in a room, at a biome end, and in the finale.
+-  :RunState (entity) - player, sahur, skills, biome, room and challenge data of the current run.
+-  :SaveMgr (service) - saving, loading and clearing the run in browser localStorage.
+-  Messages - solid arrows are synchronous calls and dashed arrows are return messages; loop and alt combined fragments express the room loop, the per-frame game loop and the win / lose branches.
+A complete run contains a large number of interactions, so the sequence diagram is drawn as four continuous parts; each part begins exactly where the previous one ends.
+Sequence Diagram - Part 1 of 4 - starting a new run, the prologue cutscene and the first skill choice
+[IMG] 
+Fig. 6.1 - Sequence diagram (Part 1): the Player starts a new run, the previous save is cleared, a fresh RunState is created, the prologue cutscene is typed out line by line, and the first upgrade is chosen before the first room is set up.
+Sequence Diagram - Part 2 of 4 - the room loop, combat and the biome boss fight
+[IMG] 
+Fig. 6.2 - Sequence diagram (Part 2): for every room of the biome enemies are spawned, the per-frame game loop exchanges damage between Player and Enemy, the room is checked for clear, an upgrade is chosen and the run is saved; after the last room the biome boss is spawned and fought.
+Sequence Diagram - Part 3 of 4 - boss outcome, biome progression and the game-over branch
+[IMG] 
+Fig. 6.3 - Sequence diagram (Part 3): if the boss is defeated the challenges are evaluated, the closing cutscene plays, a skill roll is offered and the run advances to the next biome; if the Player dies instead the run ends on the game-over screen.
+Sequence Diagram - Part 4 of 4 - the final AI Bubble fight and the victory finale
+[IMG] 
+Fig. 6.4 - Sequence diagram (Part 4): after the last biome the core cutscene plays, a final upgrade is spent, The AI Bubble is fought through its phases, and the beats finale leads to the victory screen while the save is cleared.
+Conclusion:
+The behavioural view of Sahur Protocol was modelled as a UML sequence diagram in four parts. Drawing it made the control structure of the game explicit: :GameCtrl owns the mode of the run and delegates to :GameUI and :RoomMgr, each of which owns its own input and audio, while :RunState is the single entity that every object reads and writes and :SaveMgr is touched only at well-defined checkpoints - room start, room clear, biome change and the end of a run. The loop fragments show the two nested repetitions in the game, the per-room loop and the per-frame update loop, and the alt fragments capture the boss-defeated, next-biome and player-died branches. The diagram therefore records the time-ordered interaction between objects, which the static class and use-case views of the earlier experiments could not express.

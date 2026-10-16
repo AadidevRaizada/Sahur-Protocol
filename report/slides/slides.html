@@ -1,0 +1,400 @@
+<!doctype html><html><head><meta charset="utf-8"><style>@font-face { font-family: "Press Start 2P"; src: url("../assets/fonts/PressStart2P-Regular.ttf"); }
+@font-face { font-family: "Bungee"; src: url("../assets/fonts/Bungee-Regular.ttf"); }
+@font-face { font-family: "Bungee Shade"; src: url("../assets/fonts/BungeeShade-Regular.ttf"); }
+@font-face { font-family: "Silkscreen"; src: url("../assets/fonts/Silkscreen-Bold.ttf"); }
+@font-face { font-family: "VT323"; src: url("../assets/fonts/VT323-Regular.ttf"); }
+@font-face { font-family: "Space Grotesk"; src: url("../assets/fonts/SpaceGrotesk[wght].ttf"); font-weight: 300 700; }
+@font-face { font-family: "JetBrains Mono"; src: url("../assets/fonts/JetBrainsMono[wght].ttf"); font-weight: 100 800; }
+
+:root { --night:#120d1f; --panel:#1d1630; --ink:#f4f0ff; --muted:#b9b0d6; --magenta:#ff2e88; --cyan:#00c2ff; --yellow:#ffd23f; --lime:#3ddc84; --red:#ff4d4d; --violet:#9b6bff; }
+@page { size: 1920px 1080px; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #000; }
+body { font-family: "Space Grotesk", Arial, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+.slide { width: 1920px; height: 1080px; position: relative; overflow: hidden; padding: 96px 128px 120px; background: var(--night);
+  background-image: radial-gradient(ellipse at 85% 0%, rgba(123,63,228,.35), transparent 55%); break-after: page; }
+.slide .bgfx { position: absolute; left: -10%; right: -10%; bottom: -40px; height: 260px; pointer-events: none; opacity: .18;
+  background-image: linear-gradient(rgba(255,46,136,.9) 2px, transparent 2px), linear-gradient(90deg, rgba(255,46,136,.9) 2px, transparent 2px);
+  background-size: 80px 56px; transform: perspective(300px) rotateX(60deg); transform-origin: 50% 0; }
+.slide > * { position: relative; }
+
+.kicker { font-family: "Press Start 2P"; font-size: 22px; color: var(--yellow); letter-spacing: .04em; margin-bottom: 26px; }
+h2 { font-family: "Bungee"; font-weight: 400; font-size: 76px; line-height: 1.02; margin: 0 0 30px; text-transform: uppercase;
+  text-shadow: 5px 5px 0 var(--magenta), 10px 10px 0 rgba(0,194,255,.85); }
+h2 .hl { color: var(--yellow); }
+h2 s.red { text-decoration-thickness: 9px; text-decoration-color: var(--red); color: var(--muted); }
+h2 code.big { font-family: "JetBrains Mono"; font-weight: 800; font-size: .82em; text-transform: none; color: var(--cyan); text-shadow: none; background: rgba(0,194,255,.12); padding: 0 14px; border-radius: 8px; }
+.lede { font-size: 31px; line-height: 1.4; color: var(--muted); max-width: 1500px; margin: 0 0 30px; }
+.lede b, .small b { color: var(--ink); }
+.small { font-size: 26px; line-height: 1.45; color: var(--muted); margin: 22px 0 0; }
+.label { font-family: "Silkscreen"; font-size: 22px; letter-spacing: .08em; color: var(--magenta); margin: 0 0 14px; }
+code { font-family: "JetBrains Mono"; font-size: .88em; color: var(--cyan); }
+
+footer { position: absolute !important; left: 128px; right: 128px; bottom: 44px; display: flex; align-items: center; gap: 28px; font-family: "Silkscreen"; font-size: 20px; color: #8f86a8; letter-spacing: .08em; }
+footer .who { margin-left: auto; color: var(--night); background: var(--pc); padding: 8px 16px 6px; box-shadow: 4px 4px 0 #fff; }
+footer .who.all { background: transparent; color: #8f86a8; box-shadow: none; }
+footer .num { font-family: "Press Start 2P"; font-size: 18px; color: var(--ink); }
+
+/* CRT frames */
+.crt { background: #1b1626; border-radius: 16px; padding: 12px 12px 26px; box-shadow: inset 0 0 0 2px #3a3150, 8px 8px 0 #000; position: relative; }
+.crt .screen { border-radius: 10px; overflow: hidden; line-height: 0; position: relative; }
+.crt .screen img { width: 100%; display: block; }
+.crt .screen::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.45) 100%); }
+.crt::after { content: "● P1"; position: absolute; left: 18px; bottom: 5px; font-family: "Silkscreen"; font-size: 14px; color: var(--lime); letter-spacing: .1em; }
+figure { margin: 0; }
+figcaption { font-family: "Silkscreen"; font-size: 19px; color: var(--muted); margin-top: 12px; letter-spacing: .05em; }
+
+/* stats */
+.stats { display: flex; gap: 26px; margin-top: 28px; }
+.stats.col { flex-direction: column; margin-top: 0; }
+.stats.grid2 { display: grid; grid-template-columns: 1fr 1fr; margin-top: 0; }
+.stats.tight .stat { padding: 16px 20px; }
+.stat { flex: 1; border: 4px solid var(--ink); background: var(--panel); padding: 20px 24px 18px; box-shadow: 8px 8px 0 var(--sc); }
+.stat b { font-family: "Bungee"; font-weight: 400; font-size: 64px; line-height: 1; display: block; }
+.stat span { font-family: "Silkscreen"; font-size: 19px; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; display: block; margin-top: 10px; }
+
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: start; }
+.two.wide-left { grid-template-columns: 1.45fr 1fr; gap: 56px; }
+.row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+
+/* title */
+.slide.title { padding-top: 110px; }
+.title-grid { display: grid; grid-template-columns: 1fr 820px; gap: 70px; align-items: center; }
+.pre { font-family: "Press Start 2P"; font-size: 20px; color: var(--yellow); letter-spacing: .12em; }
+.mega { font-family: "Bungee Shade"; font-weight: 400; font-size: 138px; line-height: .95; margin: 26px 0 0; text-shadow: 7px 7px 0 var(--magenta), 14px 14px 0 var(--cyan); }
+.sub { font-family: "VT323"; font-size: 54px; color: #e8e2ff; margin-top: 30px; }
+.meta { font-family: "Silkscreen"; font-size: 21px; line-height: 1.7; color: var(--muted); margin-top: 26px; letter-spacing: .06em; }
+.players { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-top: 66px; }
+.pl { border: 4px solid #fff; background: rgba(18,13,31,.85); padding: 20px 26px; box-shadow: 8px 8px 0 var(--pc); }
+.pl .p { font-family: "Press Start 2P"; font-size: 16px; color: var(--lime); display: block; }
+.pl .n { font-weight: 700; font-size: 38px; display: block; margin-top: 12px; }
+.pl .r { font-family: "Press Start 2P"; font-size: 20px; color: var(--yellow); display: block; margin-top: 10px; }
+
+/* survey */
+ul.strike { list-style: none; padding: 0; margin: 0 0 6px; font-size: 32px; line-height: 1.55; }
+ul.strike s { color: #7d7598; text-decoration-color: var(--red); text-decoration-thickness: 4px; }
+ul.strike li.win { color: var(--night); background: var(--yellow); display: inline-block; padding: 2px 18px; margin-top: 8px; font-weight: 700; box-shadow: 6px 6px 0 var(--magenta); }
+.chips { display: flex; flex-wrap: wrap; gap: 14px; }
+.chips span { font-size: 24px; border: 3px solid var(--cyan); padding: 6px 16px; border-radius: 40px; color: var(--ink); background: rgba(0,194,255,.08); }
+.small + .label, ul.strike + .small + .label { margin-top: 30px; }
+.techs { display: grid; gap: 14px; margin-bottom: 30px; }
+.techs div { display: flex; justify-content: space-between; align-items: baseline; border: 3px solid #3a3150; padding: 14px 22px; font-size: 27px; background: var(--panel); }
+.techs div span { font-size: 23px; color: var(--muted); }
+.techs .pick { border-color: var(--yellow); box-shadow: 6px 6px 0 var(--yellow); }
+.techs .pick b { color: var(--yellow); }
+
+/* findings */
+.findings .f { border-left: 10px solid var(--cyan); background: var(--panel); padding: 18px 26px; margin-bottom: 18px; font-size: 27px; line-height: 1.4; }
+.findings .f b { display: block; font-family: "Silkscreen"; font-size: 19px; color: var(--cyan); letter-spacing: .08em; margin-bottom: 4px; }
+.findings .f.fail { border-left-color: var(--red); }
+.findings .f.fail b { color: var(--red); }
+
+/* story */
+.story { border: 4px solid var(--ink); background: var(--panel); box-shadow: 10px 10px 0 var(--violet); }
+.story .sh { display: flex; align-items: center; gap: 18px; padding: 16px 22px; border-bottom: 4px solid var(--ink); background: #261d3f; }
+.story .sid { font-family: "Press Start 2P"; font-size: 16px; background: var(--ink); color: var(--night); padding: 8px 10px; }
+.story .sh b { font-size: 30px; flex: 1; }
+.story .tag { font-family: "Silkscreen"; font-size: 17px; color: var(--violet); border: 2px solid var(--violet); padding: 4px 10px; }
+.story p { font-size: 27px; line-height: 1.45; padding: 0 26px; margin: 20px 0; }
+.story .label { padding: 0 26px; color: var(--violet); }
+.story ol { font-size: 25px; line-height: 1.45; margin: 0 0 22px; padding: 0 26px 0 64px; }
+
+/* diagrams on dark: white card */
+.diagram { background: #fff; border-radius: 10px; padding: 14px; box-shadow: 10px 10px 0 var(--cyan); line-height: 0; }
+.diagram img { width: 100%; display: block; }
+.act { display: grid; grid-template-columns: 560px 1fr; gap: 60px; align-items: start; margin-top: -10px; }
+.act .tallimg { width: 560px; }
+.act .tallimg img { height: 560px; width: auto; margin: 0 auto; }
+.ends { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.slide#s7 h2 { margin-bottom: 26px; }
+
+.map { display: grid; gap: 12px; margin-bottom: 28px; }
+.map div { display: flex; justify-content: space-between; font-size: 26px; padding: 12px 20px; background: var(--panel); border-left: 8px solid var(--magenta); }
+.map span { font-family: "JetBrains Mono"; font-size: 22px; color: var(--cyan); }
+
+.seq { display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px; }
+.seq .diagram { padding: 10px; box-shadow: 8px 8px 0 var(--magenta); height: 400px; display: flex; align-items: center; }
+.seq .diagram img { max-height: 380px; width: auto; max-width: 100%; margin: 0 auto; }
+.savebar { margin-top: 40px; display: flex; flex-direction: column; gap: 4px; }
+.savebar .note { font-family: "Silkscreen"; font-size: 21px; color: var(--yellow); margin-top: 16px; letter-spacing: .06em; }
+
+.impl { display: grid; grid-template-columns: 600px 520px 1fr; gap: 50px; align-items: start; }
+.stack { display: grid; gap: 14px; }
+.stack div { background: var(--panel); border-left: 8px solid var(--cyan); padding: 12px 20px; }
+.stack b { font-size: 28px; display: block; }
+.stack span { font-size: 21px; color: var(--muted); }
+
+ol.lessons { font-size: 27px; line-height: 1.42; padding-left: 40px; margin: 0 0 30px; }
+ol.lessons li { margin-bottom: 12px; color: var(--muted); }
+ol.lessons b { color: var(--ink); }
+.slide .bgfx { left: 0; right: 0; }
+h2 s.red { text-shadow: none; text-decoration-thickness: 6px; color: #8f86a8; }
+#s8 .diagram img { max-height: 540px; width: auto; max-width: 100%; margin: 0 auto; }
+/* v2: simple layout */
+.slide h2 { font-size: 70px; margin-bottom: 34px; }
+.summary { position: absolute !important; left: 128px; right: 128px; bottom: 104px; background: var(--yellow); color: var(--night); font-size: 31px; font-weight: 700; padding: 18px 28px 18px 24px; display: flex; align-items: center; gap: 22px; box-shadow: 8px 8px 0 var(--magenta); }
+.summary span { font-family: "Press Start 2P"; font-size: 15px; background: var(--night); color: var(--yellow); padding: 10px 12px; flex: none; }
+ul.pts { list-style: none; padding: 0; margin: 0; }
+ul.pts li { font-size: 31px; line-height: 1.38; margin-bottom: 16px; padding-left: 40px; position: relative; color: #e2dcf5; }
+ul.pts li::before { content: "▸"; position: absolute; left: 0; color: var(--magenta); }
+ul.pts b { color: #fff; }
+.flow { display: flex; flex-wrap: wrap; gap: 10px 8px; align-items: center; }
+.flow span { font-family: "Silkscreen"; font-size: 19px; background: var(--panel); border: 2px solid var(--cyan); padding: 8px 12px; letter-spacing: .03em; }
+.flow i { color: var(--yellow); font-style: normal; font-size: 24px; }
+.flow.vert { flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 26px; }
+.flow.vert span { font-family: "Space Grotesk"; font-size: 27px; letter-spacing: 0; padding: 12px 18px; }
+.flow.vert i { text-align: center; }
+.small-flow span { font-size: 24px !important; padding: 8px 16px !important; }
+.three { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 56px; }
+ul.opts { list-style: none; padding: 0; margin: 0; font-size: 29px; }
+ul.opts li { padding: 10px 18px; margin-bottom: 10px; background: var(--panel); color: var(--muted); }
+ul.opts li.win { background: var(--yellow); color: var(--night); font-weight: 700; box-shadow: 6px 6px 0 var(--magenta); }
+.reqbox { background: var(--panel); padding: 26px 30px 10px; border-top: 8px solid var(--magenta); }
+.reqbox.nfr { border-top-color: var(--cyan); }
+.reqbox ul.pts li { font-size: 27px; margin-bottom: 10px; }
+.reqbox .stats { margin: 14px 0 18px; }
+.stats.tight .stat b { font-size: 52px; }
+.two, .three, .impl, .act, .seq { max-height: 600px; }
+.slide#s6 .diagram img { max-height: 540px; width: auto; max-width: 100%; margin: 0 auto; }
+.slide#s8 .diagram img { max-height: 520px; }
+.act .tallimg img { height: 540px; }
+.act { grid-template-columns: 540px 1fr; }
+.act .tallimg { width: 540px; }
+.ends figcaption { font-size: 17px; }
+.seq .diagram { height: 380px; }
+.seq .diagram img { max-height: 360px; }
+.legend { display: flex; gap: 28px; margin-top: 30px; font-size: 25px; color: var(--muted); }
+.legend b { color: var(--cyan); }
+table.tt { width: 100%; border-collapse: collapse; font-size: 27px; border: 3px solid var(--ink); }
+table.tt th { font-family: "Silkscreen"; font-size: 19px; text-align: left; background: var(--ink); color: var(--night); padding: 10px 18px; }
+table.tt td { padding: 10px 18px; border-top: 2px solid #3a3150; background: var(--panel); }
+table.tt td.ok { color: var(--lime); font-weight: 700; width: 170px; }
+</style></head><body>
+<section class="slide title" id="s1">
+<div class="bgfx"></div>
+
+
+<div class="title-grid">
+  <div>
+    <div class="pre">★ SOFTWARE ENGINEERING MINI-PROJECT ★</div>
+    <h1 class="mega">SAHUR<br>PROTOCOL</h1>
+    <div class="sub">Building a browser game, the software engineering way</div>
+    <div class="meta">SVKM's NMIMS · MPSTME · Computer Engineering<br>Semester V · Class E · AY 2026–27</div>
+  </div>
+  <div class="crt" style="box-shadow:0 0 0 4px #2c2440, 0 0 90px rgba(255,46,136,.45)"><div class="screen"><img src="../assets/web/shots/01-title.jpg"></div></div>
+</div>
+<div class="players"><div class="pl" style="--pc:var(--magenta)"><span class="p">PLAYER 1</span><span class="n">Aadidev Raizada</span><span class="r">N152</span></div><div class="pl" style="--pc:var(--cyan)"><span class="p">PLAYER 2</span><span class="n">Kush Modi</span><span class="r">N135</span></div><div class="pl" style="--pc:var(--yellow)"><span class="p">PLAYER 3</span><span class="n">Pratham Baldewa</span><span class="r">N153</span></div></div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who all">P1 · P2 · P3</span><span class="num">01/12</span></footer>
+</section>
+<section class="slide" id="s2">
+<div class="bgfx"></div>
+<div class="kicker">OVERVIEW</div>
+
+<h2>What we built, and how</h2>
+<div class="two wide-left">
+  <div>
+    <ul class="pts"><li><b>Sahur Protocol</b> is a 2D action game that runs in any web browser.</li><li>You and your companion <b>Sahur</b> fight through <b>3 worlds</b> and <b>4 bosses</b>.</li><li>Built as <b>one HTML file</b> and published online.</li></ul>
+    <div class="label" style="margin-top:34px">OUR SOFTWARE ENGINEERING PROCESS</div>
+    <div class="flow"><span>1. Survey</span><i>→</i><span>2. Requirements</span><i>→</i><span>3. NFR stories</span><i>→</i><span>4. Use case</span><i>→</i><span>5. Activity</span><i>→</i><span>6. Class</span><i>→</i><span>7. Sequence</span><i>→</i><span>8. Build</span><i>→</i><span>9. Test</span></div>
+  </div>
+  <figure><div class="crt" ><div class="screen"><img src="../assets/shots/07-biome2-combat.png"></div></div><figcaption>Gameplay: the player, Sahur and enemies</figcaption></figure>
+</div>
+<div class="summary"><span>IN ONE LINE</span>We built a game and took it through every step of the software engineering life cycle.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--magenta)">▶ P1 · AADIDEV RAIZADA · N152</span><span class="num">02/12</span></footer>
+</section>
+<section class="slide" id="s3">
+<div class="bgfx"></div>
+<div class="kicker">STEP 1 · LITERATURE SURVEY · EXP 1</div>
+
+<h2>Choosing the project</h2>
+<div class="three">
+  <div>
+    <div class="label">5 IDEAS WE COMPARED</div>
+    <ul class="opts"><li>Library Management</li><li>Hospital Management</li><li>Food Delivery</li><li>Student Attendance</li><li class="win">2D action game ✔ SELECTED</li></ul>
+  </div>
+  <div>
+    <div class="label">WHY THE GAME</div>
+    <ul class="pts"><li>Real-time behaviour gives <b>richer diagrams</b>.</li><li>Can be finished in <b>one semester</b>.</li><li>Ideas taken from games like <b>Rogue, Hades</b> and <b>The Binding of Isaac</b>.</li></ul>
+  </div>
+  <div>
+    <div class="label">TECHNOLOGY CHOSEN</div>
+    <div class="techs"><div><b>Unity</b><span>game engine</span></div><div><b>Godot</b><span>game engine</span></div><div><b>Phaser</b><span>JS library</span></div><div class="pick"><b>HTML5 Canvas ✔</b><span>plain JavaScript</span></div></div>
+    <p class="small">No install, no build step: it opens from a link.</p>
+  </div>
+</div>
+<div class="summary"><span>IN ONE LINE</span>We compared 5 project ideas and chose the game because it gave us the most to design and model.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--magenta)">▶ P1 · AADIDEV RAIZADA · N152</span><span class="num">03/12</span></footer>
+</section>
+<section class="slide" id="s4">
+<div class="bgfx"></div>
+<div class="kicker">STEP 2 · REQUIREMENTS · EXP 1</div>
+
+<h2>What the game must do</h2>
+<div class="two">
+  <div class="reqbox fr">
+    <div class="label">FUNCTIONAL · WHAT IT DOES</div>
+    <ul class="pts"><li>Start a new game or <b>continue</b> a saved one</li><li>Move with <b>WASD</b>, swing with <b>Space</b></li><li>Sahur attacks enemies <b>automatically</b></li><li>3 worlds × 3 rooms + a boss, then the final boss</li><li>Pick a <b>skill upgrade</b> after every room</li><li><b>Auto-save</b> at checkpoints</li><li><b>Touch controls</b> on phones</li></ul>
+  </div>
+  <div class="reqbox nfr">
+    <div class="label">NON-FUNCTIONAL · HOW WELL</div>
+    <ul class="pts"><li><b>Performance:</b> smooth play on any screen</li><li><b>Portability:</b> desktop and mobile browsers</li><li><b>Usability:</b> readable text, clear menus</li><li><b>Reliability:</b> keeps running even if saving is blocked</li><li><b>Maintainability:</b> content kept in simple data tables</li></ul>
+    <div class="stats tight"><div class="stat" style="--sc:var(--magenta)"><b>21</b><span>functional</span></div><div class="stat" style="--sc:var(--cyan)"><b>14</b><span>non-functional</span></div></div>
+  </div>
+</div>
+<div class="summary"><span>IN ONE LINE</span>We wrote 21 functional and 14 non-functional requirements, and the finished game meets them.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--magenta)">▶ P1 · AADIDEV RAIZADA · N152</span><span class="num">04/12</span></footer>
+</section>
+<section class="slide" id="s5">
+<div class="bgfx"></div>
+<div class="kicker">STEP 3 · AGILE NFRs · EXP 2</div>
+
+<h2>Quality written as user stories</h2>
+<div class="two">
+  <div class="story">
+    <div class="sh"><span class="sid">NFR-US-02</span><b>Steady frames</b><span class="tag">PERFORMANCE</span></div>
+    <p><b>As a</b> player on a slow device, <b>I want</b> the game to stay fair when it slows down, <b>so that</b> enemies never jump across the screen.</p>
+    <div class="label">ACCEPTANCE CRITERIA</div>
+    <ol><li>The game redraws on every screen refresh.</li><li>Each update step is at most <b>33 ms</b>.</li></ol>
+  </div>
+  <div>
+    <div class="label">HOW IT WORKS</div>
+    <div class="flow vert"><span>User story: who wants what, and why</span><i>↓</i><span>Acceptance criteria: how we test it</span><i>↓</i><span>Definition of Done: when it's finished</span></div>
+    <div class="stats tight"><div class="stat" style="--sc:var(--magenta)"><b>10</b><span>stories</span></div><div class="stat" style="--sc:var(--cyan)"><b>34</b><span>criteria</span></div><div class="stat" style="--sc:var(--yellow)"><b>7</b><span>constraints</span></div></div>
+  </div>
+</div>
+<div class="summary"><span>IN ONE LINE</span>Every quality goal became a user story with acceptance criteria that can be tested.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--cyan)">▶ P2 · KUSH MODI · N135</span><span class="num">05/12</span></footer>
+</section>
+<section class="slide" id="s6">
+<div class="bgfx"></div>
+<div class="kicker">STEP 4 · USE CASE DIAGRAM · EXP 3</div>
+
+<h2>Who uses the system, and for what</h2>
+<div class="two wide-left">
+  <div class="diagram"><img src="../assets/web/diagrams/exp3-usecase.png"></div>
+  <div>
+    <ul class="pts"><li><b>Actor:</b> who uses it, mainly the <b>Player</b>, plus audio, storage and display</li><li><b>Use case:</b> a goal, e.g. <i>Start New Game, Play, Pause, Settings</i></li><li><b>«include»:</b> always happens (a new game always plays the intro)</li><li><b>«extend»:</b> optional (Resume / Restart from pause)</li></ul>
+    <div class="stats tight"><div class="stat" style="--sc:var(--magenta)"><b>4</b><span>actors</span></div><div class="stat" style="--sc:var(--cyan)"><b>26</b><span>use cases</span></div></div>
+  </div>
+</div>
+<div class="summary"><span>IN ONE LINE</span>The use case diagram shows every goal a player can achieve in the game.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--cyan)">▶ P2 · KUSH MODI · N135</span><span class="num">06/12</span></footer>
+</section>
+<section class="slide" id="s7">
+<div class="bgfx"></div>
+<div class="kicker">STEP 5 · ACTIVITY DIAGRAM · EXP 4</div>
+
+<h2>The flow of one game run</h2>
+<div class="act">
+  <div class="diagram tallimg"><img src="../assets/diagrams/exp4-activity.png"></div>
+  <div>
+    <div class="flow vert small-flow"><span>Start game → intro story</span><i>↓</i><span>Room loop: fight → pick upgrade (repeat)</span><i>↓</i><span>Boss fight → final boss</span><i>↓</i><span>Decision: HP above 0?</span></div>
+    <div class="ends">
+      <figure><div class="crt" ><div class="screen"><img src="../assets/shots/14-victory.png"></div></div><figcaption>End 1: Victory</figcaption></figure>
+      <figure><div class="crt" ><div class="screen"><img src="../assets/shots/15-gameover.png"></div></div><figcaption>End 2: Game Over</figcaption></figure>
+    </div>
+  </div>
+</div>
+<div class="summary"><span>IN ONE LINE</span>The activity diagram maps the step-by-step flow of a run, with its loop, decisions and two endings.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--cyan)">▶ P2 · KUSH MODI · N135</span><span class="num">07/12</span></footer>
+</section>
+<section class="slide" id="s8">
+<div class="bgfx"></div>
+<div class="kicker">STEP 6 · CLASS DIAGRAM · EXP 5</div>
+
+<h2>The building blocks of the game</h2>
+<div class="two wide-left">
+  <div class="diagram"><img src="../assets/web/diagrams/exp5-class.png"></div>
+  <div>
+    <ul class="pts"><li><b>Classes:</b> GameState, Player, Sahur, Enemy, Boss, Skill, Biome…</li><li><b>Attributes:</b> data, e.g. Player has <i>hp, speed, damage</i></li><li><b>Operations:</b> actions, e.g. <i>attack(), takeDamage()</i></li><li><b>Relationships:</b> composition, aggregation, association, inheritance</li></ul>
+    <div class="stats tight"><div class="stat" style="--sc:var(--magenta)"><b>10</b><span>classes</span></div><div class="stat" style="--sc:var(--cyan)"><b>54</b><span>attributes</span></div><div class="stat" style="--sc:var(--yellow)"><b>25</b><span>operations</span></div></div>
+  </div>
+</div>
+<div class="summary"><span>IN ONE LINE</span>The class diagram shows what the game is made of and how the parts are connected.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--cyan)">▶ P2 · KUSH MODI · N135</span><span class="num">08/12</span></footer>
+</section>
+<section class="slide" id="s9">
+<div class="bgfx"></div>
+<div class="kicker">STEP 7 · SEQUENCE DIAGRAM · EXP 6</div>
+
+<h2>Objects talking, step by step</h2>
+<div class="seq"><figure><div class="diagram"><img src="../assets/diagrams/exp6-seq-part1.png"></div><figcaption>Part 1 · New game</figcaption></figure><figure><div class="diagram"><img src="../assets/diagrams/exp6-seq-part2.png"></div><figcaption>Part 2 · Rooms & boss</figcaption></figure><figure><div class="diagram"><img src="../assets/diagrams/exp6-seq-part3.png"></div><figcaption>Part 3 · Next world / game over</figcaption></figure><figure><div class="diagram"><img src="../assets/diagrams/exp6-seq-part4.png"></div><figcaption>Part 4 · Final boss & ending</figcaption></figure></div>
+<div class="legend"><span><b>Lifeline</b> = an object (GameUI, GameCtrl, RoomMgr, SaveMgr)</span><span><b>Arrow</b> = a message, in time order</span><span><b>loop / alt</b> = repeat / choice</span></div>
+<div class="summary"><span>IN ONE LINE</span>The sequence diagram shows, in time order, how the parts of the game talk to each other during a run.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--yellow)">▶ P3 · PRATHAM BALDEWA · N153</span><span class="num">09/12</span></footer>
+</section>
+<section class="slide" id="s10">
+<div class="bgfx"></div>
+<div class="kicker">STEP 8 · IMPLEMENTATION</div>
+
+<h2>How we built it</h2>
+<div class="impl">
+  <div class="stats grid2"><div class="stat" style="--sc:var(--magenta)"><b>1</b><span>HTML file</span></div><div class="stat" style="--sc:var(--cyan)"><b>2,143</b><span>lines of code</span></div><div class="stat" style="--sc:var(--yellow)"><b>0</b><span>dependencies</span></div><div class="stat" style="--sc:var(--lime)"><b>7</b><span>game screens/modes</span></div></div>
+  <div class="stack">
+    <div><b>HTML5 Canvas</b><span>draws the game</span></div>
+    <div><b>JavaScript</b><span>all game logic</span></div>
+    <div><b>Web Audio</b><span>music made in code</span></div>
+    <div><b>localStorage</b><span>auto-save</span></div>
+    <div><b>Vercel</b><span>hosted online</span></div>
+  </div>
+  <figure><div class="crt" ><div class="screen"><img src="../assets/shots/16-mobile-touch.png"></div></div><figcaption>Also playable on phones</figcaption></figure>
+</div>
+<div class="summary"><span>IN ONE LINE</span>One HTML file with Canvas graphics, code-made music and auto-save, running on desktop and phone.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--yellow)">▶ P3 · PRATHAM BALDEWA · N153</span><span class="num">10/12</span></footer>
+</section>
+<section class="slide" id="s11">
+<div class="bgfx"></div>
+<div class="kicker">STEP 9 · TESTING</div>
+
+<h2>Testing the finished game</h2>
+<div class="two">
+  <div>
+    <div class="label">BLACK-BOX TESTS FROM OUR USE CASES</div>
+    <table class="tt"><tr><th>Test</th><th>Result</th></tr>
+      <tr><td>Start a new game</td><td class="ok">✔ Pass</td></tr>
+      <tr><td>Move and attack</td><td class="ok">✔ Pass</td></tr>
+      <tr><td>Defeat a boss, unlock a skill</td><td class="ok">✔ Pass</td></tr>
+      <tr><td>Pause, resume, main menu</td><td class="ok">✔ Pass</td></tr>
+      <tr><td>Continue a saved game</td><td class="ok">✔ Pass</td></tr>
+      <tr><td>Touch layout remembered</td><td class="ok">✔ Pass</td></tr>
+    </table>
+  </div>
+  <div>
+    <div class="stats grid2"><div class="stat" style="--sc:var(--cyan)"><b>14</b><span>test cases</span></div><div class="stat" style="--sc:var(--lime)"><b>11</b><span>passed</span></div></div>
+    <div class="label" style="margin-top:30px">IMPROVEMENTS FOR VERSION 2</div>
+    <ul class="pts"><li>Ask before replacing a saved game</li><li>Remember volume and mute settings</li><li>Pause the game while the phone is upright</li></ul>
+  </div>
+</div>
+<div class="summary"><span>IN ONE LINE</span>Tests based on our use cases confirmed the game works, and gave us a clear list for the next version.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--yellow)">▶ P3 · PRATHAM BALDEWA · N153</span><span class="num">11/12</span></footer>
+</section>
+<section class="slide" id="s12">
+<div class="bgfx"></div>
+<div class="kicker">CONCLUSION</div>
+
+<h2>What we achieved</h2>
+<div class="two">
+  <div>
+    <ul class="pts"><li>Built and published a <b>complete, playable game</b></li><li>Followed every SE step: <b>requirements → design → build → test</b></li><li>Drew <b>4 UML diagrams</b> and checked each one against the real game</li><li>Learned that <b>clear requirements make testing easy</b></li></ul>
+    <div class="label" style="margin-top:28px">FUTURE SCOPE</div>
+    <div class="chips"><span>Difficulty levels</span><span>Key remapping</span><span>Colour-blind mode</span><span>Gamepad support</span><span>Offline app</span></div>
+  </div>
+  <figure><div class="crt" ><div class="screen"><img src="../assets/web/shots/24-cutscene-epilogue.jpg"></div></div><figcaption>Thank you! Any questions?</figcaption></figure>
+</div>
+<div class="summary"><span>IN ONE LINE</span>A finished game, a full software engineering process, and four UML models that match the real code.</div>
+
+<footer><span>SAHUR PROTOCOL // SE MINI-PROJECT</span><span class="who" style="--pc:var(--yellow)">▶ P3 · PRATHAM BALDEWA · N153</span><span class="num">12/12</span></footer>
+</section>
+</body></html>

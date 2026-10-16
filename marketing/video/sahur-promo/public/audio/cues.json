@@ -1,0 +1,1329 @@
+{
+ "musicVolume": 0.9,
+ "duck": [
+  [
+   1140,
+   1221,
+   0.708
+  ],
+  [
+   2282,
+   2348,
+   0.708
+  ]
+ ],
+ "cues": [
+  {
+   "file": "sfx/breath_calm_slow_cut330.wav",
+   "frame": 0,
+   "volume": 0.02,
+   "dur": 330
+  },
+  {
+   "file": "sfx/room_tone_night.wav",
+   "frame": 0,
+   "volume": 0.0155
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 12,
+   "volume": 0.1497
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 24,
+   "volume": 0.1397
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 36,
+   "volume": 0.1497
+  },
+  {
+   "file": "sfx/reel_sahur_squeak.wav",
+   "frame": 48,
+   "volume": 0.106
+  },
+  {
+   "file": "sfx/swipe_tick.wav",
+   "frame": 70,
+   "volume": 0.0112
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 84,
+   "volume": 0.1413
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 96,
+   "volume": 0.1319
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 108,
+   "volume": 0.1413
+  },
+  {
+   "file": "sfx/reel_sahur_squeak.wav",
+   "frame": 120,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 156,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 168,
+   "volume": 0.1047
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 180,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/reel_sahur_squeak_drowsy.wav",
+   "frame": 192,
+   "volume": 0.1301
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 228,
+   "volume": 0.0842
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 240,
+   "volume": 0.0785
+  },
+  {
+   "file": "sfx/tung_tiny_phone.wav",
+   "frame": 252,
+   "volume": 0.0842
+  },
+  {
+   "file": "sfx/reel_sahur_squeak_drowsy.wav",
+   "frame": 264,
+   "volume": 0.0976
+  },
+  {
+   "file": "sfx/phone_chest_slide.wav",
+   "frame": 280,
+   "volume": 0.0631
+  },
+  {
+   "file": "sfx/exhale_sleepy_cut44.wav",
+   "frame": 286,
+   "volume": 0.0398,
+   "dur": 44
+  },
+  {
+   "file": "sfx/tung_tiny_phone_cloth.wav",
+   "frame": 300,
+   "volume": 0.1421
+  },
+  {
+   "file": "sfx/tung_tiny_phone_cloth_cut18.wav",
+   "frame": 312,
+   "volume": 0.1421,
+   "dur": 18
+  },
+  {
+   "file": "sfx/tung_tiny_phone_cloth_cut6.wav",
+   "frame": 324,
+   "volume": 0.1421,
+   "dur": 6
+  },
+  {
+   "file": "sfx/feed_hum_film.wav",
+   "frame": 360,
+   "volume": 0.0451
+  },
+  {
+   "file": "sfx/siren_far_uw.wav",
+   "frame": 384,
+   "volume": 0.037
+  },
+  {
+   "file": "sfx/inhale_uw.wav",
+   "frame": 452,
+   "volume": 0.038
+  },
+  {
+   "file": "sfx/duvet_rustle.wav",
+   "frame": 548,
+   "volume": 0.0355
+  },
+  {
+   "file": "sfx/sync_ping_crowd.wav",
+   "frame": 612,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/sync_ping_crowd.wav",
+   "frame": 636,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/sync_ping_crowd.wav",
+   "frame": 660,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/siren_pass.wav",
+   "frame": 672,
+   "volume": 0.0708
+  },
+  {
+   "file": "sfx/sync_ping_crowd.wav",
+   "frame": 684,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/tung_door.wav",
+   "frame": 740,
+   "volume": 0.3982
+  },
+  {
+   "file": "sfx/dust_trickle.wav",
+   "frame": 742,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/tung_door.wav",
+   "frame": 780,
+   "volume": 0.4468
+  },
+  {
+   "file": "sfx/dust_trickle.wav",
+   "frame": 782,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 790,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/tung_door.wav",
+   "frame": 820,
+   "volume": 0.5014
+  },
+  {
+   "file": "sfx/dust_trickle.wav",
+   "frame": 822,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/breath_scared_loop_s3.wav",
+   "frame": 824,
+   "volume": 0.1392
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 832,
+   "volume": 0.1141
+  },
+  {
+   "file": "sfx/siren_far_bed_s3.wav",
+   "frame": 860,
+   "volume": 0.0377
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 870,
+   "volume": 0.1286
+  },
+  {
+   "file": "sfx/door_handle.wav",
+   "frame": 872,
+   "volume": 0.0708
+  },
+  {
+   "file": "sfx/door_creak.wav",
+   "frame": 890,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/fog_hiss.wav",
+   "frame": 900,
+   "volume": 0.0801
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 904,
+   "volume": 0.1431
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 934,
+   "volume": 0.1572
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 960,
+   "volume": 0.1706
+  },
+  {
+   "file": "sfx/gasp.wav",
+   "frame": 962,
+   "volume": 0.0892
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 984,
+   "volume": 0.1839
+  },
+  {
+   "file": "sfx/step_wood_floor.wav",
+   "frame": 990,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1010,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/step_wood_floor.wav",
+   "frame": 1018,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1036,
+   "volume": 0.1951
+  },
+  {
+   "file": "sfx/step_wood_floor.wav",
+   "frame": 1046,
+   "volume": 0.245
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 1060,
+   "volume": 0.0063
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1062,
+   "volume": 0.1907
+  },
+  {
+   "file": "sfx/step_wood_floor.wav",
+   "frame": 1072,
+   "volume": 0.265
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1088,
+   "volume": 0.1865
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1114,
+   "volume": 0.1823
+  },
+  {
+   "file": "sfx/knee_wood_floor.wav",
+   "frame": 1124,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 1140,
+   "volume": 0.0871
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1142,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 1143,
+   "volume": 0.0847
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 1146,
+   "volume": 0.0759
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 1152,
+   "volume": 0.0866
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 1158,
+   "volume": 0.0856
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 1161,
+   "volume": 0.0851
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1172,
+   "volume": 0.162
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 1194,
+   "volume": 0.0759
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 1197,
+   "volume": 0.0755
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 1200,
+   "volume": 0.0785
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1206,
+   "volume": 0.1458
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 1206,
+   "volume": 0.0795
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 1212,
+   "volume": 0.0891
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 1215,
+   "volume": 0.085
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1248,
+   "volume": 0.1279
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 1290,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/mitten_wood_pfftok.wav",
+   "frame": 1336,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/exhale.wav",
+   "frame": 1342,
+   "volume": 0.0708
+  },
+  {
+   "file": "sfx/heartbeat_calm.wav",
+   "frame": 1350,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/bed_creak.wav",
+   "frame": 1352,
+   "volume": 0.0355
+  },
+  {
+   "file": "sfx/wood_creak_small.wav",
+   "frame": 1356,
+   "volume": 0.0355
+  },
+  {
+   "file": "sfx/forest_night_glitch_mont.wav",
+   "frame": 1410,
+   "volume": 0.0769
+  },
+  {
+   "file": "sfx/heartbeat_calm.wav",
+   "frame": 1410,
+   "volume": 0.0708
+  },
+  {
+   "file": "sfx/step_soft.wav",
+   "frame": 1410,
+   "volume": 0.0355
+  },
+  {
+   "file": "sfx/step_sahur_wood.wav",
+   "frame": 1430,
+   "volume": 0.0631
+  },
+  {
+   "file": "sfx/lantern_creak.wav",
+   "frame": 1444,
+   "volume": 0.02
+  },
+  {
+   "file": "sfx/step_soft.wav",
+   "frame": 1450,
+   "volume": 0.0355
+  },
+  {
+   "file": "sfx/step_sahur_wood.wav",
+   "frame": 1470,
+   "volume": 0.0631
+  },
+  {
+   "file": "sfx/coolant_water_river.wav",
+   "frame": 1490,
+   "volume": 0.1157
+  },
+  {
+   "file": "sfx/tape_flutter_whoosh.wav",
+   "frame": 1490,
+   "volume": 0.0563
+  },
+  {
+   "file": "sfx/tung_stump.wav",
+   "frame": 1570,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/tung_stump.wav",
+   "frame": 1610,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/tung_stump.wav",
+   "frame": 1650,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/mitten_clap.wav",
+   "frame": 1654,
+   "volume": 0.0631
+  },
+  {
+   "file": "sfx/tape_flutter_whoosh.wav",
+   "frame": 1670,
+   "volume": 0.0563
+  },
+  {
+   "file": "sfx/bird_far_intune.wav",
+   "frame": 1690,
+   "volume": 0.0282
+  },
+  {
+   "file": "sfx/rain_roof_shelter.wav",
+   "frame": 1730,
+   "volume": 0.1482
+  },
+  {
+   "file": "sfx/glass_ping_reverse.wav",
+   "frame": 1810,
+   "volume": 0.0563
+  },
+  {
+   "file": "sfx/tape_flutter_whoosh.wav",
+   "frame": 1810,
+   "volume": 0.0563
+  },
+  {
+   "file": "sfx/step_soft.wav",
+   "frame": 1850,
+   "volume": 0.0355
+  },
+  {
+   "file": "sfx/step_sahur_wood.wav",
+   "frame": 1870,
+   "volume": 0.0631
+  },
+  {
+   "file": "sfx/fire_crackle_bed_fire.wav",
+   "frame": 1890,
+   "volume": 0.2496
+  },
+  {
+   "file": "sfx/fire_pop.wav",
+   "frame": 1912,
+   "volume": 0.0892
+  },
+  {
+   "file": "sfx/fire_pop.wav",
+   "frame": 1955,
+   "volume": 0.0631
+  },
+  {
+   "file": "sfx/tung_small.wav",
+   "frame": 2004,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/tung_small.wav",
+   "frame": 2034,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/amber_shimmer.wav",
+   "frame": 2064,
+   "volume": 0.0251
+  },
+  {
+   "file": "sfx/tung_small.wav",
+   "frame": 2064,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/tung_knuckle.wav",
+   "frame": 2100,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/tung_knuckle.wav",
+   "frame": 2116,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/tung_knuckle_glitch.wav",
+   "frame": 2132,
+   "volume": 0.2513
+  },
+  {
+   "file": "sfx/static_blip.wav",
+   "frame": 2146,
+   "volume": 0.0447
+  },
+  {
+   "file": "sfx/log_settle.wav",
+   "frame": 2240,
+   "volume": 0.0563
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 2282,
+   "volume": 0.0354
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 2285,
+   "volume": 0.0296
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 2288,
+   "volume": 0.0325
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 2291,
+   "volume": 0.0285
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 2294,
+   "volume": 0.0317
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 2303,
+   "volume": 0.0314
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 2306,
+   "volume": 0.0326
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 2309,
+   "volume": 0.0317
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 2312,
+   "volume": 0.0298
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 2315,
+   "volume": 0.0283
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 2318,
+   "volume": 0.0331
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 2321,
+   "volume": 0.0295
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 2324,
+   "volume": 0.0282
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 2333,
+   "volume": 0.0341
+  },
+  {
+   "file": "sfx/label_tok_2.wav",
+   "frame": 2336,
+   "volume": 0.03
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 2339,
+   "volume": 0.0345
+  },
+  {
+   "file": "sfx/label_tok_1.wav",
+   "frame": 2342,
+   "volume": 0.0343
+  },
+  {
+   "file": "sfx/fire_pop_cut6.wav",
+   "frame": 2394,
+   "volume": 0.1996,
+   "dur": 6
+  },
+  {
+   "file": "sfx/slop_squelch.wav",
+   "frame": 2404,
+   "volume": 0.2513
+  },
+  {
+   "file": "sfx/ui_swoosh.wav",
+   "frame": 2408,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/slop_splat_1.wav",
+   "frame": 2414,
+   "volume": 0.3549
+  },
+  {
+   "file": "sfx/whip_whoosh.wav",
+   "frame": 2424,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/drone_buzz_cut18.wav",
+   "frame": 2430,
+   "volume": 0.1259,
+   "dur": 18
+  },
+  {
+   "file": "sfx/jargon_chirp_bolt.wav",
+   "frame": 2436,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/whoosh_air.wav",
+   "frame": 2438,
+   "volume": 0.1259
+  },
+  {
+   "file": "sfx/jargon_chirp_bolt.wav",
+   "frame": 2442,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/step_soft.wav",
+   "frame": 2448,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/slop_squelch.wav",
+   "frame": 2452,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/step_sahur_wood.wav",
+   "frame": 2454,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/step_soft.wav",
+   "frame": 2460,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/slop_squelch.wav",
+   "frame": 2462,
+   "volume": 0.0795
+  },
+  {
+   "file": "sfx/riser_fight.wav",
+   "frame": 2472,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/step_soft.wav",
+   "frame": 2472,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/reverse_cymbal.wav",
+   "frame": 2474,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/step_sahur_wood.wav",
+   "frame": 2478,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/step_soft.wav",
+   "frame": 2484,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/tung_fight.wav",
+   "frame": 2496,
+   "volume": 0.6312
+  },
+  {
+   "file": "sfx/slop_splat_1.wav",
+   "frame": 2500,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/drone_spinout.wav",
+   "frame": 2504,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/slop_splat_2.wav",
+   "frame": 2505,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/slop_splat_3.wav",
+   "frame": 2510,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/drone_spinout.wav",
+   "frame": 2512,
+   "volume": 0.1259
+  },
+  {
+   "file": "sfx/slop_splat_1.wav",
+   "frame": 2516,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/slop_splat_2.wav",
+   "frame": 2522,
+   "volume": 0.1413
+  },
+  {
+   "file": "sfx/slop_splat_3.wav",
+   "frame": 2528,
+   "volume": 0.1259
+  },
+  {
+   "file": "sfx/zoom_whoosh.wav",
+   "frame": 2544,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/echo_chime_swell.wav",
+   "frame": 2556,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/impact_hit.wav",
+   "frame": 2574,
+   "volume": 0.3549
+  },
+  {
+   "file": "sfx/ceramic_crack.wav",
+   "frame": 2576,
+   "volume": 0.3549
+  },
+  {
+   "file": "sfx/afterimage_scatter.wav",
+   "frame": 2580,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/coolant_water_wastes.wav",
+   "frame": 2592,
+   "volume": 0.1011
+  },
+  {
+   "file": "sfx/server_farm_hum_wastes.wav",
+   "frame": 2592,
+   "volume": 0.0587
+  },
+  {
+   "file": "sfx/wind_dust_gust.wav",
+   "frame": 2592,
+   "volume": 0.1259
+  },
+  {
+   "file": "sfx/soft_thud.wav",
+   "frame": 2600,
+   "volume": 0.1259
+  },
+  {
+   "file": "sfx/step_sahur_wood.wav",
+   "frame": 2604,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/scraper_rattle.wav",
+   "frame": 2616,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/scraper_grab.wav",
+   "frame": 2640,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/bat_hit_metal.wav",
+   "frame": 2648,
+   "volume": 0.3982
+  },
+  {
+   "file": "sfx/wraith_hiss.wav",
+   "frame": 2652,
+   "volume": 0.1259
+  },
+  {
+   "file": "sfx/riser_fight.wav",
+   "frame": 2664,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/wraith_whoosh.wav",
+   "frame": 2670,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/tung_fight.wav",
+   "frame": 2688,
+   "volume": 0.6686
+  },
+  {
+   "file": "sfx/water_ring_rush.wav",
+   "frame": 2690,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/box_thunk.wav",
+   "frame": 2696,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/box_thunk.wav",
+   "frame": 2704,
+   "volume": 0.1259
+  },
+  {
+   "file": "sfx/crack_fizz.wav",
+   "frame": 2714,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/label_tok_3.wav",
+   "frame": 2716,
+   "volume": 0.0708
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 2736,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/box_thunk.wav",
+   "frame": 2740,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/scraper_rattle.wav",
+   "frame": 2748,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/scraper_grab.wav",
+   "frame": 2754,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/scraper_grab.wav",
+   "frame": 2760,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/whip_whoosh.wav",
+   "frame": 2766,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/impact_hit.wav",
+   "frame": 2772,
+   "volume": 0.3549
+  },
+  {
+   "file": "sfx/digit_clang.wav",
+   "frame": 2774,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/glass_shatter.wav",
+   "frame": 2774,
+   "volume": 0.3549
+  },
+  {
+   "file": "sfx/boardroom_hvac_board.wav",
+   "frame": 2784,
+   "volume": 0.059
+  },
+  {
+   "file": "sfx/card_slide_whoosh.wav",
+   "frame": 2784,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/yesman_blips.wav",
+   "frame": 2784,
+   "volume": 0.1122
+  },
+  {
+   "file": "sfx/golem_slam.wav",
+   "frame": 2816,
+   "volume": 0.5014
+  },
+  {
+   "file": "sfx/paper_topple.wav",
+   "frame": 2818,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/golem_slab_crack.wav",
+   "frame": 2824,
+   "volume": 0.3982
+  },
+  {
+   "file": "sfx/step_sahur_wood.wav",
+   "frame": 2846,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/riser_fight.wav",
+   "frame": 2856,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/crack_fizz.wav",
+   "frame": 2860,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/impact_hit_cut20.wav",
+   "frame": 2880,
+   "volume": 0.2819,
+   "dur": 20
+  },
+  {
+   "file": "sfx/tung_fight_cut20.wav",
+   "frame": 2880,
+   "volume": 0.7082,
+   "dur": 20
+  },
+  {
+   "file": "sfx/glass_shatter_cut14.wav",
+   "frame": 2886,
+   "volume": 0.2513,
+   "dur": 14
+  },
+  {
+   "file": "sfx/smile_cracks_cut12.wav",
+   "frame": 2888,
+   "volume": 0.1779,
+   "dur": 12
+  },
+  {
+   "file": "sfx/knee_wood_floor.wav",
+   "frame": 2904,
+   "volume": 0.2819
+  },
+  {
+   "file": "sfx/crack_fizz.wav",
+   "frame": 2906,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/valuation_swell_cut36.wav",
+   "frame": 2940,
+   "volume": 0.2239,
+   "dur": 36
+  },
+  {
+   "file": "sfx/riser_fight.wav",
+   "frame": 2952,
+   "volume": 0.2239
+  },
+  {
+   "file": "sfx/glass_crack_big_cut18.wav",
+   "frame": 2958,
+   "volume": 0.3982,
+   "dur": 18
+  },
+  {
+   "file": "sfx/digit_clang_cut14.wav",
+   "frame": 2962,
+   "volume": 0.2513,
+   "dur": 14
+  },
+  {
+   "file": "sfx/digit_clang_cut10.wav",
+   "frame": 2966,
+   "volume": 0.2239,
+   "dur": 10
+  },
+  {
+   "file": "sfx/digit_clang_cut6.wav",
+   "frame": 2970,
+   "volume": 0.1996,
+   "dur": 6
+  },
+  {
+   "file": "sfx/applause_synth.wav",
+   "frame": 2976,
+   "volume": 0.1
+  },
+  {
+   "file": "sfx/hype_babble.wav",
+   "frame": 3020,
+   "volume": 0.1996
+  },
+  {
+   "file": "sfx/bubble_ping_grid.wav",
+   "frame": 3040,
+   "volume": 0.0631
+  },
+  {
+   "file": "sfx/ui_swoosh.wav",
+   "frame": 3088,
+   "volume": 0.0795
+  },
+  {
+   "file": "sfx/tung_gulp.wav",
+   "frame": 3120,
+   "volume": 0.3549
+  },
+  {
+   "file": "sfx/bubble_inflate_creak.wav",
+   "frame": 3126,
+   "volume": 0.1779
+  },
+  {
+   "file": "sfx/breath_scared_loop_bubble.wav",
+   "frame": 3168,
+   "volume": 0.1718
+  },
+  {
+   "file": "sfx/shepard_riser.wav",
+   "frame": 3168,
+   "volume": 0.376
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 3180,
+   "volume": 0.1413
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 3212,
+   "volume": 0.1532
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 3240,
+   "volume": 0.166
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 3266,
+   "volume": 0.1799
+  },
+  {
+   "file": "sfx/heartbeat_scared.wav",
+   "frame": 3290,
+   "volume": 0.195
+  },
+  {
+   "file": "sfx/heartbeat_scared_cut24.wav",
+   "frame": 3312,
+   "volume": 0.2114,
+   "dur": 24
+  },
+  {
+   "file": "sfx/shoulder_pat.wav",
+   "frame": 3336,
+   "volume": 0.0708
+  },
+  {
+   "file": "sfx/breath_out_release.wav",
+   "frame": 3350,
+   "volume": 0.0501
+  },
+  {
+   "file": "sfx/breath_in_quick.wav",
+   "frame": 3396,
+   "volume": 0.0501
+  },
+  {
+   "file": "sfx/tung_knuckle.wav",
+   "frame": 3416,
+   "volume": 0.0316
+  },
+  {
+   "file": "sfx/tung_knuckle.wav",
+   "frame": 3428,
+   "volume": 0.0316
+  },
+  {
+   "file": "sfx/ear_cover_rub.wav",
+   "frame": 3440,
+   "volume": 0.0795
+  },
+  {
+   "file": "sfx/heartbeat_ears.wav",
+   "frame": 3446,
+   "volume": 0.3982
+  },
+  {
+   "file": "sfx/tung_final_1_film.wav",
+   "frame": 3500,
+   "volume": 0.7676
+  },
+  {
+   "file": "sfx/wood_chunks_ears.wav",
+   "frame": 3502,
+   "volume": 0.1994
+  },
+  {
+   "file": "sfx/bubble_groan_ears.wav",
+   "frame": 3510,
+   "volume": 0.4238
+  },
+  {
+   "file": "sfx/heartbeat_ears.wav",
+   "frame": 3536,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/letter_tinks_ears_cut72.wav",
+   "frame": 3572,
+   "volume": 0.3512,
+   "dur": 72
+  },
+  {
+   "file": "sfx/tung_final_2_film.wav",
+   "frame": 3572,
+   "volume": 0.8321
+  },
+  {
+   "file": "sfx/bubble_seam_rip_ears_cut44.wav",
+   "frame": 3576,
+   "volume": 0.7308,
+   "dur": 44
+  },
+  {
+   "file": "sfx/wood_fall_ears_cut32.wav",
+   "frame": 3600,
+   "volume": 0.1222,
+   "dur": 32
+  },
+  {
+   "file": "sfx/heartbeat_ears.wav",
+   "frame": 3606,
+   "volume": 0.1585
+  },
+  {
+   "file": "sfx/light_fizz_cut24.wav",
+   "frame": 3620,
+   "volume": 0.0159,
+   "dur": 24
+  },
+  {
+   "file": "sfx/tung_pop_film.wav",
+   "frame": 3644,
+   "volume": 0.972
+  },
+  {
+   "file": "sfx/tinnitus.wav",
+   "frame": 3690,
+   "volume": 0.0708
+  },
+  {
+   "file": "sfx/room_tone_morning_film.wav",
+   "frame": 3800,
+   "volume": 0.0135
+  },
+  {
+   "file": "sfx/exhale_laugh.wav",
+   "frame": 3848,
+   "volume": 0.0316
+  },
+  {
+   "file": "sfx/bird_detuned_1.wav",
+   "frame": 3880,
+   "volume": 0.0224
+  },
+  {
+   "file": "sfx/duvet_rustle.wav",
+   "frame": 3920,
+   "volume": 0.0282
+  },
+  {
+   "file": "sfx/bird_detuned_2.wav",
+   "frame": 3930,
+   "volume": 0.02
+  },
+  {
+   "file": "sfx/bird_detuned_3.wav",
+   "frame": 3962,
+   "volume": 0.02
+  },
+  {
+   "file": "sfx/inhale.wav",
+   "frame": 4004,
+   "volume": 0.0282
+  },
+  {
+   "file": "sfx/bird_detuned_1_cut68.wav",
+   "frame": 4012,
+   "volume": 0.02,
+   "dur": 68
+  },
+  {
+   "file": "sfx/bird_detuned_2_cut40.wav",
+   "frame": 4040,
+   "volume": 0.0224,
+   "dur": 40
+  },
+  {
+   "file": "sfx/tung_distant.wav",
+   "frame": 4140,
+   "volume": 0.2026
+  },
+  {
+   "file": "sfx/breath_catch.wav",
+   "frame": 4146,
+   "volume": 0.0398
+  }
+ ]
+}

@@ -1,0 +1,334 @@
+{
+  "ranAt": "2026-10-13T18:40:27.903Z",
+  "browser": "Chrome (headless, puppeteer-core 23.11.1)",
+  "results": [
+    {
+      "id": "TC-01",
+      "scenario": "Start New Game",
+      "expected": "Prologue, FIRST UPGRADE, room 1/3",
+      "observed": "prologue cutscene (prologue); \"FIRST UPGRADE\" with 3 cards; play in biome 1, room 1/3, 5 enemies queued/alive",
+      "verdict": "Pass",
+      "evidence": {
+        "fu": {
+          "title": "FIRST UPGRADE",
+          "n": 3
+        },
+        "r1": {
+          "biome": 0,
+          "room": 0,
+          "boss": false,
+          "queued": 5
+        }
+      }
+    },
+    {
+      "id": "TC-02",
+      "scenario": "Advance the prologue",
+      "expected": "1st press completes line, 2nd advances",
+      "observed": "typing true→false on line 0; next press moved to line 1",
+      "verdict": "Pass",
+      "evidence": {
+        "c0": {
+          "m": "cutscene",
+          "id": "prologue",
+          "i": 0,
+          "typing": true
+        },
+        "c1": {
+          "i": 0,
+          "typing": false
+        },
+        "c2": {
+          "i": 1
+        }
+      }
+    },
+    {
+      "id": "TC-03",
+      "scenario": "Move and attack",
+      "expected": "8-way move; one swing per tap",
+      "observed": "D for 0.4 s moved 94 px; W+D moved 65/67 px (diagonal 93 px, normalised); holding Space 1 s gave 1 swing, 3 taps gave 3",
+      "verdict": "Pass",
+      "evidence": {
+        "straight": 93.69000000000017,
+        "dx": 65.19878075930546,
+        "dy": 66.7962807593054,
+        "held": 1,
+        "taps": 3
+      }
+    },
+    {
+      "id": "TC-04",
+      "scenario": "Clear Room",
+      "expected": "Up to 3 distinct upgrade cards",
+      "observed": "\"CHOOSE AN UPGRADE\" with 3 cards, all distinct: true",
+      "verdict": "Pass",
+      "evidence": {
+        "title": "CHOOSE AN UPGRADE",
+        "names": [
+          "Good Shoes",
+          "Faster Rhythm",
+          "Mixtape '07"
+        ]
+      }
+    },
+    {
+      "id": "TC-05",
+      "scenario": "Fight Boss: Echo",
+      "expected": "Cutscene, Signal Roll, biome 2",
+      "observed": "boss echo in room 4; defeat → cutscene biome1_end → \"SIGNAL ROLL\" → biome 2, room 1",
+      "verdict": "Pass",
+      "evidence": {
+        "bossIn": {
+          "room": 3,
+          "boss": "echo"
+        },
+        "bc": "biome1_end",
+        "sr": "SIGNAL ROLL",
+        "b2": {
+          "biome": 1,
+          "room": 0
+        },
+        "hudRoom": 0
+      }
+    },
+    {
+      "id": "TC-06",
+      "scenario": "Fight Boss: Valuation",
+      "expected": "\"NOT YET\" until its big burst",
+      "observed": "valuation: hit before burst 560→560 HP; window opened after its burst: true; hit in window 560→550 HP; window closed after 4 s: true",
+      "verdict": "Pass",
+      "evidence": {
+        "v0": {
+          "id": "valuation",
+          "vuln": false,
+          "before": 560,
+          "after": 560
+        },
+        "v1": {
+          "vuln": true,
+          "before": 560,
+          "after": 550,
+          "vulnT": 3.9028
+        },
+        "v2": false
+      }
+    },
+    {
+      "id": "TC-07",
+      "scenario": "Pause, resume, main menu",
+      "expected": "World freezes; CONTINUE shown",
+      "observed": "Esc → pause (overlay flex); world frozen for 0.6 s: true; RESUME → play; MAIN MENU → title, CONTINUE display block",
+      "verdict": "Pass",
+      "evidence": {
+        "pz": "pause",
+        "frozen": true,
+        "resumed": "play",
+        "mm": {
+          "m": "title",
+          "cont": "block"
+        }
+      }
+    },
+    {
+      "id": "TC-08",
+      "scenario": "Continue Game",
+      "expected": "Saved room, skills and HP",
+      "observed": "save: biome 2 room 1, HP 90; restored: biome 2 room 1, HP 90; skill levels identical: true",
+      "verdict": "Pass",
+      "evidence": {
+        "saved": {
+          "v": 1,
+          "savedAt": 1791916786553,
+          "biome": 1,
+          "room": 0,
+          "relics": [
+            "Mixtape '07 Lv.1",
+            "Good Shoes Lv.1",
+            "Sharp Take Lv.1",
+            "Louder Voice Lv.1"
+          ],
+          "skillLevels": {
+            "Mixtape '07": 1,
+            "Good Shoes": 1,
+            "Sharp Take": 1,
+            "Louder Voice": 1
+          },
+          "unlockedSkills": [
+            "Louder Voice",
+            "Quick Wit",
+            "Sharp Take",
+            "Touch Grass",
+            "Good Shoes",
+            "Thick Skin",
+            "Mixtape '07",
+            "Wider Bat",
+            "Faster Rhythm",
+            "Borrowed Beat"
+          ],
+          "completedChallenges": [
+            "first_room",
+            "echo_defeated",
+            "echo_speed",
+            "boss_no_heal"
+          ],
+          "roomsCleared": 3,
+          "speedBosses": 1,
+          "playerHp": 90,
+          "playerMaxHp": 100
+        },
+        "ct": {
+          "biome": 1,
+          "room": 0,
+          "hp": 90,
+          "skills": {
+            "Mixtape '07": 1,
+            "Good Shoes": 1,
+            "Sharp Take": 1,
+            "Louder Voice": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "TC-09",
+      "scenario": "New game over a save",
+      "expected": "Warning before overwriting",
+      "observed": "save existed: true; WAKE UP → cutscene immediately, 0 confirmation dialogs, save afterwards: deleted",
+      "verdict": "Fail",
+      "evidence": {
+        "had": true,
+        "dialogs": 0,
+        "nw": {
+          "m": "cutscene",
+          "save": null
+        }
+      }
+    },
+    {
+      "id": "TC-10",
+      "scenario": "HP reaches 0",
+      "expected": "ABSORBED; RETRY CHECKPOINT",
+      "observed": "mode end, title \"ABSORBED\", button \"RETRY CHECKPOINT\", save kept: true; button → play",
+      "verdict": "Pass",
+      "evidence": {
+        "m": "end",
+        "t": "ABSORBED",
+        "b": "RETRY CHECKPOINT",
+        "kept": true
+      }
+    },
+    {
+      "id": "TC-11",
+      "scenario": "HP 0 with Second Wind",
+      "expected": "Revive at 50% HP",
+      "observed": "revives 1→0; HP 50/100; mode stays play",
+      "verdict": "Pass",
+      "evidence": {
+        "r0": 1,
+        "m": "play",
+        "hp": 50,
+        "max": 100,
+        "r1": 0
+      }
+    },
+    {
+      "id": "TC-12",
+      "scenario": "Mute and volume",
+      "expected": "All audio silenced or scaled",
+      "observed": "M: muted true, music gain 0, choir volume 0; volume 30% → master 0.3, music gain 0.30000001192092896; after reload: muted false, master 0.7 (slider 70)",
+      "verdict": "Observed",
+      "evidence": {
+        "mu": {
+          "muted": true,
+          "gain": 0,
+          "choir": 0
+        },
+        "vol": {
+          "mv": 0.3,
+          "gain": 0.30000001192092896
+        },
+        "rl": {
+          "muted": false,
+          "mv": 0.7,
+          "slider": "70"
+        }
+      }
+    },
+    {
+      "id": "TC-13",
+      "scenario": "Touch layout, then reload",
+      "expected": "Layout kept",
+      "observed": "coarse pointer: true; joystick size set to 160 px → stored {\"stickSize\":160,\"stickLeft\":8,\"stickBottom\":8,\"attackSize\":92,\"moveMode\":\"joystick\"}; after reload size 160 px (slider 160)",
+      "verdict": "Pass",
+      "evidence": {
+        "stored": "{\"stickSize\":160,\"stickLeft\":8,\"stickBottom\":8,\"attackSize\":92,\"moveMode\":\"joystick\"}",
+        "after": {
+          "size": 160,
+          "slider": "160"
+        }
+      }
+    },
+    {
+      "id": "TC-14",
+      "scenario": "Phone in portrait",
+      "expected": "ROTATE DEVICE overlay",
+      "observed": "overlay display \"flex\" on load and \"flex\" during play; mode play; world kept updating under the overlay: true",
+      "verdict": "Observed",
+      "evidence": {
+        "rot": "flex",
+        "t0": {
+          "m": "play",
+          "e": [],
+          "q": 4
+        },
+        "t1": {
+          "m": "play",
+          "e": [
+            [
+              572.8989770388971,
+              482.67921582907724
+            ],
+            [
+              440.77532649465934,
+              59.99608146009376
+            ]
+          ],
+          "q": 2,
+          "rot": "flex"
+        }
+      }
+    },
+    {
+      "id": "E2E",
+      "scenario": "Finale end to end",
+      "expected": "Victory; save deleted; CONTINUE hidden",
+      "observed": "cutscene sacrifice → beats → epilogue → \"WE WON.\" (\"AGAIN - FOR HIM\"); save present: false; CONTINUE display after reload: none",
+      "verdict": "Pass",
+      "evidence": {
+        "sac": "sacrifice",
+        "epi": "epilogue",
+        "vic": {
+          "t": "WE WON.",
+          "b": "AGAIN - FOR HIM",
+          "save": null
+        },
+        "contAfter": "none"
+      }
+    },
+    {
+      "id": "X-01",
+      "scenario": "Storage blocked",
+      "expected": "Game stays playable; nothing saved",
+      "observed": "with every localStorage call throwing: new run, room clear, upgrade, pause and main menu all worked (mode title); CONTINUE display none; uncaught errors: 0",
+      "verdict": "Pass",
+      "evidence": {
+        "bs": {
+          "m": "title",
+          "cont": "none"
+        },
+        "errors": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+[2026-10-13 22:02] enemies agent: started. Read BRIEF + game drawEnemy/drawBoss. Plan: shared toy-neon shader lib, 6 enemies, 3 bosses, AI Bubble, FX, sheets.
+[2026-10-13 22:48] r1 QA pass rendered: all 6 compositions (EnemySheet, BossSheet, BubbleSheet, KeyFrameCore(+Vertical), TungWaveSheet). Fixed NaN blackout (pow of negative base in TungWave wall shader -> bloom spread NaN); all pow(x,2.0) now sq(x).
+[2026-10-13 22:58] r2-r5: coordinator fixes: uncanny in-film face (lon/lat, 1:1.35 glossy eyes w/ specular dots, eye lag/frame-skip, thin wrap-around smile), pop flash cluster 0.10-0.18, Core keyframe atmosphere (sky dome horizon + haze bands, god-rays, 3-depth debris + bokeh, clear lower third), FLIP_SIDED fix (BackSide passes were opaque), Scraper uses new HandModel.
+[2026-10-13 23:07] FINAL: full-res stills in qa/enemies/final/ (16 frames) + qa/enemies/final-sheet.jpg. README at src/enemies/README.md. Debug comp removed.

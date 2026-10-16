@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# build outputs
+dist/
+out/
+report/build/
+report/build-*/
+game3d/test/shots/
+
+# video renders and QA frames
+marketing/video/*/qa/
+marketing/video/*/public/audio/preview_mix.wav
+*.mp4
+*.mov
+*.webm
+
+# local secrets and OS junk
+.env
+.env.*
+.DS_Store
+Thumbs.db
+*.log
+!marketing/video/*/STATUS-*.log

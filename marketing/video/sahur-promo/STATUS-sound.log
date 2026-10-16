@@ -1,0 +1,6 @@
+[2026-10-13 22:22] sound agent: started. Read storyboard s4/s7, research s5, skill audio refs, engine. Choir decoded.
+[2026-10-13 22:50] sound agent: 102 new SFX generated (make_sfx.py --sahur): TUNG family on A3=220 Hz verified by partial analysis (A2/A3/A4/A5 + C#6 ring in every variant), plus feed/sirens/breath/heart/bedroom/forest/fire/fights/Bubble/morning.
+[2026-10-13 23:05] sound agent: score rendered (make_music_sahur.py): 75.000 s, feed/warmth/montage/fire/reply/fights/Bubble + choir at 4200 (offset 37.20 s); silences digital zero. cues.json + preview_mix rendered (make_cues_mix_sahur.py): 256 cues, -16.2 LUFS, TP -1.2 dBTP.
+[2026-10-13 23:10] sound agent: QA passed (qa.py): music.wav 3,600,000 samples; preview -16.41 LUFS integrated, TP -1.23 dBTP, pop loudest; 330-360 and 3650-3690 digital zero; 256 cues valid. SOUND-NOTES.md written.
+[2026-10-13 23:11] sound agent: skill updated: make_sfx.py (make_sahur, --sahur; verified bit-identical with the skill's engine), 60 reusable SFX copied to assets/sfx-story (now 166), sfx_durations.json merged, asset-catalog.md Audio section: one line per new SFX.
+[2026-10-13 23:12] sound agent: DONE. READY created (public/audio/READY).

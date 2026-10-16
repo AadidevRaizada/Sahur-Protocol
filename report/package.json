@@ -1,0 +1,23 @@
+{
+  "name": "sahur-protocol-report",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "python -I src/prep_assets.py && node src/build.js",
+    "build:pdf": "node src/build.js --pdf --pages",
+    "build:docx": "node src/build.js --docx --docx-pdf"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Builds the Sahur Protocol SE mini-project report (PDF + DOCX) from content/*.md",
+  "dependencies": {
+    "docx": "^9.5.1",
+    "markdown-it": "^14.1.0",
+    "markdown-it-attrs": "^4.3.1",
+    "markdown-it-container": "^4.0.0",
+    "pagedjs": "^0.4.3",
+    "pptxgenjs": "^3.12.0",
+    "puppeteer-core": "^23.11.1"
+  }
+}

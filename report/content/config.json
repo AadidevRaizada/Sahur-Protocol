@@ -1,0 +1,20 @@
+{
+  "title": "Sahur Protocol",
+  "subtitle": "Design and Modelling of a Browser-Based 2D Roguelike",
+  "reportType": "Software Engineering Mini-Project Report",
+  "course": "Software Engineering",
+  "semester": "Semester V",
+  "classBatch": "Class E",
+  "department": "Department of Computer Engineering",
+  "school": "Mukesh Patel School of Technology Management & Engineering",
+  "university": "SVKM's NMIMS",
+  "year": "Academic Year 2026–27",
+  "date": "October 2026",
+  "members": [
+    { "name": "Aadidev Raizada", "roll": "N152" },
+    { "name": "Kush Modi", "roll": "N135" },
+    { "name": "Pratham Baldewa", "roll": "N153" }
+  ],
+  "repo": "github.com/AadidevRaizada/Sahur-Protocol",
+  "coverShot": "shots/01-title.png"
+}

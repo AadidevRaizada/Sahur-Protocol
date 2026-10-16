@@ -1,0 +1,15 @@
+21:57 rig agent started: read BRIEF, sprites, cutscenes; planning rig (Sahur, BlobHands, Phone, POV kit, Bedroom, UI)
+22:52 Sahur rig built (src/rig/Sahur.tsx, pose.ts, expressions.ts, wood.ts, Bat.tsx, glitch.ts); lab passes qa/rig/lab0..lab4 (sprite-faithful idle, sunk eyes + carved rim, thicker limbs, bat-on-shoulder, kneel, glitch swap)
+22:52 Lantern prop (src/rig/Lantern.tsx) hangs world-down from the bat tip
+22:52 BlobHands + Phone + reel (night bus stop, glyph UI) built; HandsSheet r0 qa/rig/hands0, r1 qa/rig/hands1
+22:52 Bedroom set to storyboard layout (src/sets/Bedroom.tsx): fixed RectAreaLight direction, NaN shaft shader, door hinge moved to the right so the open leaf does not hide the doorway; lab qa/rig/bl0..bl5
+22:52 DoorwayScene (storyboard S08-S14) passes qa/rig/d0..d3; d4 in progress (label anchor, offered hand, amber)
+23:07 r1 finals rendered qa/rig/r1/ (SahurSheet, HandsSheet, KeyFrameDoorway 85..525, Vertical 125/340/490, KeyFramePhone 0/80). Critique: hands meet too low in frame, amber light blows out the mitten, bat jumps hands on the pull-up, holdBat grip weak, idle bat clipped in the sheet
+23:09 r2 fixes: pullUp pose (bat stays on shoulder), offered hand raised, amber source on his side of the hands, thumb nubs visible, holdBat across the lap, stronger doorway rim; rendering qa/rig/r2
+23:12 r2 finals verified qa/rig/r2/ (SahurSheet, HandsSheet, KeyFrameDoorway 85..525, Vertical 125/420/490, KeyFramePhone 0/80)
+23:16 Sahur additions ready: cracks 0..3 (amber growth-ordered crack map, src/rig/cracks.ts), innerLight 0..1 (600 cd), chips {t,seed,count,origin}, run/runAmount cycle, poses leap land stumble dropKnee tapStump tapStumpUp knuckleTap knuckleTapUp headTap headTapUp sitBench pullUp (qa/rig/lab5, lab6). Docs in src/rig/README.md
+23:19 BedroomA act built (src/film/acts/BedroomA.tsx + src/film/bedroom/PhoneShot, WakeShot; S08-S14 = DoorwayShot re-timed to cues 990/1018/1060/1124/label toks)
+23:28 BedroomB act built (S52 eyelid colour ramp, S53-S57 MorningShot: dark phone face down, we did it., turn to the empty kneel framing, …sahur? reach, far TUNG dust jump at 4140, turn to window). Bundle currently blocked by src/film/battle importing missing src/sets/Boardroom (not mine); waiting.
+23:54 coordinator fixes: subtitles 46/56 px + stronger shadow; phone shot re-composed (phone ~50% height, reel bigger, warm-cream mittens, 12 f fade-in); window push to 25 deg + billboard city (~30 identical posts visible, synced refresh); closed door lit by a far-wall bounce with a faint light gap; morning chest view re-staged (dark phone + mitten readable, gaze lifts for we did it.); hallway shortened out of the window sightline. Perf: sequence render ~0.6 s/frame (60 f in 56 s incl. bundle); a lone still ~7 s (page setup).
+00:02 final QA stills: qa/bedroomA/qa2h, qa2v, qa/bedroomB/qa2h, qa2v; best 1080p stills qa/bedroomA/best/ (66 672 985 1230 1336 1373 3840 4141). BedroomA + BedroomB acts done.
+00:02 REQUEST: footstep cues (step_wood_floor) at 1046 and 1072: Sahur's walk from the doorway to the kneel mark plants a foot there (990 and 1018 already match).
