@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>SAHUR PROTOCOL - prototype v0.2</title>
+<title>SAHUR PROTOCOL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <!--
   ============================================================
   SAHUR PROTOCOL - playable prototype
@@ -14,12 +14,13 @@
   A 2D roguelike: you + Tung Tung Tung Sahur vs. The AI Bubble.
 
   HOW TO EXTEND (everything is data-driven):
-    - POWERUPS[]   : add relics. {name, family, desc, apply(state)}
+    - SKILLS[]     : upgrade skills. {name, family, rarity, max, desc(l), apply(state,l)}
     - ENEMY_TYPES{}: add enemy behaviors (see 'slopling' as template)
     - BIOMES[]     : add biomes (rooms, palette, enemy mix, boss id)
     - BOSSES{}     : boss stat blocks + attack patterns
-    - CUTSCENES{}  : add scenes. {art, lines:[{s:speaker,t:text}]}
-    - SCENE_ART{}  : simple canvas illustrations per cutscene
+    - CUTSCENES{}  : add scenes. {art, lines:[{s:speaker,t:text,fx,art}]}
+    - BARKS{}      : Sahur's in-game speech bubbles
+    - SCENE_ART    : illustrated backgrounds + procedural memory/void art
   Engine sections are marked with ==== banners. No build step,
   no dependencies. Just open the file.
   ============================================================
@@ -38,10 +39,11 @@
     overflow:hidden; overscroll-behavior:none; touch-action:none;}
   #wrap{position:relative; width:100vw; height:100vh; height:100dvh; display:flex;
     align-items:center; justify-content:center; overflow:hidden;}
-  #game{background:var(--ink); image-rendering:pixelated;
+  #game{background:var(--ink);
     width:min(100vw, calc(100vh * 16 / 9)); width:min(100vw, calc(100dvh * 16 / 9)); height:auto;
     max-height:100vh; max-height:100dvh;
     aspect-ratio:16/9; touch-action:none;}
+  #wrap.portrait #game{width:min(100vw, calc(100vh * 9 / 16)); width:min(100vw, calc(100dvh * 9 / 16)); aspect-ratio:9/16;}
   /* CRT scanlines over everything */
   #wrap::after{content:""; position:absolute; inset:0; pointer-events:none;
     background:repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px);
@@ -106,10 +108,15 @@
     padding:18px 22px; min-height:110px;}
   #speaker{color:var(--real); letter-spacing:.2em; font-size:16px; margin-bottom:8px; font-weight:700;}
   #speaker.glitch{color:var(--glitch);}
+  #speaker.voice{color:var(--cyan);}
   #dtext{font-size:clamp(17px, 2.3vw, 21px); line-height:1.75; white-space:pre-wrap; font-weight:500;}
   #dhint{color:var(--dim); font-size:13px; text-align:right; margin-top:8px;
     letter-spacing:.2em;}
   #dialog.pop{animation:dline .18s ease-out;}
+  #dialog{position:relative;}
+  #skipBtn{position:absolute; right:10px; top:8px; background:transparent; border:1px solid var(--line); color:var(--dim);
+    font:700 11px Verdana, sans-serif; letter-spacing:.12em; padding:5px 9px; cursor:pointer;}
+  #skipBtn:hover, #skipBtn:focus-visible{color:var(--real); border-color:var(--real); outline:none;}
   @keyframes dline{from{transform:translateY(7px); opacity:.35;} to{transform:none; opacity:1;}}
   @keyframes menuDrift{from{transform:translate3d(-2%, -1%, 0) scale(1.02);} to{transform:translate3d(2%, 1%, 0) scale(1.08);}}
   /* power-up choice */
@@ -132,17 +139,33 @@
   .rarity.common{color:#e8e4d8;} .rarity.uncommon{color:#3dff9d;}
   .rarity.rare{color:#35e8ff;} .rarity.epic{color:#c07bff;}
   .rarity.legendary{color:#ffb547;}
+  .rarity.god{background:linear-gradient(90deg,#ff3df0,#ffb547,#3dff9d,#35e8ff); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .card.evo{border:2px solid transparent; background:linear-gradient(var(--panel),var(--panel)) padding-box, linear-gradient(120deg,#ff3df0,#ffb547,#3dff9d,#35e8ff) border-box;
+    animation:evoGlow 1.2s ease-in-out infinite alternate;}
+  @keyframes evoGlow{from{transform:translateY(0);} to{transform:translateY(-3px);}}
   .fam.SIGNAL{color:var(--danger);} .card.SIGNAL:hover{border-color:var(--danger);}
   .fam.GROUNDING{color:var(--cyan);} .card.GROUNDING:hover{border-color:var(--cyan);}
   .fam.NOSTALGIA{color:var(--real);} .card.NOSTALGIA:hover{border-color:var(--real);}
   .fam.CHAOS{color:var(--glitch);} .card.CHAOS:hover{border-color:var(--glitch);}
   @keyframes rollPulse{from{transform:translateY(0) scale(1);} to{transform:translateY(-3px) scale(1.025);}}
   /* end screens */
-  #endOv{background:rgba(7,9,15,.96); text-align:center;}
+  #endOv{background:rgba(7,9,15,.96); text-align:center; overflow:auto; padding:16px;}
+  .grade{font:700 clamp(46px,9vw,84px) "Press Start 2P", monospace; line-height:1.1; margin:6px 0 4px;}
+  .grade.gSp{background:linear-gradient(90deg,#ff3df0,#ffb547,#3dff9d,#35e8ff); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .grade.gS{color:#ff3df0;} .grade.gA{color:#ffb547;} .grade.gB{color:#3dff9d;} .grade.gC{color:#35e8ff;} .grade.gD{color:#8b8fa3;}
+  .gradeName{letter-spacing:.3em; font-weight:700; color:var(--text); margin-bottom:8px;}
+  .scoreLine{font:700 22px Verdana, sans-serif; color:var(--text); margin-bottom:10px;}
+  .best{color:#ffb547; font-size:13px; letter-spacing:.2em; border:1px solid #ffb547; padding:2px 6px; vertical-align:middle;}
+  .statGrid{display:grid; grid-template-columns:repeat(3, minmax(90px, 150px)); gap:8px 16px; justify-content:center; margin:0 auto 6px;}
+  .statGrid div{display:flex; flex-direction:column; border-top:1px solid var(--line); padding-top:4px;}
+  .statGrid span{font-size:11px; letter-spacing:.15em; color:var(--dim);} .statGrid b{font-size:18px; color:var(--text);}
+  .endNote{margin-top:12px; font-size:14px; letter-spacing:.1em;}
   #pauseOv{background:rgba(7,9,15,.72); text-align:center; gap:16px; padding:18px; overflow:auto;}
   #pauseOv .menuInfo{text-align:center;}
   #pauseControls{display:none;}
   #pauseControls.show{display:grid;}
+  #confirmOv{background:rgba(7,9,15,.92); text-align:center; gap:18px; padding:24px; z-index:8;}
+  #confirmOv .menuInfo{text-align:center; max-width:520px;}
   #rotateOv{display:none; background:rgba(7,9,15,.96); text-align:center; z-index:9; padding:24px;}
   .endBig{font-family:"Press Start 2P", monospace; font-size:clamp(16px,3vw,30px);
     letter-spacing:.1em; margin-bottom:16px; line-height:1.6;}
@@ -162,11 +185,18 @@
     color:var(--real); font-family:inherit; font-weight:700;
     font-size:15px; letter-spacing:.08em; z-index:4; touch-action:none; -webkit-user-select:none; user-select:none;}
   #atkBtn:active{background:rgba(255,181,71,.35);}
-  @media (orientation:portrait) and (pointer:coarse){
-    #rotateOv{display:flex;}
-  }
+  #dashBtn{position:absolute; right:calc(max(var(--attack-right), env(safe-area-inset-right)) + var(--attack-size) + 14px); bottom:max(var(--attack-bottom), env(safe-area-inset-bottom));
+    width:calc(var(--attack-size) * .68); height:calc(var(--attack-size) * .68); border-radius:50%; border:1px solid var(--cyan); background:rgba(53,232,255,.12);
+    color:var(--cyan); font:700 12px Verdana, sans-serif; z-index:4; touch-action:none; -webkit-user-select:none; user-select:none;}
+  #dashBtn:active{background:rgba(53,232,255,.35);}
+  #ultBtn{position:absolute; right:max(var(--attack-right), env(safe-area-inset-right)); bottom:calc(max(var(--attack-bottom), env(safe-area-inset-bottom)) + var(--attack-size) + 14px);
+    width:var(--attack-size); height:calc(var(--attack-size) * .5); border-radius:12px; border:2px solid var(--real); background:rgba(255,181,71,.25);
+    color:#ffe2b0; font:700 12px Verdana, sans-serif; letter-spacing:.06em; z-index:4; touch-action:none; display:none; -webkit-user-select:none; user-select:none;
+    animation:ultPulse .5s ease-in-out infinite alternate;}
+  #ultBtn.ready{display:block;}
+  @keyframes ultPulse{from{box-shadow:0 0 0 rgba(255,181,71,.0);} to{box-shadow:0 0 18px rgba(255,181,71,.7);}}
   @media (orientation:landscape) and (pointer:coarse){
-    #game{width:min(100vw, calc(100dvh * 16 / 9)); max-height:100dvh;}
+    #wrap:not(.portrait) #game{width:min(100vw, calc(100dvh * 16 / 9)); max-height:100dvh;}
     #pauseBtn{width:38px; height:32px; font-size:16px;}
     #atkBtn{font-size:12px;}
     #cutOv{padding:10px 0;}
@@ -204,6 +234,8 @@
   <div id="touchUI">
     <div id="stick"><div id="stickKnob"></div></div>
     <button id="atkBtn">SWING</button>
+    <button id="dashBtn">DASH</button>
+    <button id="ultBtn">TRIPLE T</button>
   </div>
 
   <div id="titleOv" class="overlay show">
@@ -211,15 +243,16 @@
     <div class="titleSub">TUNG&nbsp;&nbsp;TUNG&nbsp;&nbsp;TUNG</div>
     <button class="btn" id="startBtn">WAKE UP</button>
     <button class="btn" id="continueBtn">CONTINUE</button>
+    <div id="titleDiff" style="color:var(--dim); font-size:13px; letter-spacing:.15em; margin-top:10px; position:relative; z-index:1;"></div>
     <div class="menuNav">
       <button class="btn" data-menu="how">How to play</button>
       <button class="btn" data-menu="story">Story</button>
       <button class="btn" data-menu="options">Options</button>
     </div>
     <div class="controls">
-      <b>WASD / Arrows</b> move | <b>SPACE / J</b> tap swing | <b>C</b> challenges | <b>M</b> mute<br>
-      On touch screens: left stick moves, tap the right button to swing, tap top right for challenges.<br>
-      Sahur fights beside you. His TUNG is on a rhythm. Protect him, he cannot protect himself forever.
+      <b>WASD / Arrows</b> move | <b>SPACE / J</b> swing (hold) | <b>SHIFT / K</b> dash | <b>E</b> TRIPLE T | <b>M</b> mute<br>
+      Phone: left stick moves, SWING, DASH, and TRIPLE T when it lights up. Portrait or landscape, both work.<br>
+      <span id="titleLine"></span>
     </div>
   </div>
 
@@ -227,22 +260,38 @@
       <div class="titleBig">HOW TO PLAY</div>
       <div class="menuInfo">
         <b>Move:</b> WASD or Arrow keys.<br>
-        <b>Swing:</b> tap Space or J. Holding does not auto-swing.<br>
-        <b>Touch:</b> left stick moves, right button swings.<br><br>
-        Clear rooms, choose upgrades, then beat bosses to roll new skills into your pool. Sahur's TUNG is powerful, but it costs him more near the core.
+        <b>Swing:</b> Space or J. Hold it to keep swinging. (Auto-swing is in Options.)<br>
+        <b>Dash:</b> Shift or K. You can't be hit mid-dash, so dash through bullets.<br>
+        <b>TRIPLE T:</b> hits fill the three-part meter. When it glows, press E: Sahur steps up to the plate and knocks everything out of the park.<br>
+        <b>Touch:</b> left stick moves; SWING, DASH and TRIPLE T buttons on the right.<br><br>
+        <b>On the beat:</b> Sahur's TUNG lands on the music's beat. Swing on the beat too and you hit 30% harder (watch the BEAT light by your HP).<br>
+        <b>Protect him:</b> in boss fights Sahur has his own HP bar. If he is knocked down, stand next to him to pull him up.<br>
+        <b>Challenges:</b> each one you clear gives +4 max HP for the run. Press C to see them.<br><br>
+        Clear rooms, choose upgrades, then beat bosses to roll new skills into your pool. His TUNG gets slower near the core.
       </div>
       <button class="btn menuBtn" data-menu="main">Back</button>
     </div>
     <div class="menuPane" id="menuStory">
       <div class="titleBig">STORY</div>
       <div class="menuInfo">
-        The feed scrolls itself. Every post is the same post. Sahur is one of the last real things left, and The AI Bubble is eating everything that still has weight.
-        Walk with him, keep the rhythm, and pop the lie before it becomes the whole world.
+        <span id="storyPane"></span><br><br>
+        <span style="color:var(--dim); font-size:14px;">Sahur comes from an Indonesian tradition: before dawn in Ramadan, neighbours walk the lanes beating hollow wooden kentongan and calling "sahur!" so everyone wakes in time for the pre-dawn meal. The meme of a log with a bat grew from that call.</span>
       </div>
       <button class="btn menuBtn" data-menu="main">Back</button>
     </div>
     <div class="menuPane" id="menuOptions">
       <div class="titleBig">OPTIONS</div>
+      <div class="menuInfo"><b>Difficulty</b></div>
+      <div class="segRow" id="diffRow">
+        <button class="segBtn" data-diff="chill" type="button">CHILL</button>
+        <button class="segBtn" data-diff="normal" type="button">NORMAL</button>
+        <button class="segBtn" data-diff="spicy" type="button">SPICY</button>
+      </div>
+      <div class="menuInfo" id="diffLine" style="text-align:center; color:var(--dim); font-size:14px;"></div>
+      <div class="segRow">
+        <button class="segBtn" id="autoSwingBtn" type="button">Auto-swing: Off</button>
+        <button class="segBtn" id="shakeBtn" type="button">Screen shake: On</button>
+      </div>
       <button class="btn menuBtn" id="muteBtn">Music and sound: On</button>
       <label class="menuInfo" for="volumeSlider"><b>Volume</b></label>
       <input id="volumeSlider" type="range" min="0" max="100" value="70">
@@ -266,7 +315,7 @@
         </label>
       </div>
       <div class="menuInfo">
-        Cutscenes, levels, bosses, and finale beats use separate audio states. Starting a cutscene stops level music first.
+        Sound and volume are remembered. If your system asks for reduced motion, screen shake and flashes are turned down.
       </div>
       <button class="btn menuBtn" data-menu="main">Back</button>
     </div>
@@ -277,6 +326,7 @@
       <div id="speaker"></div>
       <div id="dtext"></div>
       <div id="dhint">SPACE / CLICK ></div>
+      <button id="skipBtn" type="button">SKIP SCENE &gt;&gt;</button>
     </div>
   </div>
 
@@ -289,7 +339,7 @@
   <div id="endOv" class="overlay">
     <div class="endBig" id="endTitle"></div>
     <div class="endSub" id="endSub"></div>
-    <button class="btn" id="endBtn">AGAIN</button>
+    <div class="segRow"><button class="btn" id="endBtn">AGAIN</button><button class="btn" id="shareBtn" type="button">COPY SCORE</button></div>
   </div>
 
   <div id="pauseOv" class="overlay">
@@ -319,6 +369,15 @@
     <button class="btn" id="restartBtn">RESTART RUN</button>
   </div>
 
+  <div id="confirmOv" class="overlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="endBig" id="confirmTitle">START OVER?</div>
+    <div class="menuInfo" id="confirmText"></div>
+    <div class="segRow">
+      <button class="btn" id="confirmYes">ERASE AND WAKE UP</button>
+      <button class="btn" id="confirmNo">KEEP MY RUN</button>
+    </div>
+  </div>
+
   <div id="rotateOv" class="overlay">
     <div class="endBig">ROTATE DEVICE</div>
     <div class="menuInfo">Landscape gives the full arena, HUD, and touch controls enough room.</div>
@@ -331,72 +390,68 @@
    ==== DATA - edit freely ====================================
    ============================================================ */
 
-const POWERUPS = [
-  {name:"Louder Voice",   family:"SIGNAL",    desc:"+40% swing damage. Harder to ignore.",            apply:s=>s.player.dmg*=1.4},
-  {name:"Quick Wit",      family:"SIGNAL",    desc:"Swing 30% faster.",                               apply:s=>s.player.atkCD*=0.7},
-  {name:"Sharp Take",     family:"SIGNAL",    desc:"+20% chance to crit for double damage.",          apply:s=>s.player.crit+=0.2},
-  {name:"Touch Grass",    family:"GROUNDING", desc:"+30 max HP and heal to full.",                    apply:s=>{s.player.maxHp+=30; s.player.hp=s.player.maxHp;}},
-  {name:"Thick Skin",     family:"GROUNDING", desc:"Take 25% less damage.",                           apply:s=>s.player.armor+=0.25},
-  {name:"Good Shoes",     family:"GROUNDING", desc:"Move 18% faster.",                                apply:s=>s.player.speed*=1.18},
-  {name:"Old Bootleg",    family:"NOSTALGIA", desc:"Heal 20 HP after every room.",                    apply:s=>s.player.roomHeal+=20},
-  {name:"Mixtape '07",    family:"NOSTALGIA", desc:"Hits restore 2 HP.",                              apply:s=>s.player.lifesteal+=2},
-  {name:"Second Wind",    family:"NOSTALGIA", desc:"Once per run: survive death at half HP.",         apply:s=>s.player.revives+=1},
-  {name:"Wider Bat",      family:"CHAOS",     desc:"Sahur's TUNG radius +35%.",                       apply:s=>s.sahur.radius*=1.35},
-  {name:"Faster Rhythm",  family:"CHAOS",     desc:"Sahur's TUNG comes 20% sooner. It costs him.",    apply:s=>s.sahur.cdMult*=0.8},
-  {name:"Borrowed Beat",  family:"CHAOS",     desc:"After each TUNG you deal +50% damage for 3s.",    apply:s=>s.player.beatBuff=true},
-];
-
 const RARITY_SCORE = { common:1, uncommon:2, rare:3, epic:4, legendary:5 };
 const SKILLS = [
   {name:"Louder Voice", family:"SIGNAL", rarity:"common", max:4,
-    unlock:{id:"first_room", text:"Clear your first room."},
     desc:l=>"Swing damage +" + (20*l) + "%.",
     apply:(s,l)=>s.player.dmg *= 1 + 0.20*l},
   {name:"Quick Wit", family:"SIGNAL", rarity:"common", max:4,
-    unlock:{id:"echo_defeated", text:"Defeat Echo."},
     desc:l=>"Swing cooldown -" + (12*l) + "%.",
     apply:(s,l)=>s.player.atkCD *= Math.max(0.42, 1 - 0.12*l)},
   {name:"Sharp Take", family:"SIGNAL", rarity:"rare", max:3,
-    unlock:{id:"echo_speed", text:"Defeat Echo in under 55 seconds."},
     desc:l=>"Crit chance +" + (12*l) + "%.",
     apply:(s,l)=>s.player.crit += 0.12*l},
   {name:"Touch Grass", family:"GROUNDING", rarity:"uncommon", max:3,
-    unlock:{id:"scraper_defeated", text:"Defeat The Scraper."},
     desc:l=>"Max HP +" + (18*l) + ".",
     apply:(s,l)=>{s.player.maxHp += 18*l;}},
   {name:"Good Shoes", family:"GROUNDING", rarity:"rare", max:3,
-    unlock:{id:"scraper_speed", text:"Defeat The Scraper in under 70 seconds."},
     desc:l=>"Move speed +" + (8*l) + "%.",
     apply:(s,l)=>s.player.speed *= 1 + 0.08*l},
   {name:"Thick Skin", family:"GROUNDING", rarity:"rare", max:3,
-    unlock:{id:"valuation_defeated", text:"Defeat The Valuation."},
     desc:l=>"Damage taken -" + (8*l) + "%.",
     apply:(s,l)=>s.player.armor += 0.08*l},
   {name:"Mixtape '07", family:"NOSTALGIA", rarity:"epic", max:3,
-    unlock:{id:"valuation_clean", text:"Defeat The Valuation under 90s without reviving."},
     desc:l=>"Hits restore " + l + " HP.",
     apply:(s,l)=>s.player.lifesteal += l},
   {name:"Second Wind", family:"NOSTALGIA", rarity:"legendary", max:2,
-    unlock:{id:"perfect_bubble_entry", text:"Reach The Bubble with 5 or more challenge clears."},
-    desc:l=>"Survive death " + l + " time" + (l>1?"s":"") + ".",
+    desc:l=>"Survive death " + l + " time" + (l>1?"s":"") + ", back at half HP.",
     apply:(s,l)=>s.player.revives += l},
   {name:"Wider Bat", family:"CHAOS", rarity:"uncommon", max:3,
-    unlock:{id:"rooms_4", text:"Clear 4 rooms."},
     desc:l=>"Sahur TUNG radius +" + (15*l) + "%.",
     apply:(s,l)=>s.sahur.radius *= 1 + 0.15*l},
   {name:"Faster Rhythm", family:"CHAOS", rarity:"epic", max:3,
-    unlock:{id:"boss_no_heal", text:"Defeat any boss without dropping below 40 HP."},
-    desc:l=>"Sahur TUNG cooldown -" + (10*l) + "%. It costs him.",
-    apply:(s,l)=>s.sahur.cdMult *= Math.max(0.55, 1 - 0.10*l)},
+    desc:l=>"Sahur TUNG comes " + (10*l) + "% sooner. It costs him: his max HP -" + (12*l) + "%.",
+    apply:(s,l)=>{ s.sahur.cdMult *= Math.max(0.55, 1 - 0.10*l); s.sahur.maxHp *= Math.max(0.6, 1 - 0.12*l); }},
   {name:"Borrowed Beat", family:"CHAOS", rarity:"legendary", max:2,
-    unlock:{id:"three_speed_bosses", text:"Beat all three biome bosses under their challenge timers."},
     desc:l=>"After each TUNG, player damage +" + (35*l) + "% for 3s.",
     apply:(s,l)=>{s.player.beatBuff=true; s.player.beatMult = 1 + 0.35*l;}},
 ];
+/* v3 skills */
+SKILLS.push(
+  {name:"Boomerang Bat", family:"CHAOS", rarity:"rare", max:3,
+    desc:l=>"Every 3rd swing throws a spinning bat. It comes back. (" + (60+30*l) + "% dmg)",
+    apply:(s,l)=>{ s.player.boomerang = l; }},
+  {name:"Kentongan Horn", family:"SIGNAL", rarity:"rare", max:3,
+    desc:l=>"Dashing knocks: a shockwave that stuns. Dash cooldown -" + (10*l) + "%.",
+    apply:(s,l)=>{ s.player.horn = l; s.player.dashCdMult = 1 - 0.10*l; }},
+  {name:"Pinch Hitter", family:"NOSTALGIA", rarity:"epic", max:3,
+    desc:l=>"TRIPLE T charges " + (35*l) + "% faster. The log likes the spotlight.",
+    apply:(s,l)=>{ s.player.tttRate = 1 + 0.35*l; }},
+  {name:"Rice Box", family:"GROUNDING", rarity:"common", max:4,
+    desc:l=>"Heal " + (8*l) + " HP every time you clear a room.",
+    apply:(s,l)=>{ s.player.roomHeal = 8*l; }},
+  {name:"Sahur Snack", family:"NOSTALGIA", rarity:"common", max:3,
+    desc:l=>"Sahur: +" + (25*l) + "% HP and heals faster. He is wood. He accepts.",
+    apply:(s,l)=>{ s.sahur.maxHp *= 1 + 0.25*l; s.sahur.regenMult = 1 + 0.5*l; }},
+  {name:"Aura Farmer", family:"SIGNAL", rarity:"rare", max:3,
+    desc:l=>"On-beat hits drop extra aura. Pickup range +" + (25*l) + "%.",
+    apply:(s,l)=>{ s.player.auraFarm = l; s.player.magnet = 1 + 0.25*l; }},
+);
 const DEFAULT_UNLOCKED_SKILLS = [
   "Louder Voice", "Quick Wit", "Sharp Take",
   "Touch Grass", "Good Shoes", "Thick Skin",
-  "Mixtape '07", "Wider Bat", "Faster Rhythm"
+  "Mixtape '07", "Wider Bat", "Faster Rhythm",
+  "Boomerang Bat", "Kentongan Horn", "Rice Box", "Sahur Snack", "Aura Farmer"
 ];
 const CHALLENGE_ROWS = [
   {id:"first_room", label:"First room"},
@@ -407,10 +462,38 @@ const CHALLENGE_ROWS = [
   {id:"scraper_speed", label:"Scraper speed"},
   {id:"valuation_defeated", label:"Valuation down"},
   {id:"valuation_clean", label:"Valuation clean"},
-  {id:"boss_no_heal", label:"No low HP boss"},
+  {id:"boss_no_heal", label:"Boss above 40 HP"},
+  {id:"sahur_standing", label:"Boss, Sahur never down"},
+  {id:"on_beat_20", label:"20 swings on the beat"},
   {id:"three_speed_bosses", label:"3 speed bosses"},
   {id:"perfect_bubble_entry", label:"Bubble entry"}
 ];
+const CHALLENGE_HP = 4;
+const ON_BEAT_WINDOW = 0.11, ON_BEAT_MULT = 1.3;      // seconds either side of the beat line
+const SAHUR_REGEN = 5, SAHUR_REGEN_DELAY = 3;         // HP/s after 3 s untouched (boss fights)
+const SAHUR_HELP_R = 64, SAHUR_HELP_TIME = 1.4, SAHUR_SELF_UP = 10;
+const SNIPE_WINDUP = 0.9;
+const DASH_TIME = 0.16, DASH_SPEED = 780, DASH_CD = 0.85;
+const COMBO_TIME = 2.6;
+const COARSE = matchMedia("(pointer:coarse)").matches;
+const CAP = { parts: COARSE ? 150 : 320, texts: 26, orbs: 90 };
+/* difficulty: CHILL / NORMAL / SPICY */
+const DIFFS = {
+  chill:  { hurt:0.5, enemyHp:0.85, sahurHp:1.5, score:0.7, elite:0.6 },
+  normal: { hurt:1,   enemyHp:1,    sahurHp:1,   score:1,   elite:1 },
+  spicy:  { hurt:1.35,enemyHp:1.35, sahurHp:1,   score:1.6, elite:1.8 },
+};
+const PREFS_KEY = "sahurProtocolPrefsV1";
+let prefs = { diff:"normal", autoSwing:COARSE, shake:1, skipSeen:false };
+try{ prefs = {...prefs, ...JSON.parse(localStorage.getItem(PREFS_KEY) || "{}")}; }catch(e){}
+if(!DIFFS[prefs.diff]) prefs.diff = "normal";
+function savePrefs(){ try{ localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); }catch(e){} }
+function diff(){ return DIFFS[prefs.diff] || DIFFS.normal; }
+const HALL_KEY = "sahurProtocolHallV1";
+let hall = { ids:[], bestScore:0, bestCombo:0, runs:0, wins:0 };
+try{ hall = {...hall, ...JSON.parse(localStorage.getItem(HALL_KEY) || "{}")}; }catch(e){}
+function saveHall(){ try{ localStorage.setItem(HALL_KEY, JSON.stringify(hall)); }catch(e){} }
+function buzz(ms){ if(COARSE && navigator.vibrate){ try{ navigator.vibrate(ms); }catch(e){} } }    // every cleared challenge: +4 max HP for the rest of the run
 
 const ENEMY_TYPES = {
   slopling:{ hp:30, speed:95,  r:14, dmg:8,  color:"#ff3df0", ai:"chase",
@@ -445,60 +528,356 @@ const BIOMES = [
 
 const BOSSES = {
   echo:     { name:"ECHO, THE ENGAGEMENT WRAITH", hp:320, r:30, color:"#ff3df0",
-              patterns:["burst","summon","dash"], patCD:2.6 },
+              patterns:["burst","summon","dash","snipe"], patCD:2.6 },
   scraper:  { name:"THE SCRAPER", hp:480, r:34, color:"#c07bff",
-              patterns:["spread","summon","offbeat"], patCD:2.4 },
+              patterns:["spread","snipe","summon","offbeat"], patCD:2.4 },
   valuation:{ name:"THE VALUATION", hp:560, r:38, color:"#35e8ff",
-              patterns:["bigburst","spread","summon"], patCD:2.2,
+              patterns:["bigburst","snipe","spread","summon"], patCD:2.2,
               overextend:true },  // only damageable after its big attack
   bubble:   { name:"THE AI BUBBLE", hp:1350, r:56, color:"#ff3df0",
-              patterns:["burst","spread","summon","cross","spiral","chase"], patCD:1.45, final:true },
+              patterns:["burst","spread","snipe","summon","cross","spiral","chase"], patCD:1.45, final:true },
 };
 
 const CUTSCENES = {
-  prologue:{ art:"apartment", lines:[
-    {s:"-", t:"Grey apartment. The feed scrolls itself now. Every post is the same post."},
-    {s:"???", t:"TUNG."},
-    {s:"???", t:"TUNG."},
-    {s:"SAHUR", t:"TUNG. You sleep too long. Everything real is almost gone.\nI am almost gone. Get up. We go pop it."},
-    {s:"YOU", t:"Pop... what?"},
-    {s:"SAHUR", t:"The big lie. Bring shoes."},
+  /* fx: black | dark | eyes | knock | reveal | memory | return. A line may also set art (memory art),
+     knocks:n (the player answers with n knocks), or t as a function of the run state. */
+  prologue: { art: "apartment", lines: [
+    {s:"-", t:"3:07 AM. The feed scrolls itself, thumb or no thumb.\nFar off, a voice: \"Sahur... sahur...\"", fx:"dark"},
+    {s:"-", t:"Again, nearer. A third time, right under your window.\nNo light comes on. You keep scrolling.", fx:"dark"},
+    {s:"???", t:"TUNG.", fx:"knock"},
+    {s:"???", t:"TUNG.", fx:"knock"},
+    {s:"-", t:"The screen dies. Darkness. Two round eyes at the glass, level with yours. They do not blink.", fx:"eyes"},
+    {s:"-", t:"TUNG.\nThe window goes. A wooden thing stands in your living room, bat in hand, neon on its shoulders.", fx:"reveal"},
+    {s:"YOU", t:"I'm sorry. I'm getting up. I'm getting up."},
+    {s:"-", t:"The bat comes up. It swings. Past you. Your phone bursts against the wall, and the whole room goes quiet."},
+    {s:"SAHUR", t:"Whole city sleeping. We go pop it."},
+    {s:"YOU", t:"...Why me?"},
+    {s:"SAHUR", t:"Bring shoes."}
   ]},
-  biome1_end:{ art:"fire", lines:[
-    {s:"-", t:"A fire that renders at 24 real frames per second. Sahur looks at his own hand. For one frame, it is static."},
-    {s:"SAHUR", t:"Don't make the face. Everything costs.\nSleep. Tomorrow, TUNG."},
+
+  biome1_end: { art: "fire", lines: [
+    {s:"-", t:"A campfire in the purple forest. The flames buffer, like a video that can't decide."},
+    {s:"-", t:"Sahur shoves a box of rice and egg into your hands. He does not eat. He is wood."},
+    {s:"SAHUR", t:"Eat. Sun is coming."},
+    {s:"SAHUR", t:"Lesson. TUNG, TUNG, TUNG. Always three.\nTwo is rumor. Three is a call."},
+    {s:"-", t:"He taps the count on his knee. On the third, his hand turns to static. Then it is a hand again."}
   ]},
-  biome2_end:{ art:"river", lines:[
-    {s:"-", t:"A coolant river. The hum of a million servers pretending to think."},
-    {s:"SAHUR", t:"The Bubble eats real things. I am the most real thing left.\nSo near the middle, I burn fast. At the middle...\n...loud. One time. Very loud."},
+
+  biome2_end: { art: "river", lines: [
+    {s:"-", t:"Blue coolant hums between the server racks. Sahur's outline stutters. You can see the river through his chest."},
+    {s:"YOU", t:"Why are you fading?"},
+    {s:"-", t:"Years ago, this lane: lanterns, hollow drums, a light coming on behind every call.", fx:"memory", art:"memory_street"},
+    {s:"-", t:"The kids on the lane gave him a name: Triple T, because he always knocked three times."},
+    {s:"SAHUR", t:"Now nobody answers. A call with no answer gets quiet.\nI am made of answered calls.", fx:"return"},
+    {s:"SAHUR", t:"At the middle, I burn. One time. Very loud."},
     {s:"YOU", t:"Then we find another way in."},
-    {s:"SAHUR", t:"There is no other way in.\nThere is only whether you are with me."},
-    {s:"YOU", t:"...I'm with you."},
-    {s:"SAHUR", t:"Good. Now sleep. I will teach you the rhythm tomorrow. In case."},
+    {s:"SAHUR", t:"There is no other way in. Only whether you are with me."},
+    {s:"YOU", t:"...I'm with you."}
   ]},
-  biome3_end:{ art:"boardroom", lines:[
-    {s:"-", t:"Outside the boardroom window there is nothing. Not darkness - nothing.\nThe Bubble never built anything past the pitch."},
-    {s:"SAHUR", t:"There was never going to be anything out there.\nThat's why it needs to be loud in here."},
-    {s:"-", t:"He hands you the bat. You hold it. He takes it back.\nNeither of you says anything about it."},
+
+  biome3_end: { art: "boardroom", lines: [
+    {s:"-", t:"Behind the glass, nothing. Not night, not sky. A pale blank where the city should be."},
+    {s:"-", t:st=>"Sahur sits in a leather chair, bat across his knees. " + (st && st.sahurHelps ? "You hauled him up " + ["","once","twice","three times"][Math.min(3,st.sahurHelps)] + (st.sahurHelps>3?" and more":"") + " out there." : "You kept every hit off him out there.") + " He has not mentioned it."},
+    {s:"YOU", t:"Out of everyone. Why me?"},
+    {s:"-", t:"A lit window, years ago. A small kid waving down at the lane. First to answer, every night.", fx:"memory", art:"memory_window"},
+    {s:"SAHUR", t:"Was you. Then phone came. I still knock.", fx:"return"},
+    {s:"-", t:"He holds out the bat. You take it. It is warmer than wood should be. He takes it back. Neither of you speaks."}
   ]},
-  core_intro:{ art:"core", lines:[
-    {s:"-", t:"THE CORE. White. Silent. Weightless.\nThe Bubble fills the sky, stitched from a billion borrowed sentences."},
-    {s:"THE BUBBLE", t:"this changes everything - thrilled to announce - we believe - at scale -\ndelighted - disrupting - thrilled to announce - thrilled to announce -"},
-    {s:"SAHUR", t:"It talks a lot for a thing with nothing inside.\nStay close to me."},
+
+  core_intro: { art: "void", lines: [
+    {s:"THE BUBBLE", t:"thrilled to announce - this changes everything - at scale - we believe -\nseamless - delighted - thrilled to announce - thrilled to announce -"},
+    {s:"SAHUR", t:"It talks a lot for a thing with nothing inside."},
+    {s:"SAHUR", t:"Stay close."}
   ]},
-  sacrifice:{ art:"core", lines:[
-    {s:"THE BUBBLE", t:"(in your voice) ...come back. the feed misses you.\neverything easy. everything soft. forever. come back."},
-    {s:"-", t:"You can't hurt it. Nothing can hurt it. It just grows.\nSahur puts a hand on your shoulder. The music stops."},
+
+  sacrifice: { art: "core", lines: [
+    {s:"-", t:"Every swing slides off. The Bubble ripples, almost pleased, and speaks in your voice."},
+    {s:"THE BUBBLE", t:"Come back... it's so quiet here. Everything easy. Five more minutes."},
+    {s:"-", t:"Sahur's hand lands on your shoulder. The music stops.\nFor the first time since the apartment, you hear your own breathing."},
+    {s:"SAHUR", t:"Cannot hit it. It is not a thing to hit. It is a thing to wake."},
+    {s:"YOU", t:"Not you. There's another way. There has to be."},
     {s:"SAHUR", t:"Hey. It was a good walk."},
-    {s:"YOU", t:"Sahur -"},
-    {s:"SAHUR", t:"Cover your ears."},
+    {s:"SAHUR", t:"Three TUNG. When I call, you answer. Don't be late."}
   ]},
-  epilogue:{ art:"dawn", lines:[
-    {s:"-", t:"Real dawn. Real birds, badly out of tune. Wonderful.\nThe city is ugly and unoptimized and alive."},
-    {s:"-", t:"On the ground where he stood: the bat."},
-    {s:"-", t:"You pick it up. You knock it against a lamppost.\nOnce. Twice. Three times."},
-    {s:"-", t:"Down the street, a window opens.\nSomewhere, someone wakes up."},
-  ]},
+
+  epilogue: { art: "dawn", music: "dawn", lines: [
+    {s:"-", t:"Dawn. A real one. Birds out of tune, a horn somewhere, the ruined city going gold, ugly and alive."},
+    {s:"-", t:"Sahur sits beside you like always. Bat against the stone. He is just wood now, rough and warm in the sun."},
+    {s:"-", t:"You eat the cold rice you saved. Nobody tells you to. You do it anyway."},
+    {s:"-", t:"You lift the bat. It is heavier than it looked.\nThree knocks on the stone. Always three.", knocks:3},
+    {s:"-", t:"Down the street, a shutter bangs open. Someone leans out, squinting at the light."},
+    {s:"VOICE", t:"...sahur?"}
+  ]}
+};
+
+const BARKS = {
+  room_start: {
+    "0-0": "Stay close. I hit, you hit.",
+    "0-1": "You swing like you scroll. Tiny.",
+    "0-2": "Better. Tree is scared of you.",
+    "1-0": "Wires everywhere. Watch feet.",
+    "1-1": "Servers loud. You swing louder.",
+    "1-2": "A little slow today. Is okay.",
+    "2-0": "Quiet here. Too quiet.",
+    "2-1": "Stay close.",
+    "2-2": "Almost. Count with me."
+  },
+  boss_start: {
+    echo: "It copy everything. Be original.",
+    scraper: "Many hands. Hit the core.",
+    valuation: "Big number. Only number.",
+    bubble: "Whatever happens, stay close."
+  },
+  down: ["Little sleepy. Help me up?", "Knocked over. Come stand by me.", "Down. Not out. Come."],
+  up: ["Good. Still wood.", "Thank. Now hit.", "I owe you one. Maybe three."],
+  on_beat: ["Yes. Like that.", "On beat. Good.", "That is the rhythm."],
+  player_low: ["You look pale. Careful.", "Dodge. Then eat. Always eat."],
+  fading: ["Still here. Look. Still here.", "I go a bit. I come back."]
+};
+
+/* ---------- v3 copy deck (report/research/v3-copy.js): announcer, combos, modifiers, versus cards ---------- */
+const COPY = {
+
+  // 1. ANNOUNCER: caption bar during TRIPLE T (pinch-hitter broadcast)
+  announcer: {
+    walkup: [
+      "NOW BATTING... TRIPLE T.",
+      "The bubble leads. A log approaches the plate.",
+      "Down 0-2. Send in the log.",
+      "An anomaly steps into the box.",
+      "No warm-up swings. He does not need them.",
+      "He takes one practice swing. The stadium leans away."
+    ],
+    homerun: [
+      "TUNG. TUNG. TUNG. And that is gone.",
+      "That ball has left the city.",
+      "Deep. Deeper. Out of the feed entirely.",
+      "Retired side, and a few retired postcodes.",
+      "No doubt. Nobody has been in doubt since 3:07.",
+      "Replay unavailable. It has not landed yet."
+    ],
+    boss: [
+      "A valuation of infinity. A bat of one.",
+      "He is swinging at the big one. Bold.",
+      "Bottom of the ninth. Top of the market.",
+      "The Bubble has been called. Three times."
+    ]
+  },
+
+  // 2. COMBO NAMES (hits -> label)
+  combo: [
+    { n: 3,  label: "TUNG TUNG TUNG" },
+    { n: 6,  label: "SIX TUNG. NO NOTES" },
+    { n: 9,  label: "SAHUUUR" },
+    { n: 15, label: "BRAINROT GOD" },
+    { n: 25, label: "TIER: SECRET" },
+    { n: 40, label: "TIER: ???" },
+    { n: 60, label: "SAHUR SOLOS" },
+    { n: 99, label: "UNPRICED" }
+  ],
+
+  // 3. ROOM MODIFIERS
+  modifiers: [
+    { id: "algorithm_boost", name: "ALGORITHM BOOST", line: "The feed likes you today. Aura doubles.", effect: "aura x2" },
+    { id: "ratiod", name: "RATIO'D", line: "Everyone showed up, and faster. Aura pays more.", effect: "enemies faster, aura +50%" },
+    { id: "golden_hour", name: "GOLDEN HOUR", line: "Everything shiny is about to be hit.", effect: "more gold elites" },
+    { id: "beat_drop", name: "BEAT DROP", line: "On the beat, it counts twice.", effect: "on-beat bonus x2" },
+    { id: "lag_spike", name: "LAG SPIKE", line: "Slow enemies. Sturdy enemies. Sorry.", effect: "enemies slower, more HP" },
+    { id: "trending", name: "TRENDING", line: "More of them. More score. Same you.", effect: "more enemies, score x1.5" },
+    { id: "shadowbanned", name: "SHADOWBANNED", line: "Nobody can see you. Stay near the log.", effect: "dark arena, light around you and Sahur" },
+    { id: "patch_notes", name: "PATCH NOTES", line: "Minor fixes. One upgrade, free.", effect: "one random free upgrade" },
+    { id: "touch_grass", name: "TOUCH GRASS", line: "Kills drop little green sprouts. Eat one.", effect: "every 5th kill drops a heal orb" },
+    { id: "sponsored", name: "SPONSORED", line: "An ad bubble floats by. Pop it for loot.", effect: "roaming ad bubble drops big loot if popped" }
+  ],
+
+  // 4. ELITE VARIANTS (ladder)
+  elites: {
+    gold:    { label: "GOLD",    prefix: "Gold",    toast: "GOLD CHEST. Shiny. Take it." },
+    diamond: { label: "DIAMOND", prefix: "Diamond", toast: "DIAMOND CHEST. Heavier than it looks." },
+    rainbow: { label: "RAINBOW", prefix: "Rainbow", toast: "RAINBOW CHEST. Everyone saw that." }
+  },
+
+  // 5. NEW SKILLS
+  skills: [
+    { key: "boomerang_bat", name: "Boomerang Bat", family: "CHAOS", rarity: "RARE",
+      desc: "Every 3rd swing throws a spinning bat. It comes back." },
+    { key: "kentongan_horn", name: "Kentongan Horn", family: "SIGNAL", rarity: "RARE",
+      desc: "Dashing releases a shockwave that stuns nearby enemies." },
+    { key: "pinch_hitter", name: "Pinch Hitter", family: "NOSTALGIA", rarity: "EPIC",
+      desc: "TRIPLE T charges faster. The log likes the spotlight." },
+    { key: "rice_box", name: "Rice Box", family: "GROUNDING", rarity: "COMMON",
+      desc: "Heal a little every time you clear a room." },
+    { key: "sahur_snack", name: "Sahur Snack", family: "NOSTALGIA", rarity: "COMMON",
+      desc: "Sahur gets more HP and heals over time. He is wood. He accepts." },
+    { key: "aura_farmer", name: "Aura Farmer", family: "SIGNAL", rarity: "RARE",
+      desc: "On-beat hits drop extra aura. Keep the rhythm, keep the crop." }
+  ],
+
+  // 6. EVOLUTIONS (rarity BRAINROT GOD; recipe = two skills at level 2+)
+  evolutions: [
+    { name: "THREE-PEAT", rarity: "BRAINROT GOD",
+      desc: "Sahur slams three times in a row. Then pretends nothing happened.",
+      recipe: ["Wider Bat", "Faster Rhythm"], recipeLine: "Wider Bat + Faster Rhythm" },
+    { name: "FIFTH TUNG", rarity: "BRAINROT GOD",
+      desc: "Every 5th swing sends out a shockwave. It was always five.",
+      recipe: ["Louder Voice", "Quick Wit"], recipeLine: "Louder Voice + Quick Wit" },
+    { name: "FAMILY MEAL", rarity: "BRAINROT GOD",
+      desc: "Big heal on room clear, for you and Sahur. Seconds, even.",
+      recipe: ["Mixtape '07", "Touch Grass"], recipeLine: "Mixtape '07 + Touch Grass" },
+    { name: "PERFECT PITCH", rarity: "BRAINROT GOD",
+      desc: "On-beat swings always crit. Off-beat is a lifestyle choice.",
+      recipe: ["Sharp Take", "Borrowed Beat"], recipeLine: "Sharp Take + Borrowed Beat" }
+  ],
+
+  // 7. BOSS VERSUS CARDS (tier-list / powerscaling)
+  versus: {
+    patatam: {
+      name: "GRR GRR PATATAM",
+      sub: "Mossy. Offended. Technically a tree.",
+      rows: ["AURA: 4,000 vs 9000", "MOSS: 100% vs 0%", "TIER: GOD vs ???"],
+      barks: [
+        { s: "PATATAM", t: "GRR. GRR. PATATAM." },
+        { s: "SAHUR",   t: "Is a lot of words. Come swing." }
+      ]
+    },
+    echo: {
+      name: "ECHO THE ENGAGEMENT WRAITH",
+      sub: "Repeats you. Says it was its idea.",
+      rows: ["AURA: 12 vs 9000", "ORIGINAL IDEAS: 0 vs 1", "TIER: SECRET vs ???"]
+    },
+    scraper: {
+      name: "THE SCRAPER",
+      sub: "Took everything. Credited no one.",
+      rows: ["HANDS: 40 vs 2", "LICENSE: NONE vs WOOD", "TIER: MYTHIC vs ???"]
+    },
+    valuation: {
+      name: "THE VALUATION",
+      sub: "A number with a mouth.",
+      rows: ["VALUE: INFINITE vs 1 BAT", "PROFIT: NONE vs RICE", "TIER: SECRET vs ???"]
+    },
+    bubble: {
+      name: "THE AI BUBBLE",
+      sub: "Seamless. At scale. Empty.",
+      rows: ["HYPE: MAX vs HONEST", "INSIDE: NOTHING vs 3 TUNGS", "TIER: SECRET vs ???"]
+    }
+  },
+
+  // 8. TUTORIAL PROMPTS (max 4 words)
+  tutorial: {
+    desktop: {
+      move:          { t: "MOVE", key: "WASD / ARROWS" },
+      swing:         { t: "SWING", key: "SPACE / J" },
+      swing_on_beat: { t: "SWING ON THE BEAT", key: "SPACE / J" },
+      dash:          { t: "DASH THROUGH BULLETS", key: "SHIFT / K" },
+      triple_t_ready:{ t: "TRIPLE T READY", key: "E / L" },
+      help_up:       { t: "HELP SAHUR UP", key: "STAND NEAR HIM" },
+      skip:          { t: "HOLD TO SKIP", key: "ENTER" }
+    },
+    touch: {
+      move:          { t: "MOVE", key: "LEFT STICK" },
+      swing:         { t: "SWING", key: "TAP HIT" },
+      swing_on_beat: { t: "SWING ON THE BEAT", key: "TAP HIT" },
+      dash:          { t: "DASH THROUGH BULLETS", key: "TAP DASH" },
+      triple_t_ready:{ t: "TRIPLE T READY", key: "TAP TRIPLE T" },
+      help_up:       { t: "HELP SAHUR UP", key: "STAND NEAR HIM" },
+      skip:          { t: "HOLD TO SKIP", key: "HOLD SCREEN" }
+    }
+  },
+
+  // 9. RESULTS SCREEN
+  grades: {
+    D: "STILL LOADING",
+    C: "BASIC",
+    B: "RESPECTABLE WOOD",
+    A: "BRAINROT GOD",
+    S: "SECRET TIER",
+    "S+": "SAHUR SOLOS"
+  },
+  statLabels: ["TUNGS", "BEST COMBO", "ON-BEAT %", "AURA", "SAHUR SAVES", "TIME"],
+  share: "SAHUR PROTOCOL - Biome {biome} - Grade {grade} - {tungs} TUNGs - best combo {combo} - tung tung tung",
+
+  // 10. HALL OF TUNG
+  achievements: [
+    { id: "pinch_hitter",   name: "PINCH HITTER",        cond: "Win a boss fight at 1-10 HP." },
+    { id: "metronome",      name: "METRONOME",           cond: "Land 25 on-beat swings in one run." },
+    { id: "triple_t_trio",  name: "THREE UP, THREE DOWN", cond: "TRIPLE T hits 3+ enemies at once." },
+    { id: "wake_on_time",   name: "NOBODY LEFT BEHIND",  cond: "Beat a boss without Sahur falling." },
+    { id: "clean_room",     name: "UNTOUCHED",           cond: "Clear a room without taking damage." },
+    { id: "first_answer",   name: "FIRST ANSWER",        cond: "Finish the game." },
+    { id: "spicy",          name: "SPICY WOOD",          cond: "Finish the game on SPICY." },
+    { id: "ninety_nine",    name: "UNPRICED",            cond: "Reach a 99 combo." },
+    { id: "aura_farmer",    name: "AURA FARMER",         cond: "Collect 500 aura in one run." },
+    { id: "rainbow",        name: "NOW IT'S PERSONAL",   cond: "Defeat a Rainbow elite." },
+    { id: "evolved",        name: "BRAINROT GOD",        cond: "Take an evolution." },
+    { id: "overbooked",     name: "OVERBOOKED",          cond: "Clear 3 rooms in a row at under 20 s each." }
+  ],
+
+  // 11. SAHUR BARKS (max 38 chars)
+  barks: {
+    triple_t_first: "They call me Triple T. Watch.",
+    triple_t_used: ["TUNG.", "Three. As promised.", "Send in the log."],
+    elite_spotted: ["Shiny one. Hit it twice.", "That one is wearing gold."],
+    modifier: ["Today is different. Okay.", "Rules changed. Bat did not."],
+    combo25: ["Still counting. Good.", "Many TUNG. I am proud."],
+    dash_lot: "You run more than I knock.",
+    idle: "You sleeping again?",
+    rival: {
+      spawn: "Moss man. I know this one.",
+      exchange: [
+        { s: "PATATAM", t: "GRR GRR." },
+        { s: "SAHUR",   t: "Yes yes. Tree. I am wood too." }
+      ],
+      defeat: "Is only moss. Takes time."
+    }
+  },
+
+  // 12. DIFFICULTY
+  difficulty: {
+    CHILL:  { name: "CHILL",  line: "Slower enemies. Sahur gets up faster. Vibes." },
+    NORMAL: { name: "NORMAL", line: "The intended walk. Three knocks, no mercy." },
+    SPICY:  { name: "SPICY",  line: "Faster enemies, no free heals. Sahur says good luck." }
+  },
+
+  // 13. STORY ADDITIONS (existing script otherwise unchanged)
+  story: {
+    // add to biome2_end memory (art memory_street), after the lanterns line
+    memory_line: "The kids on the lane gave him a name: Triple T, because he always knocked three times.",
+    epilogue_title: ["EPILOGUE I", "THE FIRST ANSWER"],
+    // post-credits stinger, then "TO BE CONTINUED"
+    stinger: [
+      "Far away, another quiet city. Another dark window.",
+      "The Bubble had siblings. They did not get the memo.",
+      "TUNG. TUNG. TUNG.",
+      "...TUNG?",
+      "TO BE CONTINUED"
+    ],
+    credits_tag: "Made with respect for the kentongan sahur tradition of Indonesia."
+  }
+};
+const COMBO_TIERS = COPY.combo;
+/* evolutions: two skills at level 2+ unlock a BRAINROT GOD card */
+const EVOS = COPY.evolutions.map((e,i)=>({...e, apply:[
+  s=>{ s.sahur.triple = true; },
+  s=>{ s.player.vineBoom = true; },
+  s=>{ s.player.familyMeal = true; },
+  s=>{ s.player.beatCrit = true; },
+][i]}));
+CUTSCENES.epilogue_card = { art:"dawn", lines:[
+  {s:"", t:COPY.story.epilogue_title.join("\n"), fx:"black"},
+  {s:"", t:COPY.story.stinger[0], fx:"black"},
+  {s:"", t:COPY.story.stinger[1], fx:"black"},
+  {s:"???", t:COPY.story.stinger[2], fx:"knock"},
+  {s:"???", t:COPY.story.stinger[3], fx:"knock"},
+  {s:"", t:COPY.story.stinger[4], fx:"black"},
+]};
+
+const STORY_PANE = "The feed has put the world to sleep, and nobody wakes up anymore. In the dark before dawn, a wooden log with a baseball bat breaks into your apartment, because you ignored three calls. He is called Sahur, and together you must walk through three broken places and pop the AI Bubble before the sun forgets to rise.";
+
+const TITLE_LINE = "Sahur fights beside you. Swing on his beat for bonus damage. In boss fights, stand next to him to pull him up when he falls.";
+
+const END_TEXT = {
+  lose_sub: "The feed closes over you, warm and easy.\nFar off, a wooden knock: TUNG. Get up.\nYour last checkpoint is still intact.",
+  win_sub: "BUT AT WHAT COST.\nSomewhere, very far away... a fourth tung?"
 };
 
 /* ============================================================
@@ -542,10 +921,20 @@ const SAHUR_IMGS = {
   idle: SAHUR_SPRITES.idle.map(src=>{ const i = new Image(); i.src = src; return i; }),
   attack: SAHUR_SPRITES.attack.map(src=>{ const i = new Image(); i.src = src; return i; }),
 };
-const cv = document.getElementById("game"), ctx = cv.getContext("2d", {alpha:false});
-const W = cv.width, H = cv.height;
-const sceneCv = document.getElementById("sceneCanvas"), sctx = sceneCv.getContext("2d");
 const $ = id => document.getElementById(id);
+const cv = document.getElementById("game"), ctx = cv.getContext("2d", {alpha:false});
+/* the arena is 960x540 in landscape and 540x960 in portrait; RS scales the backing store for sharp text */
+let W = 960, H = 540, RS = 1;
+function fitArena(){
+  const portrait = innerHeight > innerWidth * 1.08;
+  W = portrait ? 540 : 960; H = portrait ? 960 : 540;
+  $("wrap").classList.toggle("portrait", portrait);
+  const cssW = Math.min(innerWidth, innerHeight * W / H);
+  RS = Math.max(1, Math.min(2, cssW * (window.devicePixelRatio || 1) / W));
+  const bw = Math.round(W * RS), bh = Math.round(H * RS);
+  if(cv.width !== bw || cv.height !== bh){ cv.width = bw; cv.height = bh; }
+}
+const sceneCv = document.getElementById("sceneCanvas"), sctx = sceneCv.getContext("2d");
 
 let mode = "title";        // title | cutscene | play | choose | beats | end
 let keys = {};
@@ -554,6 +943,11 @@ let shake = 0, flash = 0;
 let last = performance.now();
 const SAVE_KEY = "sahurProtocolRunV1";
 const CONTROL_KEY = "sahurProtocolControlsV1";
+const AUDIO_KEY = "sahurProtocolAudioV1";
+const RM_QUERY = matchMedia("(prefers-reduced-motion: reduce)");
+const reducedMotion = ()=> RM_QUERY.matches;
+let hitStop = 0;
+function freeze(sec){ if(!reducedMotion()) hitStop = Math.max(hitStop, sec); }
 
 /* ---------- audio (tiny synth, no assets) ---------- */
 let AC = null;
@@ -568,6 +962,8 @@ function tone(freq, dur, type="sine", vol=0.15){
   o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + dur);
 }
 function tung(big=false){ tone(big?55:70, big?0.9:0.5, "sine", big?0.5:0.3); tone(big?110:140, 0.15, "square", 0.08); }
+/* a hollow wooden knock (kentongan / door) */
+function knock(){ tone(196, 0.07, "square", 0.10); tone(98, 0.28, "sine", 0.38); tone(392, 0.03, "triangle", 0.05); }
 
 const ChoirMusic = {
   el:null, mode:"off", loopStart:0, loopEnd:85,
@@ -599,9 +995,20 @@ const ChoirMusic = {
     if(el.currentTime < this.loopStart || el.currentTime >= this.loopEnd) el.currentTime = this.loopStart;
     el.play().catch(()=>{});
   },
-  stop(){ if(this.el){ this.el.pause(); this.mode = "off"; } },
-  setVolume(v){ masterVolume = v; if(this.el) this.el.volume = Music.muted ? 0 : masterVolume; },
-  setMuted(muted){ if(this.el) this.el.volume = muted ? 0 : masterVolume; }
+  stop(){ if(this.fadeTimer){ clearInterval(this.fadeTimer); this.fadeTimer = null; } if(this.el){ this.el.pause(); this.mode = "off"; } },
+  fadeOut(sec){
+    if(!this.el || this.mode === "off") return;
+    if(this.fadeTimer) clearInterval(this.fadeTimer);
+    const el = this.el, start = el.volume, t0 = performance.now();
+    this.mode = "fading";
+    this.fadeTimer = setInterval(()=>{
+      const k = Math.min(1, (performance.now()-t0)/(sec*1000));
+      el.volume = Music.muted ? 0 : start*(1-k);
+      if(k >= 1){ clearInterval(this.fadeTimer); this.fadeTimer = null; el.pause(); this.mode = "off"; }
+    }, 50);
+  },
+  setVolume(v){ masterVolume = v; if(this.el && this.mode !== "fading") this.el.volume = Music.muted ? 0 : masterVolume; },
+  setMuted(muted){ if(this.el && this.mode !== "fading") this.el.volume = muted ? 0 : masterVolume; }
 };
 
 /* ---------- music (procedural sequencer, lookahead-scheduled) ----------
@@ -659,11 +1066,25 @@ const Music = {
     if(this.timer){ clearInterval(this.timer); this.timer = null; }
     this.name = null; this.cur = null;
   },
+  /* where the beat is right now, as the player hears it.
+     Returns null when no track is playing. beat = quarter notes since the track started. */
+  beat(){
+    if(!this.cur || !AC) return null;
+    const stepDur = 60 / this.cur.bpm / 4;
+    const heard = AC.currentTime - (AC.outputLatency || AC.baseLatency || 0);
+    const stepF = this.step - (this.nextT - heard) / stepDur;
+    if(stepF < 0) return null;
+    const beatF = stepF / 4, idx = Math.floor(beatF), ph = beatF - idx;
+    return { idx, phase:ph, len:stepDur*4,
+             /* seconds to the nearest beat line, either side */
+             off: Math.min(ph, 1-ph) * stepDur*4 };
+  },
   toggleMute(){
     this.muted = !this.muted;
     if(this.gain) this.gain.gain.value = this.muted ? 0 : masterVolume;
     if(typeof SceneSound !== "undefined") SceneSound.setMuted(this.muted);
     if(typeof ChoirMusic !== "undefined") ChoirMusic.setMuted(this.muted);
+    saveAudioSettings();
   },
   note(freq, t, dur, wave, vol){
     const o = AC.createOscillator(), g = AC.createGain();
@@ -760,15 +1181,20 @@ const SceneSound = {
 /* ---------- run state ---------- */
 function newRun(){
   return {
-    biome:0, room:0, relics:[], skillLevels:{}, unlockedSkills:new Set(DEFAULT_UNLOCKED_SKILLS), completedChallenges:new Set(), unlockFeed:[],
+    biome:0, room:0, relics:[], skillLevels:{}, evolutions:[], unlockedSkills:new Set(DEFAULT_UNLOCKED_SKILLS), completedChallenges:new Set(), unlockFeed:[],
     roomsCleared:0, speedBosses:0, bossTime:0, bossDamageTaken:0, bossMinHp:100, bossRevivesUsed:0, lastBossResult:null,
     showChallenges:false, attackQueued:false,
     player:{ x:W/2, y:H/2, r:15, hp:100, maxHp:100, speed:225, dmg:13,
-      atkCD:0.38, atkT:0, crit:0, armor:0, lifesteal:0, roomHeal:0,
-      revives:0, inv:0, beatBuff:false, beatMult:1.5, buffT:0, swing:0, fx:1, fy:0 },
+      atkCD:0.38, atkT:0, crit:0, armor:0, lifesteal:0,
+      revives:0, inv:0, beatBuff:false, beatMult:1.5, buffT:0, swing:0, onBeat:0, fx:1, fy:0,
+      dashT:0, dashCD:0, dashVx:0, dashVy:0, swings:0, squash:0 },
     sahur:{ x:W/2-50, y:H/2, r:17, alive:true, slamT:2.5, radius:135,
-      cdMult:1, flicker:0, degrade:1, anim:"idle", animF:0, animT:0, facing:1 },
-    enemies:[], bullets:[], parts:[], texts:[],
+      cdMult:1, flicker:0, degrade:1, anim:"idle", animF:0, animT:0, facing:1,
+      hp:120, maxHp:120, inv:0, hurtT:0, calm:0, down:false, downT:0, help:0, wasDown:false, fade:0, drainT:0 },
+    onBeatSwings:0, sahurHelps:0, bark:null, barkCD:0, lowBarkT:0, snipes:[], beatPulse:0,
+    enemies:[], bullets:[], parts:[], texts:[], orbs:[], flyers:[], ghosts:[], waves:[],
+    combo:0, comboT:0, bestCombo:0, score:0, aura:0, kills:0, ttt:0, tttUses:0, tttReadyShown:false,
+    ult:null, slowT:0, roomHurt:false, homeRuns:0, elitesKilled:0, runTime:0, modifier:null,
     spawnQueue:[], pending:[], spawnT:0,
     boss:null, phase:0, phaseT:0, collapseT:0, roomClearing:false,
     levelOver:false, cutsceneActive:false, nextAction:null,
@@ -792,6 +1218,7 @@ function serializeRun(){
     relics:state.relics,
     skillLevels:state.skillLevels,
     unlockedSkills:[...state.unlockedSkills],
+    evolutions:state.evolutions || [], score:state.score, aura:state.aura, bestCombo:state.bestCombo,
     completedChallenges:[...state.completedChallenges],
     roomsCleared:state.roomsCleared,
     speedBosses:state.speedBosses,
@@ -819,6 +1246,8 @@ function loadProgress(){
     s.completedChallenges = new Set(Array.isArray(data.completedChallenges) ? data.completedChallenges : []);
     s.roomsCleared = data.roomsCleared || 0;
     s.speedBosses = data.speedBosses || 0;
+    s.evolutions = Array.isArray(data.evolutions) ? data.evolutions : [];
+    s.score = data.score || 0; s.aura = data.aura || 0; s.bestCombo = data.bestCombo || 0;
     state = s;
     applySkillLoadout();
     state.player.hp = Math.min(state.player.maxHp, Math.max(1, data.playerHp || state.player.maxHp));
@@ -878,12 +1307,19 @@ addEventListener("keydown", e=>{
   if(mode==="title") ChoirMusic.playMenu();
   const k = e.key.toLowerCase();
   keys[k] = true;
+  if($("confirmOv").classList.contains("show")){
+    if(k==="escape"){ $("confirmOv").classList.remove("show"); confirmAction = null; }
+    return;
+  }
+  if((k===" " || k==="j" || k==="enter") && !e.repeat && mode==="beats"){ e.preventDefault(); answerBeat(); return; }
   if(k==="m"){ Music.toggleMute(); updateMuteButton(); }
   if(k==="escape") togglePause();
   if(k==="c" && state){ state.showChallenges = !state.showChallenges; }
   if((k===" " || k==="j") && mode==="play" && state && !e.repeat){ state.attackQueued = true; }
+  if((k==="shift" || k==="k") && mode==="play" && state && !e.repeat){ state.dashQueued = true; }
+  if((k==="e" || k==="l" || k==="q") && mode==="play" && state && !e.repeat){ state.ultQueued = true; }
   if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(e.key.toLowerCase())) e.preventDefault();
-  if(mode==="cutscene" && (e.key===" "||e.key==="Enter")) advanceCut();
+  if(mode==="cutscene" && (e.key===" "||e.key==="Enter") && !e.repeat) advanceCut();
 });
 addEventListener("keyup", e=> keys[e.key.toLowerCase()] = false);
 
@@ -914,14 +1350,19 @@ const touch = { dx:0, dy:0, id:null, moveId:null, tx:0, ty:0, active:false };
       touch.id = null; touch.dx = 0; touch.dy = 0; setKnob(0,0); } };
   stick.addEventListener("touchend", stickEnd, {passive:false});
   stick.addEventListener("touchcancel", stickEnd, {passive:false});
-  atk.addEventListener("touchstart", e=>{ e.preventDefault(); audio(); if(mode==="play" && state) state.attackQueued = true; }, {passive:false});
-  atk.addEventListener("touchend",   e=>{ e.preventDefault(); }, {passive:false});
-  atk.addEventListener("touchcancel",e=>{ e.preventDefault(); }, {passive:false});
+  atk.addEventListener("touchstart", e=>{ e.preventDefault(); audio(); if(mode==="beats"){ answerBeat(); return; } if(mode==="play" && state){ state.attackQueued = true; touch.atkHeld = true; } }, {passive:false});
+  atk.addEventListener("touchend",   e=>{ e.preventDefault(); touch.atkHeld = false; }, {passive:false});
+  atk.addEventListener("touchcancel",e=>{ e.preventDefault(); touch.atkHeld = false; }, {passive:false});
+  const dashB = $("dashBtn"), ultB = $("ultBtn");
+  dashB.addEventListener("touchstart", e=>{ e.preventDefault(); if(mode==="play" && state) state.dashQueued = true; }, {passive:false});
+  ultB.addEventListener("touchstart", e=>{ e.preventDefault(); if(mode==="play" && state) state.ultQueued = true; }, {passive:false});
 })();
 loadControlSettings();
+loadAudioSettings();
 primeMobileLandscape();
 $("titleOv").addEventListener("pointerdown", ()=> ChoirMusic.playMenu());
 $("game").addEventListener("pointerdown", e=>{
+  if(mode==="beats"){ answerBeat(); return; }
   if(!state) return;
   const r = $("game").getBoundingClientRect();
   const x = (e.clientX - r.left) / r.width * W;
@@ -967,10 +1408,21 @@ function endTouchMove(e){
 $("game").addEventListener("touchend", endTouchMove, {passive:false});
 $("game").addEventListener("touchcancel", endTouchMove, {passive:false});
 $("cutOv").addEventListener("click", ()=>{ if(mode==="cutscene") advanceCut(); });
-$("startBtn").addEventListener("click", e=>{ e.target.blur(); audio(); startGame(); });
+$("skipBtn").addEventListener("click", e=>{ e.stopPropagation(); e.currentTarget.blur(); skipCut(); });
+function skipCut(){
+  if(mode!=="cutscene" || !cut) return;
+  $("cutOv").classList.remove("show");
+  SceneSound.stop();
+  const d = cut.done; cut = null; typing = false;
+  if(state){ state.cutsceneActive = false; state.nextAction = null; }
+  if(d) d();
+}
+$("startBtn").addEventListener("click", e=>{ e.target.blur(); audio(); confirmNewRun(startGame); });
 $("continueBtn").addEventListener("click", e=>{ e.target.blur(); audio(); continueGame(); });
 $("endBtn").addEventListener("click", e=>{
-  e.target.blur(); audio(); $("endOv").classList.remove("show");
+  e.target.blur(); audio();
+  if(endAction){ const a = endAction; endAction = null; a(); return; }
+  $("endOv").classList.remove("show");
   if(storageGet(SAVE_KEY)) continueGame();
   else startGame();
 });
@@ -981,7 +1433,25 @@ $("pauseControlsBtn").addEventListener("click", e=>{
   $("pauseControls").classList.toggle("show");
 });
 $("mainMenuBtn").addEventListener("click", e=>{ e.target.blur(); audio(); goMainMenu(); });
-$("restartBtn").addEventListener("click", e=>{ e.target.blur(); audio(); $("pauseOv").classList.remove("show"); startGame(); });
+$("restartBtn").addEventListener("click", e=>{ e.target.blur(); audio(); confirmNewRun(()=>{ $("pauseOv").classList.remove("show"); startGame(); }); });
+/* never wipe a checkpoint without asking */
+let confirmAction = null;
+function confirmNewRun(action){
+  const raw = storageGet(SAVE_KEY);
+  if(!raw){ action(); return; }
+  let where = "your checkpoint";
+  try{
+    const d = JSON.parse(raw);
+    where = d.biome >= BIOMES.length ? "your checkpoint at The Core"
+      : "your checkpoint in " + BIOMES[d.biome].name + ", room " + Math.min((d.room||0)+1, 4) + (d.room>=3 ? " (boss)" : "");
+  }catch(e){}
+  $("confirmText").textContent = "Starting a new run erases " + where + ". This cannot be undone.";
+  confirmAction = action;
+  $("confirmOv").classList.add("show");
+  $("confirmNo").focus();
+}
+$("confirmYes").addEventListener("click", e=>{ e.target.blur(); $("confirmOv").classList.remove("show"); const a = confirmAction; confirmAction = null; if(a) a(); });
+$("confirmNo").addEventListener("click", e=>{ e.target.blur(); $("confirmOv").classList.remove("show"); confirmAction = null; });
 $("muteBtn").addEventListener("click", e=>{ e.target.blur(); audio(); Music.toggleMute(); updateMuteButton(); });
 $("volumeSlider").addEventListener("input", e=> updateVolume(Number(e.target.value)/100));
 [
@@ -1025,6 +1495,20 @@ function updateVolume(v){
   if(Music.gain) Music.gain.gain.value = Music.muted ? 0 : masterVolume;
   if(SceneSound.gain) SceneSound.gain.gain.value = Music.muted ? 0 : 0.45 * masterVolume;
   ChoirMusic.setVolume(masterVolume);
+  saveAudioSettings();
+}
+function saveAudioSettings(){
+  storageSet(AUDIO_KEY, JSON.stringify({muted:Music.muted, volume:masterVolume}));
+}
+function loadAudioSettings(){
+  try{
+    const a = JSON.parse(storageGet(AUDIO_KEY) || "null");
+    if(!a) return;
+    if(typeof a.volume === "number") masterVolume = Math.max(0, Math.min(1, a.volume));
+    Music.muted = !!a.muted;
+  }catch(e){}
+  $("volumeSlider").value = String(Math.round(masterVolume*100));
+  updateMuteButton();
 }
 function tryLandscapeLock(){
   if(!matchMedia("(pointer:coarse)").matches) return;
@@ -1099,31 +1583,80 @@ function goMainMenu(){
   updateContinueButton();
 }
 updateContinueButton();
+$("titleLine").textContent = TITLE_LINE;
+function refreshPrefsUI(){
+  document.querySelectorAll("[data-diff]").forEach(b=>b.classList.toggle("on", b.dataset.diff === prefs.diff));
+  $("diffLine").textContent = COPY.difficulty[prefs.diff.toUpperCase()].line;
+  $("autoSwingBtn").textContent = "Auto-swing: " + (prefs.autoSwing ? "On" : "Off");
+  $("autoSwingBtn").classList.toggle("on", !!prefs.autoSwing);
+  $("shakeBtn").textContent = "Screen shake: " + (prefs.shake ? "On" : "Off");
+  $("shakeBtn").classList.toggle("on", !!prefs.shake);
+  const best = hall.bestScore ? "  |  BEST " + hall.bestScore.toLocaleString() : "";
+  $("titleDiff").textContent = "DIFFICULTY: " + prefs.diff.toUpperCase() + best + "  |  HALL OF TUNG " + hall.ids.length + "/" + COPY.achievements.length;
+}
+document.querySelectorAll("[data-diff]").forEach(b=>b.addEventListener("click", e=>{ e.currentTarget.blur(); prefs.diff = e.currentTarget.dataset.diff; savePrefs(); refreshPrefsUI(); if(state) applySkillLoadout(); }));
+$("autoSwingBtn").addEventListener("click", e=>{ e.currentTarget.blur(); prefs.autoSwing = !prefs.autoSwing; savePrefs(); refreshPrefsUI(); });
+$("shakeBtn").addEventListener("click", e=>{ e.currentTarget.blur(); prefs.shake = prefs.shake ? 0 : 1; savePrefs(); refreshPrefsUI(); });
+refreshPrefsUI();
+$("storyPane").textContent = STORY_PANE;
 
 /* ---------- cutscene player ---------- */
 let cut = null, typeT = 0, typing = false;
 function playCut(id, done){
   Music.stop();
   mode = "cutscene";
-  if(state){ state.cutsceneActive = true; state.levelOver = true; state.nextAction = done || null; }
-  cut = { scene:CUTSCENES[id], id, i:0, done, t:0, particles:[] };
+  clearTouchState();
+  if(state){ state.cutsceneActive = true; state.levelOver = true; state.nextAction = done || null; state.bark = null; }
+  cut = { scene:CUTSCENES[id], id, i:0, done, t:0, particles:[], art:CUTSCENES[id].art, fx:null, fxT:0, k:0 };
   $("cutOv").classList.add("show");
-  if(ChoirMusic.mode !== "finale") SceneSound.play(cut.scene.art);
-  drawSceneArt(cut.scene.art);
+  if(cut.scene.music){
+    /* the epilogue has its own music: let the choir go, bring the dawn in */
+    ChoirMusic.fadeOut(3.5);
+    Music.play(cut.scene.music);
+  } else if(ChoirMusic.mode !== "finale") SceneSound.play(cut.scene.art);
   showLine();
+  drawSceneArt(cut.art);
 }
+function lineText(L){ return typeof L.t === "function" ? L.t(state) : L.t; }
 function showLine(){
   const L = cut.scene.lines[cut.i];
+  cut.text = lineText(L); cut.k = 0;
   const sp = $("speaker");
-  sp.textContent = L.s; sp.className = (L.s==="THE BUBBLE") ? "glitch" : "";
+  sp.textContent = L.s; sp.className = (L.s==="THE BUBBLE") ? "glitch" : (L.s==="VOICE" ? "voice" : "");
   $("dtext").textContent = ""; typeT = 0; typing = true; cut.shown = 0;
+  $("dhint").textContent = "SPACE / CLICK >";
   $("dialog").classList.remove("pop"); void $("dialog").offsetWidth; $("dialog").classList.add("pop");
-  cut.jolt = L.t.startsWith("TUNG") || L.s==="THE BUBBLE" ? 8 : 2.5;
-  if(L.t.startsWith("TUNG")) tung();
+  /* per-line staging: memory art stays up until a "return" line */
+  if(L.fx === "memory"){ cut.fx = "memory"; cut.art = L.art || cut.scene.art; cut.fxT = 0; tone(523,0.6,"sine",0.05); tone(392,0.9,"sine",0.04); }
+  else if(L.fx === "return"){ cut.fx = "return"; cut.art = cut.scene.art; cut.fxT = 0; }
+  else if(L.fx){ cut.fx = L.fx; cut.fxT = 0; cut.art = L.art || cut.scene.art; }
+  else if(cut.fx !== "memory"){ cut.fx = null; }
+  if(L.fx === "reveal"){ cut.flash = 1; knock(); tung(true); }
+  if(L.fx === "knock"){ knock(); }
+  cut.jolt = (L.fx==="knock" || L.fx==="reveal") ? 14 : (cut.text.startsWith("TUNG") || L.s==="THE BUBBLE" ? 8 : 2.5);
+  if(cut.text.startsWith("TUNG") && !L.fx) tung();
 }
 function advanceCut(){
+  if(!cut) return;
   const L = cut.scene.lines[cut.i];
-  if(typing){ $("dtext").textContent = L.t; typing = false; return; }
+  if(typing){ $("dtext").textContent = (cut.id === "epilogue_card" && L.fx === "black") ? "" : cut.text; typing = false; if(L.knocks) knockHint(); return; }
+  if(L.knocks && cut.k < L.knocks){
+    /* the player answers: one knock per press */
+    cut.k++; knock(); tung(); cut.jolt = 12; knockHint();
+    if(cut.k >= L.knocks){
+      cut.knockLock = true;
+      setTimeout(()=>{ if(cut){ cut.knockLock = false; nextLine(); } }, 900);
+    }
+    return;
+  }
+  if(cut.knockLock) return;
+  nextLine();
+}
+function knockHint(){
+  const L = cut.scene.lines[cut.i];
+  $("dhint").textContent = cut.k >= L.knocks ? "..." : "SPACE / TAP TO KNOCK   " + cut.k + " / " + L.knocks;
+}
+function nextLine(){
   cut.i++;
   if(cut.i >= cut.scene.lines.length){
     $("cutOv").classList.remove("show");
@@ -1136,14 +1669,14 @@ function advanceCut(){
 function tickTyper(dt){
   if(mode!=="cutscene" || !cut || !typing) return;
   typeT += dt*45;
-  const L = cut.scene.lines[cut.i];
-  const n = Math.min(L.t.length, Math.floor(typeT));
+  const L = cut.scene.lines[cut.i], T = cut.text;
+  const n = Math.min(T.length, Math.floor(typeT));
   if(n > cut.shown){
-    for(let k=cut.shown; k<n; k++) typeBlip(L.s, L.t[k]);
+    for(let k=cut.shown; k<n; k++) typeBlip(L.s, T[k]);
     cut.shown = n;
   }
-  $("dtext").textContent = L.t.slice(0, n);
-  if(n >= L.t.length) typing = false;
+  $("dtext").textContent = (cut.id === "epilogue_card" && L.fx === "black") ? "" : T.slice(0, n);
+  if(n >= T.length){ typing = false; if(L.knocks) knockHint(); }
 }
 /* per-character "talk blip" - pitch/timbre keyed to speaker, silent on spaces/punctuation pauses */
 function typeBlip(speaker, ch){
@@ -1152,6 +1685,8 @@ function typeBlip(speaker, ch){
     tone(140 + Math.random()*24, 0.05, "sawtooth", 0.05);
   } else if(speaker==="YOU"){
     tone(340 + Math.random()*36, 0.035, "triangle", 0.045);
+  } else if(speaker==="VOICE"){
+    tone(420 + Math.random()*30, 0.04, "sine", 0.04);
   } else if(speaker==="THE BUBBLE"){
     tone(180 + Math.random()*300, 0.045, "sawtooth", 0.045);   // unstable, stitched-together pitch
   } else {
@@ -1167,28 +1702,188 @@ const CUTSCENE_BGS = {
 };
 for(const k in CUTSCENE_BGS) CUTSCENE_BGS[k].src = CUTSCENE_BG_DATA[k];
 
-function drawSceneArt(id, t=0){
-  sctx.clearRect(0,0,CUT_W,CUT_H);
+/* the illustrated backgrounds, with a slow pan/zoom */
+function drawArtImage(id, t, still){
   const img = CUTSCENE_BGS[id] || CUTSCENE_BGS.apartment;
-  if(img.complete && img.naturalWidth > 0){
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const zoom = reduced ? 1 : 1.05 + 0.025*Math.sin(t*0.35);
-    const panX = reduced ? 0 : Math.sin(t*0.22 + id.length) * 22;
-    const panY = reduced ? 0 : Math.cos(t*0.18 + id.length) * 14;
-    const sw = img.naturalWidth / zoom, sh = img.naturalHeight / zoom;
-    const sx = Math.max(0, Math.min(img.naturalWidth - sw, (img.naturalWidth - sw)/2 + panX));
-    const sy = Math.max(0, Math.min(img.naturalHeight - sh, (img.naturalHeight - sh)/2 + panY));
-    const jolt = cut && cut.scene.art===id && cut.jolt>0 ? cut.jolt : 0;
-    sctx.save();
-    if(jolt) sctx.translate((Math.random()-.5)*jolt, (Math.random()-.5)*jolt);
-    sctx.drawImage(img, sx, sy, sw, sh, 0, 0, CUT_W, CUT_H);
-    sctx.restore();
-  } else {
-    // fallback while the data-URI image is still decoding (near-instant in practice)
-    sctx.fillStyle = "#0a0d16"; sctx.fillRect(0,0,CUT_W,CUT_H);
+  if(!(img.complete && img.naturalWidth > 0)){ sctx.fillStyle = "#0a0d16"; sctx.fillRect(0,0,CUT_W,CUT_H); return; }
+  const calm = still || reducedMotion();
+  const zoom = calm ? 1 : 1.05 + 0.025*Math.sin(t*0.35);
+  const panX = calm ? 0 : Math.sin(t*0.22 + id.length) * 22;
+  const panY = calm ? 0 : Math.cos(t*0.18 + id.length) * 14;
+  const sw = img.naturalWidth / zoom, sh = img.naturalHeight / zoom;
+  const sx = Math.max(0, Math.min(img.naturalWidth - sw, (img.naturalWidth - sw)/2 + panX));
+  const sy = Math.max(0, Math.min(img.naturalHeight - sh, (img.naturalHeight - sh)/2 + panY));
+  sctx.drawImage(img, sx, sy, sw, sh, 0, 0, CUT_W, CUT_H);
+}
+/* draws a Sahur frame on the scene canvas, feet at (x,y) */
+function drawSahurAt(c, x, y, h, frame, flip, alpha){
+  const img = SAHUR_IMGS.idle[frame % SAHUR_IMGS.idle.length];
+  if(!(img && img.complete && img.naturalWidth)) return;
+  c.save(); c.globalAlpha = alpha === undefined ? 1 : alpha;
+  c.translate(x, y); if(flip) c.scale(-1, 1);
+  c.drawImage(img, -h/2, -h*0.86, h, h);
+  c.restore();
+}
+/* MEMORY: the lane as it was. Lanterns, hollow drums, and a light behind every call. */
+function drawMemoryStreet(t){
+  const c = sctx;
+  const sky = c.createLinearGradient(0,0,0,CUT_H);
+  sky.addColorStop(0,"#0b1430"); sky.addColorStop(0.6,"#1d2440"); sky.addColorStop(1,"#2a2230");
+  c.fillStyle = sky; c.fillRect(0,0,CUT_W,CUT_H);
+  for(let i=0;i<40;i++){ c.fillStyle = "rgba(255,240,210," + (0.25+0.25*Math.sin(t*2+i)) + ")"; c.fillRect((i*97)%CUT_W, (i*53)%220, 2, 2); }
+  /* lane */
+  c.fillStyle = "#1a1612";
+  c.beginPath(); c.moveTo(380,300); c.lineTo(580,300); c.lineTo(900,CUT_H); c.lineTo(60,CUT_H); c.closePath(); c.fill();
+  /* houses either side, each window lights up in turn */
+  const houses = [[0,150,190,420],[150,215,110,300],[245,252,70,262],[640,252,70,262],[705,215,110,300],[815,150,190,420]];
+  houses.forEach(([x,y,w,h],hi)=>{
+    c.fillStyle = "#120f14"; c.fillRect(x,y,w,h);
+    c.beginPath(); c.moveTo(x-8,y); c.lineTo(x+w/2,y-w*0.35); c.lineTo(x+w+8,y); c.closePath(); c.fill();
+    const rows = hi%3===2 ? 1 : 2, cols = hi%3===2 ? 1 : 2;
+    for(let r=0;r<rows;r++) for(let k=0;k<cols;k++){
+      const on = t > 0.4 + (hi*2 + r*cols + k)*0.28;
+      const wx = x + w*(0.18 + k*0.42), wy = y + h*(0.14 + r*0.32), ww = w*0.24, wh = h*0.14;
+      c.fillStyle = on ? "#ffcf7a" : "#24202a"; c.fillRect(wx, wy, ww, wh);
+      if(on){ c.fillStyle = "rgba(255,200,110,.18)"; c.fillRect(wx-6, wy-6, ww+12, wh+12); }
+    }
+  });
+  /* neighbours with lanterns and drums, following him */
+  for(let i=0;i<9;i++){
+    const depth = (i%3);
+    const px = 330 + (i*61)%300 + Math.sin(t*1.3+i)*4;
+    const py = 360 + depth*48 + (i>5?40:0);
+    const sc = 0.55 + depth*0.2 + (i>5?0.15:0);
+    const bob = Math.abs(Math.sin(t*3 + i))*4*sc;
+    c.fillStyle = "#0c0a0d";
+    c.beginPath(); c.arc(px, py-48*sc-bob, 9*sc, 0, 7); c.fill();
+    c.fillRect(px-8*sc, py-40*sc-bob, 16*sc, 40*sc);
+    if(i%2===0){
+      const lx = px+14*sc, ly = py-34*sc-bob, fl = 0.75 + 0.25*Math.sin(t*9+i);
+      const g = c.createRadialGradient(lx,ly,1,lx,ly,34*sc);
+      g.addColorStop(0,"rgba(255,214,130,"+(0.9*fl)+")"); g.addColorStop(1,"rgba(255,180,80,0)");
+      c.fillStyle = g; c.beginPath(); c.arc(lx,ly,34*sc,0,7); c.fill();
+      c.fillStyle = "#ffd98a"; c.fillRect(lx-3*sc, ly-4*sc, 6*sc, 8*sc);
+    } else {
+      c.fillStyle = "#5a3a1e"; c.fillRect(px+8*sc, py-34*sc-bob, 7*sc, 22*sc);   // a hollow drum
+    }
   }
-  if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
-    const palette = {apartment:"#35e8ff", fire:"#ffb547", river:"#35e8ff", boardroom:"#ff3df0", core:"#ff3df0", dawn:"#ffb547"};
+  /* him, leading the walk */
+  drawSahurAt(c, 480 + Math.sin(t*0.8)*6, 560, 230, Math.floor(t/0.45), false, 1);
+}
+/* MEMORY: one lit window, a small kid waving down at him */
+function drawMemoryWindow(t){
+  const c = sctx;
+  c.fillStyle = "#0d1022"; c.fillRect(0,0,CUT_W,CUT_H);
+  /* house wall */
+  c.fillStyle = "#17141c"; c.fillRect(520,0,440,CUT_H);
+  c.fillStyle = "#1f1b26"; for(let y=20;y<CUT_H;y+=38) c.fillRect(520,y,440,2);
+  /* the window */
+  const wx = 640, wy = 120, ww = 210, wh = 170;
+  const glow = c.createRadialGradient(wx+ww/2, wy+wh/2, 10, wx+ww/2, wy+wh/2, 260);
+  glow.addColorStop(0,"rgba(255,206,120,.35)"); glow.addColorStop(1,"rgba(255,206,120,0)");
+  c.fillStyle = glow; c.fillRect(380,0,580,520);
+  c.fillStyle = "#ffcf7a"; c.fillRect(wx,wy,ww,wh);
+  c.fillStyle = "#3b2a1e"; c.fillRect(wx+ww/2-3,wy,6,wh); c.fillRect(wx,wy+wh/2-3,ww,6);
+  c.strokeStyle = "#3b2a1e"; c.lineWidth = 8; c.strokeRect(wx,wy,ww,wh);
+  /* the kid: head, shoulders, a waving arm */
+  const kx = wx+70, ky = wy+wh-8;
+  c.fillStyle = "#2a1c14";
+  c.beginPath(); c.arc(kx, ky-74, 20, 0, 7); c.fill();
+  c.fillRect(kx-24, ky-54, 48, 54);
+  c.save(); c.translate(kx+20, ky-48); c.rotate(-1.9 + Math.sin(t*6)*0.45);
+  c.fillRect(0,-5,46,10); c.restore();
+  /* the lane, wet */
+  c.fillStyle = "#121522"; c.fillRect(0,470,CUT_W,130);
+  c.fillStyle = "rgba(255,207,122,.10)"; c.fillRect(wx-20,480,ww+40,6);
+  /* rain */
+  c.strokeStyle = "rgba(170,190,255,.25)"; c.lineWidth = 1;
+  for(let i=0;i<70;i++){ const x = (i*53 + t*60)%CUT_W, y = (i*97 + t*520)%CUT_H; c.beginPath(); c.moveTo(x,y); c.lineTo(x-4,y+14); c.stroke(); }
+  /* him, alone in the lane, looking up */
+  drawSahurAt(c, 300, 560, 250, Math.floor(t/0.45), false, 1);
+}
+/* THE CORE: white, silent, and the Bubble filling the sky */
+function drawVoid(t){
+  const c = sctx;
+  const g = c.createRadialGradient(CUT_W/2, 220, 40, CUT_W/2, 300, 700);
+  g.addColorStop(0,"#ffffff"); g.addColorStop(1,"#d9d9e8");
+  c.fillStyle = g; c.fillRect(0,0,CUT_W,CUT_H);
+  c.font = "15px Verdana, sans-serif"; c.textAlign = "center";
+  const frags = ["thrilled to announce","at scale","this changes everything","we believe","seamless","delighted","disrupting","the future of"];
+  for(let i=0;i<14;i++){
+    c.fillStyle = "rgba(143,123,255," + (0.12 + 0.1*Math.sin(t*0.9+i)) + ")";
+    c.fillText(frags[i%frags.length], (i*173 + t*14*(i%2?1:-1)) % (CUT_W+200) - 100, 60 + (i*61)%460);
+  }
+  const R = 175 + Math.sin(t*1.4)*5, bx = CUT_W/2, by = 230;
+  const bg = c.createRadialGradient(bx-R*0.35, by-R*0.35, R*0.1, bx, by, R+20);
+  bg.addColorStop(0,"#ffffff"); bg.addColorStop(0.35,"#c8f4ff"); bg.addColorStop(0.65,"#ffb3f2"); bg.addColorStop(1,"#8f7bff");
+  c.globalAlpha = 0.92; c.fillStyle = bg; c.beginPath(); c.arc(bx,by,R,0,7); c.fill();
+  const drift = Math.sin(t*0.9)*8;
+  c.globalAlpha = 0.8; c.fillStyle = "#07090f";
+  c.beginPath(); c.arc(bx-42-drift, by-18, 14, 0, 7); c.fill();
+  c.beginPath(); c.arc(bx+46+drift, by-24, 18, 0, 7); c.fill();
+  c.strokeStyle = "#07090f"; c.lineWidth = 7;
+  c.beginPath(); c.arc(bx+drift, by+38, 36, 0.2, Math.PI-0.4); c.stroke();
+  c.globalAlpha = 1;
+  /* two small figures at the bottom: you and him */
+  c.fillStyle = "#e8e4d8"; c.strokeStyle = "#07090f"; c.lineWidth = 3;
+  c.beginPath(); c.arc(530, 540, 17, 0, 7); c.fill(); c.stroke();
+  drawSahurAt(c, 450, 566, 96, Math.floor(t/0.45), false, 1);
+}
+/* the dark apartment: only the phone's glow, and whatever it lights */
+function drawDarkRoom(t){
+  const c = sctx;
+  drawArtImage("apartment", 0, true);
+  const flick = 0.85 + 0.15*Math.sin(t*23) * Math.sin(t*7);
+  const g = c.createRadialGradient(285, 470, 20, 285, 470, 330);
+  g.addColorStop(0, "rgba(0,0,0," + (0.05/flick) + ")"); g.addColorStop(0.6, "rgba(0,0,0,.72)"); g.addColorStop(1, "rgba(0,0,0,.98)");
+  c.fillStyle = g; c.fillRect(0,0,CUT_W,CUT_H);
+  /* the window region stays black: whatever is out there, you cannot see it yet */
+  c.fillStyle = "rgba(0,0,0,.97)"; c.fillRect(440,40,520,440);
+  c.fillStyle = "rgba(80,190,255," + (0.10*flick) + ")"; c.fillRect(0,0,CUT_W,CUT_H);
+}
+function drawEyes(t){
+  const c = sctx;
+  c.fillStyle = "#000"; c.fillRect(0,0,CUT_W,CUT_H);
+  /* the faintest hint of a window frame */
+  c.strokeStyle = "rgba(120,60,160,.18)"; c.lineWidth = 3; c.strokeRect(470,60,330,380);
+  const ex = 640, ey = 175, glow = 0.85 + 0.15*Math.sin(t*3);
+  [[-17,0],[17,0]].forEach(([dx,dy])=>{
+    const gx = c.createRadialGradient(ex+dx, ey+dy, 2, ex+dx, ey+dy, 40);
+    gx.addColorStop(0, "rgba(255,236,190," + (0.55*glow) + ")"); gx.addColorStop(1, "rgba(255,236,190,0)");
+    c.fillStyle = gx; c.beginPath(); c.arc(ex+dx, ey+dy, 40, 0, 7); c.fill();
+    c.fillStyle = "rgba(255,248,230," + glow + ")"; c.beginPath(); c.ellipse(ex+dx, ey+dy, 11, 13, 0, 0, 7); c.fill();
+    c.fillStyle = "#000"; c.beginPath(); c.arc(ex+dx+2, ey+dy+1, 5, 0, 7); c.fill();
+  });
+}
+function drawSceneArt(id, t=0){
+  const fx = cut ? cut.fx : null, fxT = cut ? cut.fxT : 0;
+  sctx.save();
+  const jolt = cut && cut.jolt > 0 && !reducedMotion() ? cut.jolt : 0;
+  if(jolt) sctx.translate((Math.random()-.5)*jolt, (Math.random()-.5)*jolt);
+  if(fx === "black"){
+    sctx.fillStyle = "#000"; sctx.fillRect(-20,-20,CUT_W+40,CUT_H+40);
+    if(cut && cut.id === "epilogue_card"){
+      const lines = cut.text.split("\n"), a = Math.min(1, cut.fxT*1.5);
+      sctx.textAlign = "center"; sctx.globalAlpha = a;
+      lines.forEach((ln, i)=>{
+        const big = cut.i === 0 && i === 0;
+        sctx.font = big ? "700 54px \"Press Start 2P\", monospace" : (cut.i === 0 ? "700 22px Verdana, sans-serif" : "26px Verdana, sans-serif");
+        sctx.fillStyle = big ? "#ffb547" : "#e8e4d8";
+        sctx.fillText(ln, CUT_W/2, CUT_H/2 - (lines.length-1)*36 + i*72);
+      });
+      sctx.globalAlpha = 1;
+    }
+  }
+  else if(fx === "eyes") drawEyes(t);
+  else if(fx === "dark" || fx === "knock") drawDarkRoom(t);
+  else if(id === "memory_street") drawMemoryStreet(fxT);
+  else if(id === "memory_window") drawMemoryWindow(fxT);
+  else if(id === "void") drawVoid(t);
+  else drawArtImage(id, t, false);
+  sctx.restore();
+  const dark = fx === "black" || fx === "eyes" || fx === "dark" || fx === "knock";
+  if(!dark && !reducedMotion()){
+    const palette = {apartment:"#35e8ff", fire:"#ffb547", river:"#35e8ff", boardroom:"#ff3df0", core:"#ff3df0", dawn:"#ffb547", void:"#8f7bff", memory_street:"#ffcf7a", memory_window:"#ffcf7a"};
     sctx.save();
     sctx.globalCompositeOperation = "screen";
     for(let i=0;i<18;i++){
@@ -1200,6 +1895,29 @@ function drawSceneArt(id, t=0){
     }
     sctx.restore();
   }
+  if(fx === "memory"){
+    /* old photograph: warm tint, grain, soft edges, and a label so it is never mistaken for now */
+    sctx.save();
+    sctx.globalCompositeOperation = "color";
+    sctx.fillStyle = "#a07a4a"; sctx.globalAlpha = 0.75; sctx.fillRect(0,0,CUT_W,CUT_H);
+    sctx.globalCompositeOperation = "multiply";
+    sctx.fillStyle = "#e9d2a8"; sctx.globalAlpha = 0.5; sctx.fillRect(0,0,CUT_W,CUT_H);
+    sctx.restore();
+    sctx.save();
+    for(let i=0;i<220;i++){ sctx.fillStyle = Math.random()<0.5 ? "rgba(0,0,0,.12)" : "rgba(255,240,210,.10)";
+      sctx.fillRect(Math.random()*CUT_W, Math.random()*CUT_H, 2, 2); }
+    const v = sctx.createRadialGradient(CUT_W/2, CUT_H/2, CUT_W*0.25, CUT_W/2, CUT_H/2, CUT_W*0.62);
+    v.addColorStop(0,"rgba(30,18,6,0)"); v.addColorStop(1,"rgba(30,18,6,.75)");
+    sctx.fillStyle = v; sctx.fillRect(0,0,CUT_W,CUT_H);
+    sctx.fillStyle = "rgba(255,236,200,.85)"; sctx.font = "700 16px Verdana, sans-serif"; sctx.textAlign = "left";
+    sctx.fillText("MEMORY", 26, 38);
+    sctx.restore();
+  }
+  /* soft white cut into and out of a memory, and the flash of the reveal */
+  let white = 0;
+  if((fx === "memory" || fx === "return") && fxT < 0.45) white = 1 - fxT/0.45;
+  if(cut && cut.flash > 0) white = Math.max(white, cut.flash);
+  if(white > 0){ sctx.fillStyle = "rgba(255,255,255," + (reducedMotion() ? white*0.3 : white) + ")"; sctx.fillRect(0,0,CUT_W,CUT_H); }
   const g = sctx.createRadialGradient(CUT_W/2, CUT_H/2, CUT_W*.18, CUT_W/2, CUT_H/2, CUT_W*.7);
   g.addColorStop(0, "rgba(0,0,0,0)");
   g.addColorStop(1, "rgba(0,0,0,.42)");
@@ -1207,35 +1925,83 @@ function drawSceneArt(id, t=0){
 }
 function tickCutscene(dt){
   if(mode!=="cutscene" || !cut) return;
-  cut.t += dt;
+  cut.t += dt; cut.fxT += dt;
   cut.jolt = Math.max(0, (cut.jolt || 0) - dt*26);
-  drawSceneArt(cut.scene.art, cut.t);
+  cut.flash = Math.max(0, (cut.flash || 0) - dt*1.6);
+  drawSceneArt(cut.art, cut.t);
 }
 // redraw the current cutscene panel once its art finishes decoding, in case it wasn't ready on first paint
 for(const k in CUTSCENE_BGS){
-  CUTSCENE_BGS[k].addEventListener("load", ()=>{ if(mode==="cutscene" && cut && cut.scene.art===k) drawSceneArt(k); });
+  CUTSCENE_BGS[k].addEventListener("load", ()=>{ if(mode==="cutscene" && cut && cut.art===k) drawSceneArt(k, cut.t); });
 }
 
 /* ---------- rooms & spawning ---------- */
 function biome(){ return BIOMES[Math.min(state.biome, BIOMES.length-1)]; }
+/* particles, text, rings, ghosts and launched enemies: run in play and during TRIPLE T */
+function updateFx(dt){
+  const s = state;
+  s.parts.forEach(pt=>{ pt.x+=pt.vx*dt; pt.y+=pt.vy*dt; pt.t-=dt; });
+  s.parts = s.parts.filter(pt=>pt.t>0);
+  if(s.parts.length > CAP.parts) s.parts.splice(0, s.parts.length - CAP.parts);
+  s.texts.forEach(t=>{ t.t-=dt; t.y-=(t.num ? 34 : 14)*dt; });
+  s.texts = s.texts.filter(t=>t.t>0);
+  s.waves.forEach(w=>{ w.t -= dt; }); s.waves = s.waves.filter(w=>w.t>0);
+  s.ghosts.forEach(g=>{ g.t -= dt; }); s.ghosts = s.ghosts.filter(g=>g.t>0);
+  s.flyers.forEach(f=>{
+    f.t += dt; f.x += f.vx*dt; f.y += f.vy*dt; f.vy -= 260*dt; f.rot += f.vr*dt;
+    if(f.t > 1.05 && !f.twinkled){ f.twinkled = true; burst(Math.max(10,Math.min(W-10,f.x)), Math.max(10,Math.min(H-10,f.y)), "#ffffff", 6, 90); }
+  });
+  s.flyers = s.flyers.filter(f=>f.t < 1.1);
+  if(s.comboT > 0){ s.comboT -= dt; if(s.comboT <= 0){ s.combo = 0; s.comboTier = 0; } }
+  s.comboPop = Math.max(0, (s.comboPop||0) - dt*4);
+}
 function startRoom(){
   const s = state; s.enemies = []; s.bullets = []; s.boss = null; s.roomClearing = false; s.levelOver = false; s.cutsceneActive = false; s.nextAction = null;
   s.spawnQueue = []; s.pending = []; s.spawnT = 0.9;
-  s.player.x = W/2; s.player.y = H-90; s.sahur.x = W/2-50; s.sahur.y = H-90;
+  const startY = W < H ? H*0.62 : H-90;
+  s.player.x = W/2; s.player.y = startY; s.sahur.x = W/2-50; s.sahur.y = startY;
   s.sahur.degrade = biome().sahurDrain || 1;
+  s.sahur.hp = s.sahur.maxHp; s.sahur.down = false; s.sahur.help = 0; s.sahur.waitBeat = null;
+  s.snipes = []; s.bark = null; s.orbs = []; s.bats = []; s.flyers = []; s.waves = []; s.magnetAll = false; s.roomHurt = false; s.ult = null;
+  s.roomStartT = s.runTime;
   const b = biome();
+  /* every room after the first rolls a modifier */
+  s.modifier = null;
+  if(s.room < b.rooms && !(s.biome===0 && s.room===0)) pickModifier();
   if(s.room < b.rooms){
-    const count = 5 + s.biome*2 + s.room;
+    setTimeout(()=>{ if(state===s && mode==="play") sahurBark(BARKS.room_start[s.biome + "-" + s.room], 3.2); }, 900);
+    let count = 5 + s.biome*2 + s.room;
+    if(s.modifier && s.modifier.id==="trending") count = Math.round(count*1.5);
     for(let i=0;i<count;i++){
       const t = b.mix[Math.floor(Math.random()*b.mix.length)];
       s.spawnQueue.push({ type:t, scale:b.statScale });
     }
-    toast(b.name + " - ROOM " + (s.room+1) + "/" + b.rooms, b.accent);
+    if(!s.modifier) toast(b.name + " - ROOM " + (s.room+1) + "/" + b.rooms, b.accent);
+    /* biome 1, room 3: the mossy rival shows up */
+    if(s.biome===0 && s.room===2){
+      s.rivalPending = true;
+      setTimeout(()=>{ s.rivalPending = false; if(state!==s || mode!=="play") return;
+        const e = spawnEnemyAt("golem", W/2, 90, 1, true);
+        e.rival = true; e.hp = e.maxHp = 260*diff().enemyHp; e.r = 26; e.color = "#6fbf4a"; e.speed = 62; e.dmg = 14;
+        s.versus = { id:"patatam", t:0, dur:2.4 };
+        setTimeout(()=>{ if(state===s) sahurBark(COPY.barks.rival.spawn, 2.4); }, 2500);
+        setTimeout(()=>{ if(state===s && e.hp>0) s.texts.push({msg:COPY.barks.rival.exchange[0].t, col:"#6fbf4a", x:e.x, y:e.y-44, t:1.8, big:true}); }, 5000);
+        setTimeout(()=>{ if(state===s && e.hp>0) sahurBark(COPY.barks.rival.exchange[1].t, 2.6); }, 6600);
+      }, 2600);
+    }
     Music.play(BIOME_TRACKS[Math.min(s.biome, BIOME_TRACKS.length-1)]);
   } else {
     spawnBoss(b.boss);
   }
   saveProgress();
+}
+function pickModifier(){
+  const s = state;
+  const pool = COPY.modifiers.filter(m=>m.id!=="sponsored" && m.id!==s.lastModifier);
+  const m = pool[Math.floor(Math.random()*pool.length)];
+  s.modifier = m; s.lastModifier = m.id; s.modCard = 3.2;
+  if(m.id === "patch_notes") setTimeout(()=>{ if(state===s && mode==="play") openChest("gold"); }, 1400);
+  if(Math.random() < 0.5) setTimeout(()=>{ if(state===s && mode==="play") sahurBark(pickLine(COPY.barks.modifier), 2.4); }, 3400);
 }
 /* enemies enter from the borders, one at a time, with a telegraph first */
 function borderPoint(){
@@ -1249,25 +2015,96 @@ function queueSpawn(type, scale, delay){
   const pt = borderPoint();
   state.pending.push({ type, scale, x:pt.x, y:pt.y, t:delay });
 }
-function spawnEnemyAt(type, x, y, scale){
-  const T = ENEMY_TYPES[type];
-  state.enemies.push({ type, x, y, r:T.r, hp:T.hp*scale, maxHp:T.hp*scale, sc:scale,
-    speed:T.speed, dmg:T.dmg*Math.sqrt(scale), color:T.color, ai:T.ai,
-    t:Math.random()*2, dashT:0, wind:0, vx:0, vy:0, hitT:0 });
+function spawnEnemyAt(type, x, y, scale, noElite){
+  const T = ENEMY_TYPES[type], m = state.modifier ? state.modifier.id : "";
+  let hp = T.hp*scale*diff().enemyHp, speed = T.speed;
+  if(m==="ratiod") speed *= 1.22;
+  if(m==="lag_spike"){ speed *= 0.72; hp *= 1.4; }
+  const e = { type, x, y, r:T.r, hp, maxHp:hp, sc:scale,
+    speed, dmg:T.dmg*Math.sqrt(scale), color:T.color, ai:T.ai,
+    t:Math.random()*2, dashT:0, wind:0, vx:0, vy:0, hitT:0, kx:0, ky:0, sq:0, stun:0, born:0 };
+  /* the mutation ladder: gold, diamond, rainbow */
+  if(!noElite && !state.boss){
+    const chance = 0.045 * diff().elite * (m==="golden_hour" ? 4 : 1) * (state.biome+1 > 1 ? 1.2 : 1);
+    if(Math.random() < chance){
+      const r = Math.random();
+      e.elite = r < 0.06 ? "rainbow" : (r < 0.3 ? "diamond" : "gold");
+      const k = {gold:2.6, diamond:3.4, rainbow:4.5}[e.elite];
+      e.hp *= k; e.maxHp = e.hp; e.r += 4; e.dmg *= 1.15;
+      if(state.barkCD <= 0) sahurBark(pickLine(COPY.barks.elite_spotted), 2.4);
+    }
+  }
+  state.enemies.push(e);
+  return e;
+}
+function dropOrb(x, y, n, kind){
+  const o = state.orbs;
+  for(let i=0;i<n;i++){
+    if(o.length >= CAP.orbs){ o[i % o.length].v += 1; continue; }
+    const a = Math.random()*6.28, sp = 60 + Math.random()*140;
+    o.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, v:1, t:0, kind:kind || "aura"});
+  }
+}
+function onEnemyKilled(e){
+  const s = state;
+  s.kills++;
+  burst(e.x, e.y, e.color, e.elite ? 26 : 14, e.elite ? 300 : 200);
+  freeze(e.elite ? 0.11 : 0.05);
+  gainTTT(e.elite ? 0.12 : 0.022);
+  addScore(e.elite ? 120 : 10 + 4*s.biome);
+  const mod = s.modifier ? s.modifier.id : "";
+  dropOrb(e.x, e.y, (e.elite ? 10 : 1 + (Math.random()<0.45?1:0)) * (mod==="algorithm_boost" ? 2 : 1));
+  const p = s.player;
+  if(Math.random() < 0.045 + (p.hp/p.maxHp < 0.4 ? 0.08 : 0)) dropOrb(e.x, e.y, 1, "rice");
+  if(mod==="touch_grass" && s.kills % 5 === 0) dropOrb(e.x, e.y, 1, "rice");
+  if(s.boss && Math.random() < 0.22) dropOrb(e.x, e.y, 1, "snack");
+  if(e.rival){ sahurBark(COPY.barks.rival.defeat, 2.6); openChest("diamond"); addScore(400); }
+  if(e.elite){
+    s.elitesKilled++;
+    if(e.elite === "rainbow") award("rainbow");
+    openChest(e.elite);
+  }
+}
+/* an elite's chest: a free level in a random skill you can still raise */
+function openChest(kind){
+  const pool = availableSkillChoices();
+  const E = COPY.elites[kind];
+  if(!pool.length){ addScore(500); toast(E.label + " CHEST  +500", "#ffb547"); return; }
+  const n = kind === "rainbow" ? 2 : 1;
+  const got = [];
+  for(let i=0;i<n && pool.length;i++){
+    const sk = pool.splice(Math.floor(Math.random()*pool.length), 1)[0];
+    state.skillLevels[sk.name] = (state.skillLevels[sk.name]||0) + 1; got.push(sk.name);
+  }
+  state.relics = Object.entries(state.skillLevels).map(([name,lvl])=>name+" Lv."+lvl);
+  applySkillLoadout();
+  toast(E.toast, kind==="rainbow" ? "#ff3df0" : (kind==="diamond" ? "#35e8ff" : "#ffb547"));
+  state.texts.push({msg:"+ " + got.join(" + "), col:"#e8e4d8", x:W/2, y:centerY(H/2-10), t:2.4, big:true, center:true});
+  tone(880,0.15,"square",0.06); tone(1320,0.25,"triangle",0.05);
 }
 function spawnBoss(id){
   const B = BOSSES[id];
-  state.boss = { id, ...B, x:W/2, y:130, hp:B.hp, maxHp:B.hp, t:1.5,
+  state.boss = { id, ...B, x:W/2, y:(W < H ? 240 : 130), hp:B.hp, maxHp:B.hp, t:1.5,
     pat:0, vuln:!B.overextend, vulnT:0, hitT:0 };
   state.bossTime = 0; state.bossDamageTaken = 0; state.bossMinHp = state.player.hp; state.bossRevivesUsed = 0;
-  toast("! " + B.name, "#ff4d5e");
+  const sa = state.sahur;
+  sa.hp = sa.maxHp; sa.down = false; sa.wasDown = false; sa.help = 0; sa.calm = 0; sa.inv = 1.5;
+  state.snipes = [];
+  state.versus = { id, t:0, dur:2.6 };
+  state.boss.t += 2.4;     // it waits for the card
+  setTimeout(()=>{ if(state && state.boss && state.boss.id===id && mode==="play") sahurBark(BARKS.boss_start[id], 3.2); }, 1300);
+  if(!state.seenSahurBar){ state.seenSahurBar = true; setTimeout(()=>{ if(state && state.boss && mode==="play") banner("PROTECT SAHUR - IF HE FALLS, STAND BY HIM", "#ffb547"); }, 2400); }
   Music.play(B.final ? "core" : "boss");
   if(B.final){ state.phase = 1; banner("PHASE 1 - HYPE"); }
 }
 
 /* ---------- combat helpers ---------- */
-function toast(msg, col){ state.texts.push({msg, col, x:W/2, y:H/2-120, t:2.2, big:true}); }
-function banner(msg){ state.texts.push({msg, col:"#ff3df0", x:W/2, y:120, t:2.6, big:true}); }
+function centerY(base){
+  const used = state.texts.filter(t=>t.center && t.t > 0.3).length;
+  return base + used*30;
+}
+function toast(msg, col){ state.texts.push({msg, col, x:W/2, y:centerY(H/2-10), t:2.2, big:true, center:true}); }
+function banner(msg, col){ state.texts.push({msg, col:col || "#ff3df0", x:W/2, y:H/2-50, t:2.6, big:true}); }
 function ftext(msg, x, y, col){ state.texts.push({msg, col, x, y, t:0.8, big:false}); }
 function burst(x,y,col,n=10,spd=140){
   for(let i=0;i<n;i++){ const a = Math.random()*7;
@@ -1284,8 +2121,9 @@ function fireAimed(x,y,n,spread,spd,dmg){
 }
 function damagePlayer(d){
   const p = state.player;
-  if(p.inv > 0) return;
-  const real = d * (1-p.armor);
+  if(p.inv > 0 || state.ult) return;
+  const real = d * (1-p.armor) * diff().hurt;
+  state.roomHurt = true; buzz(40);
   if(state.boss){ state.bossDamageTaken += real; state.bossMinHp = Math.min(state.bossMinHp, p.hp - real); }
   p.hp -= real; p.inv = 0.7; shake = Math.max(shake, 5);
   tone(160,0.12,"square",0.1);
@@ -1294,17 +2132,112 @@ function damagePlayer(d){
     else gameOver();
   }
 }
-function damageEnemy(e, d, fromPlayer){
-  if(state.boss===e && !e.vuln){ ftext("NOT YET", e.x, e.y-e.r-14, "#8b8fa3"); return; }
-  let dm = d;
+function sahurSlam(mult, label){
+  const s = state, sa = s.sahur, p = s.player;
+  sa.anim = "attack"; sa.animT = 0; sa.animF = 0;
+  tung(); shake = Math.max(shake, 9);
+  s.texts.push({msg:label, col:"#ffb547", x:sa.x, y:sa.y-40, t:0.7, big:true});
+  burst(sa.x, sa.y, "#ffb547", 18, 220);
+  if(p.beatBuff) p.buffT = 3;
+  s.enemies.forEach(e=>{
+    const d = Math.hypot(e.x-sa.x, e.y-sa.y);
+    if(d < sa.radius+e.r){ damageEnemy(e, 26*mult, false, {from:sa, knock:420}); }
+  });
+  if(s.boss && Math.hypot(s.boss.x-sa.x, s.boss.y-sa.y) < sa.radius+s.boss.r) damageEnemy(s.boss, 26*mult, false);
+  freeze(0.06); buzz(25);
+  sa.ring = 0.4;
+}
+/* Sahur can be hurt only in boss fights. At 0 HP he is knocked down, never killed:
+   the player helps him up by standing beside him. */
+function damageSahur(d){
+  const sa = state.sahur;
+  if(!state.boss || !sa.alive || sa.down || sa.inv > 0) return;
+  if(state.boss.final && state.phase >= 3) return;
+  sa.hp -= d; sa.inv = 0.45; sa.calm = 0; sa.hurtT = 0.25;
+  tone(120,0.1,"square",0.07);
+  if(sa.hp <= 0){
+    sa.hp = 0; sa.down = true; sa.downT = 0; sa.help = 0; sa.wasDown = true;
+    sa.anim = "idle"; sa.waitBeat = null;
+    shake = Math.max(shake, 8); knock();
+    state.texts.push({msg:"SAHUR IS DOWN", col:"#ffb547", x:sa.x, y:sa.y-145, t:1.6, big:true});
+    sahurBark(pickLine(BARKS.down), 3);
+  }
+}
+function award(id){
+  if(hall.ids.includes(id)) return;
+  const a = COPY.achievements.find(x=>x.id===id); if(!a) return;
+  hall.ids.push(id); saveHall();
+  if(state) state.unlockFeed.push({kind:"ach", msg:a.name, t:4, col:"#ffb547"});
+  tone(659,0.12,"square",0.05); tone(988,0.2,"square",0.04);
+}
+/* tutorial prompts: shown once, only until you do the thing */
+function tutShow(k){
+  if(!state || (prefs.tut && prefs.tut[k])) return;
+  if(!state.tut || state.tut.k !== k) state.tut = { k, t:0 };
+}
+function tutDone(k){
+  prefs.tut = prefs.tut || {};
+  if(prefs.tut[k]) return;
+  prefs.tut[k] = true; savePrefs();
+  if(state && state.tut && state.tut.k === k) state.tut = null;
+}
+function pickLine(list){ return list[Math.floor(Math.random()*list.length)]; }
+function sahurBark(text, dur=3){
+  if(!state || !text) return;
+  state.bark = { text, t:dur, max:dur };
+  state.barkCD = 4;
+}
+function damageEnemy(e, d, fromPlayer, opts){
+  opts = opts || {};
+  if(state.boss===e && !e.vuln && !opts.pierce){ ftext("NOT YET", e.x, e.y-e.r-14, "#8b8fa3"); return; }
+  if(state.boss===e && e.final && state.phase>=3) return;
+  let dm = d, crit = false;
   if(fromPlayer){
-    if(Math.random() < state.player.crit){ dm*=2; }
+    if(Math.random() < state.player.crit || opts.crit){ dm*=2; crit = true; }
     if(state.player.beatBuff && state.player.buffT>0) dm*=state.player.beatMult || 1.5;
     if(state.player.lifesteal && state.boss !== e) state.player.hp = Math.min(state.player.maxHp, state.player.hp+state.player.lifesteal);
   }
-  e.hp -= dm; e.hitT = 0.12;
-  ftext(Math.round(dm), e.x, e.y-e.r-10, dm>d?"#ffb547":"#e8e4d8");
-  tone(300+Math.random()*80, 0.06, "triangle", 0.06);
+  e.hp -= dm; e.hitT = 0.1; e.sq = 1;
+  /* knockback away from whoever hit it (bosses barely move) */
+  if(opts.from && state.boss !== e){
+    const a = Math.atan2(e.y-opts.from.y, e.x-opts.from.x), k = (opts.knock || 260) / (e.type==="golem" ? 2.2 : 1);
+    e.kx = (e.kx||0) + Math.cos(a)*k; e.ky = (e.ky||0) + Math.sin(a)*k;
+  }
+  addCombo(1);
+  const big = dm >= d*1.25 || crit;
+  numText(Math.round(dm), e.x, e.y-e.r-10, crit ? "#ff4d5e" : (big ? "#ffb547" : "#e8e4d8"), big);
+  const c = Math.min(state.combo, 12);
+  tone((300+Math.random()*24) * Math.pow(2, c/12), 0.06, "triangle", 0.06);
+  if(state.boss===e) freeze(0.03); else freeze(crit ? 0.07 : 0.04);
+  gainTTT(0.011 * (opts.onBeat ? 2 : 1));
+}
+/* the combo counts like the chant: tung, tung tung, tung tung tung... */
+function addCombo(n){
+  const s = state; s.combo += n; s.comboT = COMBO_TIME;
+  if(s.combo > s.bestCombo) s.bestCombo = s.combo;
+  if(s.combo >= 99) award("ninety_nine");
+  const tier = COMBO_TIERS.filter(t=>s.combo >= t.n).pop();
+  if(tier && tier.n !== s.comboTier){
+    s.comboTier = tier.n; s.comboPop = 1;
+    if(tier.n >= 9) tone(523*Math.pow(2, Math.min(tier.n,60)/60), 0.18, "square", 0.05);
+    if(tier.n >= 25 && Math.random() < 0.6) sahurBark(pickLine(COPY.barks.combo25), 2.2);
+  }
+}
+function comboMult(){ return 1 + Math.min(state.combo, 60) / 30; }
+function addScore(v){ state.score += Math.round(v * comboMult() * diff().score); }
+function numText(msg, x, y, col, big){
+  const t = state.texts;
+  if(t.length > CAP.texts) t.splice(0, t.length - CAP.texts);
+  t.push({msg:String(msg), col, x:x + (Math.random()-.5)*10, y, t:0.75, big:false, num:true, pop:big ? 1.5 : 1});
+}
+function gainTTT(v){
+  const s = state;
+  if(s.ult || s.ttt >= 1) return;
+  s.ttt = Math.min(1, s.ttt + v * (s.player.tttRate || 1));
+  if(s.ttt >= 1){
+    tone(784,0.12,"square",0.06); tone(1046,0.2,"square",0.05);
+    if(!s.tttReadyShown){ s.tttReadyShown = true; sahurBark(COPY.barks.triple_t_first, 3.4); }
+  }
 }
 function bossTimeLimit(id){
   return {echo:55, scraper:70, valuation:90, bubble:120}[id] || 60;
@@ -1316,6 +2249,8 @@ function completeChallenge(id){
   state.completedChallenges.add(id);
   const row = CHALLENGE_ROWS.find(c=>c.id===id);
   state.unlockFeed.push({kind:"challenge", msg:"CHALLENGE: " + (row ? row.label : id), t:4, col:"#35e8ff"});
+  const p = state.player;
+  p.maxHp += CHALLENGE_HP; p.hp = Math.min(p.maxHp, p.hp + CHALLENGE_HP);
   saveProgress();
 }
 function rarityColor(r){
@@ -1327,16 +2262,24 @@ function fmtTime(t){
 }
 function applySkillLoadout(){
   const hpPct = state.player.maxHp ? state.player.hp / state.player.maxHp : 1;
-  state.player.maxHp = 100; state.player.speed = 225; state.player.dmg = 13;
+  const sahurPct = state.sahur.maxHp ? state.sahur.hp / state.sahur.maxHp : 1;
+  state.player.maxHp = 100 + CHALLENGE_HP * state.completedChallenges.size;
+  state.player.speed = 225; state.player.dmg = 13;
   state.player.atkCD = 0.38; state.player.crit = 0; state.player.armor = 0;
-  state.player.lifesteal = 0; state.player.roomHeal = 0; state.player.revives = 0;
+  state.player.lifesteal = 0; state.player.revives = 0;
   state.player.beatBuff = false; state.player.beatMult = 1.5;
-  state.sahur.radius = 135; state.sahur.cdMult = 1;
+  state.sahur.radius = 135; state.sahur.cdMult = 1; state.sahur.maxHp = 120 * diff().sahurHp; state.sahur.regenMult = 1; state.sahur.triple = false;
+  const P = state.player;
+  P.boomerang = 0; P.horn = 0; P.dashCdMult = 1; P.tttRate = 1; P.roomHeal = 0; P.auraFarm = 0; P.magnet = 1;
+  P.vineBoom = false; P.familyMeal = false; P.beatCrit = false;
   Object.entries(state.skillLevels).forEach(([name, lvl])=>{
     const sk = skillByName(name);
     if(sk && lvl > 0) sk.apply(state, lvl);
   });
+  (state.evolutions || []).forEach(n=>{ const ev = EVOS.find(e=>e.name===n); if(ev) ev.apply(state); });
+  state.sahur.maxHp = Math.round(state.sahur.maxHp);
   state.player.hp = Math.min(state.player.maxHp, Math.max(1, state.player.maxHp * hpPct));
+  state.sahur.hp = Math.min(state.sahur.maxHp, state.sahur.maxHp * sahurPct);
 }
 
 /* ---------- room clear / progression ---------- */
@@ -1347,26 +2290,38 @@ function checkClear(){
     if(s.boss.hp <= 0 && !s.boss.final){ s.roomClearing = true; onBossDown(); }
     return;
   }
-  if(s.enemies.length === 0 && s.spawnQueue.length === 0 && s.pending.length === 0
+  if(s.enemies.length === 0 && s.spawnQueue.length === 0 && s.pending.length === 0 && !s.rivalPending
      && s.room < biome().rooms){
     s.roomClearing = true;
     s.roomsCleared++;
     completeChallenge("first_room");
     if(s.roomsCleared >= 4) completeChallenge("rooms_4");
-    if(s.player.roomHeal){ s.player.hp = Math.min(s.player.maxHp, s.player.hp + s.player.roomHeal); }
-    setTimeout(openChoice, 450);
+    /* the last hit lands in slow motion; every orb comes home */
+    s.slowT = 0.55; s.magnetAll = true; freeze(0.12);
+    const p = s.player, sa = s.sahur;
+    if(!s.roomHurt) award("clean_room");
+    const roomTime = s.runTime - (s.roomStartT || 0);
+    s.fastRooms = roomTime < 20 ? (s.fastRooms||0) + 1 : 0;
+    if(s.fastRooms >= 3) award("overbooked");
+    if(p.roomHeal){ p.hp = Math.min(p.maxHp, p.hp + p.roomHeal); numText("+" + p.roomHeal, p.x, p.y-28, "#3dff9d", true); }
+    if(p.familyMeal){ p.hp = Math.min(p.maxHp, p.hp + p.maxHp*0.3); numText("FAMILY MEAL", p.x, p.y-44, "#3dff9d", true); }
+    addScore(150 + 50*s.biome + (s.roomHurt ? 0 : 200));
+    state.texts.push({msg:"ROOM CLEAR" + (s.roomHurt ? "" : "  -  UNTOUCHED +200"), col:"#3dff9d", x:W/2, y:H/2-40, t:1.4, big:true});
+    setTimeout(()=>{ if(state===s && s.roomClearing) openChoice(); }, 1150);
   }
 }
 function onBossDown(){
   const defeated = state.boss;
   evaluateBossChallenges(defeated);
-  burst(state.boss.x, state.boss.y, state.boss.color, 40, 260);
-  shake = 14; tung(true);
+  burst(state.boss.x, state.boss.y, state.boss.color, 60, 320);
+  shake = 14; tung(true); freeze(0.3); flash = 0.6; buzz(150);
+  addScore(1500 + 500*state.biome + (state.lastBossResult && state.lastBossResult.under ? 1000 : 0));
+  state.texts.push({msg:"BOSS DOWN", col:"#ffb547", x:W/2, y:H/2-40, t:1.6, big:true, huge:true});
   state.levelOver = true; Music.stop();
   state.boss = null; state.enemies = []; state.bullets = [];
   state.pending = []; state.spawnQueue = [];
   const cid = ["biome1_end","biome2_end","biome3_end"][state.biome];
-  setTimeout(()=>{
+  setTimeout(()=>showBiomeClear(()=>{
     playCut(cid, ()=>{
       const nextBiome = state.biome + 1;
       openSkillRoll(()=>{
@@ -1385,7 +2340,7 @@ function onBossDown(){
         }
       });
     });
-  }, 900);
+  }), 1200);
 }
 function evaluateBossChallenges(boss){
   if(!boss) return;
@@ -1405,6 +2360,8 @@ function evaluateBossChallenges(boss){
     if(under && state.bossRevivesUsed===0) completeChallenge("valuation_clean");
   }
   if(state.bossMinHp >= 40) completeChallenge("boss_no_heal");
+  if(!state.sahur.wasDown){ completeChallenge("sahur_standing"); award("wake_on_time"); }
+  if(state.player.hp <= 10) award("pinch_hitter");
   if(state.speedBosses >= 3) completeChallenge("three_speed_bosses");
 }
 function availableSkillChoices(){
@@ -1436,7 +2393,26 @@ function openChoice(afterPick, title, sub){
     picks.push(pool.splice(pickIndex,1)[0]);
   }
   const cards = $("cards"); cards.innerHTML = "";
-  if(!picks.length){
+  /* a ready evolution always shows up, framed as BRAINROT GOD */
+  const evo = EVOS.find(e=>!state.evolutions.includes(e.name) && e.recipe.every(r=>(state.skillLevels[r]||0) >= 2));
+  if(evo){
+    const b = document.createElement("button");
+    b.className = "card evo";
+    b.innerHTML = `<div class="rarity god">BRAINROT GOD</div><div class="fam">EVOLUTION</div>
+                   <div class="nm">${evo.name}</div><div class="ds">${evo.desc}</div>
+                   <div class="lvl">${evo.recipeLine}</div>`;
+    b.onclick = ev=>{
+      ev.currentTarget.blur();
+      state.evolutions.push(evo.name);
+      state.relics = Object.entries(state.skillLevels).map(([name,lvl])=>name+" Lv."+lvl).concat(state.evolutions);
+      applySkillLoadout(); award("evolved"); saveProgress();
+      tone(523,0.2,"square",0.06); tone(784,0.3,"square",0.05); tone(1046,0.5,"square",0.04);
+      $("chooseOv").classList.remove("show"); nextStep();
+    };
+    cards.appendChild(b);
+    if(picks.length > 2) picks.pop();
+  }
+  if(!picks.length && !evo){
     const b = document.createElement("button");
     b.className = "card";
     b.innerHTML = `<div class="nm">No upgrades available</div><div class="ds">Beat bosses to roll more skills into the pool.</div>`;
@@ -1455,7 +2431,7 @@ function openChoice(afterPick, title, sub){
     b.onclick = ev=>{
       ev.target.blur();
       state.skillLevels[p.name] = next;
-      state.relics = Object.entries(state.skillLevels).map(([name,lvl])=>name+" Lv."+lvl);
+      state.relics = Object.entries(state.skillLevels).map(([name,lvl])=>name+" Lv."+lvl).concat(state.evolutions);
       applySkillLoadout();
       saveProgress();
       $("chooseOv").classList.remove("show");
@@ -1508,7 +2484,7 @@ function openSkillRoll(afterRoll){
     b.innerHTML = `<div class="rarity ${roll.rarity}">${roll.rarity.toUpperCase()} UNLOCK</div>
                    <div class="fam ${roll.family}">${roll.family}</div>
                    <div class="nm">${roll.name}</div>
-                   <div class="ds">${roll.unlock.text}<br><br>${roll.desc(1)}</div>
+                   <div class="ds">${roll.desc(1)}<br><br>Joins your upgrade pool for the rest of the run.</div>
                    <div class="lvl">Claim skill</div>`;
     tone(520, 0.16, "triangle", 0.08);
   }, 1500);
@@ -1523,14 +2499,63 @@ function openSkillRoll(afterRoll){
   };
   cards.appendChild(b);
 }
+function gradeRun(){
+  const s = state;
+  const onPct = s.player.swings ? s.onBeatSwings / s.player.swings : 0;
+  let pts = 0;
+  pts += s.bestCombo >= 40 ? 3 : s.bestCombo >= 20 ? 2 : s.bestCombo >= 10 ? 1 : 0;
+  pts += onPct >= 0.35 ? 3 : onPct >= 0.2 ? 2 : onPct >= 0.1 ? 1 : 0;
+  if(!s.sahur.wasDown) pts++;
+  if(s.lastBossResult && s.lastBossResult.under) pts += 2;
+  if(s.player.hp / s.player.maxHp > 0.5) pts++;
+  if(s.elitesKilled > 0) pts++;
+  if(s.tttUses > 0) pts++;
+  const g = pts >= 11 ? "S+" : pts >= 9 ? "S" : pts >= 7 ? "A" : pts >= 5 ? "B" : pts >= 3 ? "C" : "D";
+  return { g, name:COPY.grades[g], onPct };
+}
+function resultsHtml(gr){
+  const s = state, newBest = s.score > hall.bestScore;
+  if(newBest) hall.bestScore = s.score;
+  if(s.bestCombo > hall.bestCombo) hall.bestCombo = s.bestCombo;
+  saveHall();
+  const L = COPY.statLabels, mm = Math.floor(s.runTime/60), ss = String(Math.floor(s.runTime%60)).padStart(2,"0");
+  const stats = [[L[0], s.kills], [L[1], s.bestCombo], [L[2], Math.round(gr.onPct*100) + "%"], [L[3], Math.floor(s.aura)], [L[4], s.sahurHelps], [L[5], mm + ":" + ss]];
+  return `<div class="grade g${gr.g.replace("+","p")}">${gr.g}</div><div class="gradeName">${escapeHtml(gr.name)}</div>
+    <div class="scoreLine">${s.score.toLocaleString()}${newBest ? ' <span class="best">NEW BEST</span>' : ''}</div>
+    <div class="statGrid">${stats.map(([k,v])=>`<div><span>${escapeHtml(k)}</span><b>${v}</b></div>`).join("")}</div>`;
+}
+function shareText(gr){
+  return COPY.share.replace("{biome}", Math.min(state.biome+1, 3)).replace("{grade}", gr.g).replace("{tungs}", state.kills).replace("{combo}", state.bestCombo);
+}
+let endAction = null;
+function showEnd(title, col, bodyHtml, btnLabel, action, gr){
+  mode = "end";
+  $("endTitle").textContent = title; $("endTitle").style.color = col;
+  $("endSub").innerHTML = bodyHtml;
+  $("endBtn").textContent = btnLabel; endAction = action;
+  $("shareBtn").style.display = gr ? "" : "none";
+  $("shareBtn").textContent = "COPY SCORE";
+  $("shareBtn").onclick = ()=>{
+    const t = shareText(gr);
+    const done = ()=>{ $("shareBtn").textContent = "COPIED!"; };
+    try{ navigator.clipboard.writeText(t).then(done, ()=>prompt("Copy your score:", t)); }catch(e){ prompt("Copy your score:", t); }
+  };
+  $("endOv").classList.add("show");
+  setTimeout(()=>$("endBtn").focus(), 50);
+}
+/* after each biome boss: a results card, then the story moves on */
+function showBiomeClear(next){
+  const gr = gradeRun();
+  showEnd("BIOME CLEAR", "#3dff9d", resultsHtml(gr), "CONTINUE", ()=>{ $("endOv").classList.remove("show"); next(); }, gr);
+}
+function escapeHtml(t){ return String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function gameOver(){
   updateContinueButton();
   mode = "end"; Music.stop(); SceneSound.stop();
-  $("endTitle").textContent = "ABSORBED";
-  $("endTitle").style.color = "#ff3df0";
-  $("endSub").innerHTML = "The Bubble made a copy of you. The copy is easier.<br>Your last checkpoint is still intact.";
-  $("endBtn").textContent = storageGet(SAVE_KEY) ? "RETRY CHECKPOINT" : "WAKE UP AGAIN";
-  $("endOv").classList.add("show");
+  hall.runs++;
+  const gr = gradeRun();
+  showEnd("ABSORBED", "#ff3df0", escapeHtml(END_TEXT.lose_sub).replace(/\n/g, "<br>") + resultsHtml(gr),
+    storageGet(SAVE_KEY) ? "RETRY CHECKPOINT" : "WAKE UP AGAIN", null, gr);
 }
 
 /* ---------- final boss ---------- */
@@ -1553,6 +2578,8 @@ function finalPhaseCheck(){
     Music.stop();   // "the music stops."
     b.vuln = false; state.collapseT = 0; state.bullets = [];
     state.sahur.degrade = 99;   // his rhythm is gone. almost.
+    state.sahur.down = false; state.snipes = [];
+    state.texts.push({msg:"...", col:"#ffb547", x:state.sahur.x, y:state.sahur.y-60, t:2.5, big:true});
   }
   if(state.phase===3){
     state.collapseT += DT;
@@ -1563,32 +2590,113 @@ function finalPhaseCheck(){
   }
 }
 
-/* ---------- the three beats (scripted finale) ---------- */
+/* ---------- TRIPLE T: the pinch hitter (ultimate) ----------
+   Broadcast bars, he walks to the plate, three TUNGs on the beat, then the home run. */
+function startTripleT(){
+  const s = state, sa = s.sahur;
+  if(!sa.alive || sa.down || (s.boss && s.boss.final && s.phase>=3)){ toast("HE CAN'T BAT RIGHT NOW", "#8b8fa3"); return; }
+  s.ult = { t:0, step:0, done:false, cap:pickLine(s.boss ? COPY.announcer.boss : COPY.announcer.walkup), cap2:pickLine(COPY.announcer.homerun),
+            px:s.player.x, py:s.player.y };
+  s.ttt = 0; s.tttUses++; tutDone("ult");
+  sahurBark(pickLine(COPY.barks.triple_t_used), 2);
+  tone(392,0.25,"square",0.06); tone(523,0.35,"square",0.05);
+}
+function tickUlt(dt){
+  const s = state, u = s.ult, sa = s.sahur, p = s.player;
+  u.t += dt;
+  /* he walks up to the plate, right in front of you */
+  const tx = p.x, ty = Math.max(80, p.y - 54);
+  sa.x += (tx - sa.x)*Math.min(1, 8*dt); sa.y += (ty - sa.y)*Math.min(1, 8*dt);
+  const marks = [0.55, 0.9, 1.25];
+  if(u.step < 3 && u.t > marks[u.step]){
+    u.step++; tung(); knock(); shake = Math.max(shake, 5 + u.step*2);
+    sa.anim = "attack"; sa.animT = 0; sa.animF = 0; sa.ring = 0.4;
+  }
+  if(!u.done && u.t > 1.7){
+    u.done = true;
+    tung(true); tone(1046,0.3,"square",0.06); flash = 0.85; shake = 16; freeze(0.18); buzz(120);
+    let launched = 0;
+    s.enemies.forEach(e=>{
+      const a = Math.atan2(e.y - sa.y, e.x - sa.x) - 0.35;
+      const sp = 1000 + Math.random()*500;
+      s.flyers.push({x:e.x, y:e.y, vx:Math.cos(a)*sp, vy:Math.min(-300, Math.sin(a)*sp), rot:0, vr:(Math.random()-.5)*30, t:0, r:e.r, color:e.color, elite:e.elite});
+      launched++; s.kills++; s.homeRuns++; addScore(40); if(e.elite){ s.elitesKilled++; openChest(e.elite); }
+      dropOrb(e.x, e.y, 2);
+    });
+    s.enemies = []; s.bullets = []; s.snipes = [];
+    if(launched >= 3) award("triple_t_trio");
+    if(s.boss) damageEnemy(s.boss, Math.max(90, s.boss.maxHp*0.17), false, {pierce:true});
+    addCombo(launched + 3);
+    s.texts.push({msg:"HOME RUN!", col:"#ffb547", x:W/2, y:H/2-60, t:1.6, big:true, huge:true});
+  }
+  /* animation keeps running */
+  sa.animT += dt;
+  if(sa.anim === "attack"){ sa.animF = Math.floor(sa.animT/0.09); if(sa.animF >= SAHUR_IMGS.attack.length){ sa.anim="idle"; sa.animT=0; sa.animF=0; } }
+  sa.ring = Math.max(0, (sa.ring||0) - dt);
+  updateFx(dt);
+  if(u.t > 2.7){ s.ult = null; sa.slamT = Math.max(sa.slamT, 1.2); }
+}
+
+/* ---------- the three beats (scripted finale) ----------
+   He calls, you answer. Three times. The answers are what pop the Bubble. */
 let beats = null;
-function startBeats(){ mode = "beats"; beats = { t:0, n:0 }; SceneSound.stop(); Music.stop(); ChoirMusic.playFinaleLoop(); }
+function startBeats(){
+  mode = "beats"; beats = { t:0, n:0, called:false, waitT:0, done:false, endT:0, calls:0 };
+  SceneSound.stop(); Music.stop(); ChoirMusic.playFinaleLoop(); clearTouchState();
+}
 function tickBeats(dt){
   beats.t += dt;
-  const times = [1.2, 2.6, 4.2];
-  if(beats.n < 3 && beats.t > times[beats.n]){
-    beats.n++; tung(true); shake = 18 + beats.n*6; flash = 0.9;
-    if(beats.n===3){
-      setTimeout(()=>{
-        state.boss = null; state.sahur.alive = false;
-        Music.play("dawn");
-        playCut("epilogue", ()=> showVictory());
-      }, 1600);
+  const sa = state.sahur;
+  state.parts.forEach(pt=>{ pt.x+=pt.vx*dt; pt.y+=pt.vy*dt; pt.t-=dt; });
+  state.parts = state.parts.filter(pt=>pt.t>0);
+  if(beats.done){
+    beats.endT += dt;
+    if(beats.endT > 1.8 && !beats.ended){
+      beats.ended = true;
+      state.boss = null;
+      playCut("epilogue", ()=> playCut("epilogue_card", ()=> showVictory()));
     }
+    return;
+  }
+  if(!beats.called){
+    if(beats.t > (beats.n===0 ? 1.0 : 0.75)){
+      beats.called = true; beats.calls++; beats.waitT = 0;
+      tung(); shake = Math.max(shake, 8 + beats.n*3);
+      if(sa.alive){ sa.anim = "attack"; sa.animT = 0; sa.animF = 0; sa.ring = 0.4; }
+    }
+  } else {
+    beats.waitT += dt;
+    if(beats.waitT > 5) answerBeat();      // never lock the ending on a missed press
+  }
+  /* keep his slam animation moving even though update() is paused */
+  if(sa.alive){
+    sa.animT += dt;
+    if(sa.anim === "attack"){ sa.animF = Math.floor(sa.animT/0.09); if(sa.animF >= SAHUR_IMGS.attack.length){ sa.anim="idle"; sa.animT=0; sa.animF=0; } }
+    else sa.animF = Math.floor(sa.animT/0.45) % SAHUR_IMGS.idle.length;
+    sa.ring = Math.max(0, (sa.ring||0) - dt);
+  }
+}
+function answerBeat(){
+  if(mode !== "beats" || !beats || beats.done || !beats.called) return;
+  beats.called = false; beats.t = 0; beats.n++;
+  tung(true); knock(); shake = 18 + beats.n*6; flash = 0.9;
+  const b = state.boss, sa = state.sahur;
+  if(b) burst(b.x, b.y, "#ff3df0", 24 + beats.n*10, 200 + beats.n*60);
+  if(beats.n >= 3){
+    beats.done = true;
+    if(b) burst(b.x, b.y, "#ffffff", 90, 520);
+    if(sa.alive){ burst(sa.x, sa.y-20, "#b0743a", 60, 360); burst(sa.x, sa.y-20, "#ffb547", 30, 240); }
+    sa.alive = false;
   }
 }
 function showVictory(){
   storageRemove(SAVE_KEY); updateContinueButton();
-  mode = "end";
-  $("endTitle").textContent = "WE WON.";
-  $("endTitle").style.color = "#ffb547";
-  $("endSub").innerHTML = "BUT AT WHAT COST.<br><br>Skills upgraded: " +
-    (state.relics.join(" | ")||"none") + "<br>Somewhere, very far away... a fourth tung?";
-  $("endBtn").textContent = "AGAIN - FOR HIM";
-  $("endOv").classList.add("show");
+  hall.runs++; hall.wins++;
+  award("first_answer"); if(prefs.diff === "spicy") award("spicy");
+  const gr = gradeRun();
+  const lines = END_TEXT.win_sub.split("\n").map(escapeHtml);
+  showEnd("WE WON.", "#ffb547", lines[0] + resultsHtml(gr) + "<div class='endNote'>" + lines.slice(1).join("<br>") +
+    "<br><br>END OF EPILOGUE I<br><span style='font-size:12px'>" + escapeHtml(COPY.story.credits_tag) + "</span></div>", "AGAIN - FOR HIM", null, gr);
 }
 
 /* ============================================================
@@ -1598,6 +2706,9 @@ let DT = 0;
 function update(dt){
   DT = dt;
   const s = state, p = s.player;
+  if(s.ult){ tickUlt(dt); return; }
+  if(s.versus){ s.versus.t += dt; if(s.versus.t > s.versus.dur) s.versus = null; }
+  if(s.modCard > 0) s.modCard -= dt;
   /* player */
   let dx = (keys["d"]||keys["arrowright"]?1:0) - (keys["a"]||keys["arrowleft"]?1:0);
   let dy = (keys["s"]||keys["arrowdown"]?1:0) - (keys["w"]||keys["arrowup"]?1:0);
@@ -1606,25 +2717,100 @@ function update(dt){
     if(dist > 10){ dx = vx/dist; dy = vy/dist; }
     else { dx = 0; dy = 0; }
   } else if(touch.dx || touch.dy){ dx = touch.dx; dy = touch.dy; }
-  if(dx||dy){ const m = Math.hypot(dx,dy); dx/=m; dy/=m; p.fx=dx; p.fy=dy; }
-  p.x = Math.max(p.r, Math.min(W-p.r, p.x + dx*p.speed*dt));
-  p.y = Math.max(p.r, Math.min(H-p.r, p.y + dy*p.speed*dt));
+  s.runTime += dt;
+  if(dx||dy){ const m = Math.hypot(dx,dy); dx/=m; dy/=m; p.fx=dx; p.fy=dy; s.idleT = 0; } else s.idleT = (s.idleT||0) + dt;
+  /* dash: a short burst with i-frames, the answer to every bullet */
+  p.dashCD = Math.max(0, p.dashCD - dt);
+  if(s.dashQueued && p.dashCD <= 0 && p.dashT <= 0){
+    const ddx = (dx||dy) ? dx : p.fx, ddy = (dx||dy) ? dy : p.fy;
+    p.dashT = DASH_TIME; p.dashCD = DASH_CD * (p.dashCdMult||1); p.dashVx = ddx*DASH_SPEED; p.dashVy = ddy*DASH_SPEED;
+    p.inv = Math.max(p.inv, DASH_TIME + 0.12); s.dashes = (s.dashes||0) + 1;
+    tone(900,0.08,"sine",0.04); tone(300,0.12,"triangle",0.05);
+    tutDone("dash");
+    if(p.horn){ /* Kentongan Horn: the dash knocks */
+      knock(); s.waves.push({x:p.x, y:p.y, r:0, max:110 + 30*p.horn, t:0.3, col:"#ffb547"});
+      s.enemies.forEach(e=>{ if(Math.hypot(e.x-p.x,e.y-p.y) < 110 + 30*p.horn + e.r){ e.stun = 0.9; damageEnemy(e, 6*p.horn, true, {from:p, knock:300}); } });
+    }
+  }
+  s.dashQueued = false;
+  if(p.dashT > 0){
+    p.dashT -= dt;
+    p.x += p.dashVx*dt; p.y += p.dashVy*dt;
+    if(Math.random() < 0.9) s.ghosts.push({x:p.x, y:p.y, t:0.22});
+  } else {
+    p.x += dx*p.speed*dt; p.y += dy*p.speed*dt;
+  }
+  p.x = Math.max(p.r, Math.min(W-p.r, p.x));
+  p.y = Math.max(p.r, Math.min(H-p.r, p.y));
+  if(dx||dy) tutDone("move");
   p.inv = Math.max(0, p.inv-dt); p.atkT = Math.max(0, p.atkT-dt);
-  p.buffT = Math.max(0, p.buffT-dt); p.swing = Math.max(0, p.swing-dt*4);
+  p.buffT = Math.max(0, p.buffT-dt); p.swing = Math.max(0, p.swing-dt*4); p.squash = Math.max(0, p.squash - dt*6);
+  /* holding swing keeps swinging; auto-swing (an assist) swings on the beat when something is in reach */
+  const R = 80 * (p.reach || 1);
+  if(keys[" "] || keys["j"] || touch.atkHeld) s.attackQueued = true;
+  let autoSw = false;
+  if(prefs.autoSwing && !s.attackQueued && p.atkT <= 0){
+    const nearE = s.enemies.some(e=>Math.hypot(e.x-p.x,e.y-p.y) < R+e.r+18) || (s.boss && Math.hypot(s.boss.x-p.x,s.boss.y-p.y) < R+s.boss.r+18);
+    const bt = Music.beat();
+    if(nearE && (!bt || bt.off < 0.045)){ s.attackQueued = true; autoSw = true; }
+  }
   if(s.attackQueued && p.atkT<=0){
-    p.atkT = p.atkCD; p.swing = 1; tone(500,0.05,"triangle",0.05);
-    const R = 80;
-    s.enemies.forEach(e=>{ if(Math.hypot(e.x-p.x,e.y-p.y) < R+e.r) damageEnemy(e, p.dmg, true); });
-    if(s.boss && Math.hypot(s.boss.x-p.x,s.boss.y-p.y) < R+s.boss.r) damageEnemy(s.boss, p.dmg, true);
+    p.atkT = p.atkCD; p.swing = 1; p.squash = 1; p.swings++;
+    /* answering his rhythm: a swing close to the beat line hits harder */
+    const bt = Music.beat();
+    const onBeat = !!(bt && bt.off < ON_BEAT_WINDOW);
+    let dmg = p.dmg;
+    if(onBeat){
+      dmg *= autoSw ? 1 + (ON_BEAT_MULT-1)/2 : ON_BEAT_MULT; p.onBeat = 1;
+      tone(660,0.06,"triangle",0.07); tone(990,0.05,"sine",0.04);
+    } else tone(500,0.05,"triangle",0.05);
+    let hit = 0;
+    const crit = !!(onBeat && p.beatCrit);
+    s.enemies.forEach(e=>{ if(Math.hypot(e.x-p.x,e.y-p.y) < R+e.r){ damageEnemy(e, dmg, true, {from:p, knock:240, onBeat, crit}); hit++; if(onBeat && p.auraFarm) dropOrb(e.x, e.y, p.auraFarm); } });
+    if(s.boss && Math.hypot(s.boss.x-p.x,s.boss.y-p.y) < R+s.boss.r){ damageEnemy(s.boss, dmg, true, {onBeat, crit}); hit++; }
+    if(hit) tutDone("swing");
+    /* Bat Boomerang: every 3rd swing throws the bat */
+    if(p.boomerang && p.swings % 3 === 0){
+      s.bats = s.bats || [];
+      s.bats.push({x:p.x, y:p.y, vx:p.fx*520, vy:p.fy*520, t:0, life:0.9, dmg:p.dmg*(0.6+0.3*p.boomerang), hit:new Set()});
+    }
+    /* Vine Boom (evolution): every 5th swing is a shockwave */
+    if(p.vineBoom && p.swings % 5 === 0){
+      s.waves.push({x:p.x, y:p.y, r:0, max:170, t:0.35, col:"#ff4d5e"}); tung(); shake = Math.max(shake, 7);
+      s.enemies.forEach(e=>{ if(Math.hypot(e.x-p.x,e.y-p.y) < 170+e.r) damageEnemy(e, p.dmg*1.5, true, {from:p, knock:380}); });
+      if(s.boss && Math.hypot(s.boss.x-p.x,s.boss.y-p.y) < 170+s.boss.r) damageEnemy(s.boss, p.dmg*1.5, true);
+    }
+    if(onBeat && hit){
+      ftext("ON BEAT", p.x, p.y-p.r-18, "#ffb547");
+      s.onBeatSwings++; tutDone("beat");
+      if(s.onBeatSwings >= 25) award("metronome");
+      if(s.onBeatSwings >= 20) completeChallenge("on_beat_20");
+      if(s.onBeatSwings === 3 || (s.onBeatSwings % 25 === 0)) sahurBark(pickLine(BARKS.on_beat), 2.4);
+    }
   }
   s.attackQueued = false;
+  /* TRIPLE T: the pinch hitter */
+  if(s.ultQueued && s.ttt >= 1 && !s.ult) startTripleT();
+  s.ultQueued = false;
+  if(s.ttt >= 1) tutShow("ult");
+  else if(!(prefs.tut && prefs.tut.move)) tutShow("move");
+  else if(s.enemies.length && !(prefs.tut && prefs.tut.swing)) tutShow("swing");
+  else if(p.swings > 5 && !(prefs.tut && prefs.tut.beat) && Music.beat()) tutShow("beat");
+  else if(!(prefs.tut && prefs.tut.dash) && s.bullets.some(b=>Math.hypot(b.x-p.x,b.y-p.y) < 150)) tutShow("dash");
+  else if(s.sahur.down) tutShow("help");
+  if(s.tut){ s.tut.t += dt; if(s.tut.k==="help" && !s.sahur.down) s.tut = null; }
+  if((s.idleT||0) > 7 && s.enemies.length && s.barkCD <= 0){ s.idleT = 0; sahurBark(COPY.barks.idle, 2.4); }
+  p.onBeat = Math.max(0, p.onBeat - dt*3);
   /* sahur */
   const sa = s.sahur;
   if(sa.alive){
-    const tx = p.x-46*p.fx, ty = p.y-46*p.fy;
-    sa.x += (tx-sa.x)*3*dt; sa.y += (ty-sa.y)*3*dt;
-    if(Math.abs(p.fx) > 0.05) sa.facing = p.fx > 0 ? 1 : -1;
+    if(!sa.down){
+      const tx = p.x-46*p.fx, ty = p.y-46*p.fy;
+      sa.x += (tx-sa.x)*3*dt; sa.y += (ty-sa.y)*3*dt;
+      if(Math.abs(p.fx) > 0.05) sa.facing = p.fx > 0 ? 1 : -1;
+    }
     sa.flicker += dt;
+    sa.inv = Math.max(0, sa.inv-dt); sa.hurtT = Math.max(0, sa.hurtT-dt); sa.calm += dt;
     /* animation timer: attack sequence plays once, then falls back to idle */
     sa.animT += dt;
     if(sa.anim === "attack"){
@@ -1635,25 +2821,56 @@ function update(dt){
       const IDLE_FRAME_TIME = 0.45;
       sa.animF = Math.floor(sa.animT / IDLE_FRAME_TIME) % SAHUR_IMGS.idle.length;
     }
+    /* his health only matters in boss fights; between them he gets his breath back */
+    const collapsing = s.boss && s.boss.final && s.phase>=3;
+    if(!s.boss){ sa.hp = sa.maxHp; sa.down = false; }
+    else if(collapsing){
+      /* the music has stopped and so, slowly, does he */
+      sa.down = false;
+      sa.hp = Math.max(0, sa.hp - sa.maxHp/6.5*dt);
+    }
+    else if(!sa.down && sa.calm > SAHUR_REGEN_DELAY) sa.hp = Math.min(sa.maxHp, sa.hp + SAHUR_REGEN*(sa.regenMult||1)*dt);
+    if(sa.down){
+      /* knocked down: stand next to him to pull him up (or he gets up on his own, slowly) */
+      sa.downT += dt;
+      const near = Math.hypot(p.x-sa.x, p.y-sa.y) < SAHUR_HELP_R;
+      sa.help = near ? sa.help + dt : Math.max(0, sa.help - dt*0.6);
+      if(sa.help >= SAHUR_HELP_TIME || sa.downT >= SAHUR_SELF_UP){
+        const helped = sa.help >= SAHUR_HELP_TIME;
+        sa.down = false; sa.help = 0; sa.inv = 1.5; sa.calm = 0;
+        sa.hp = sa.maxHp * (helped ? 0.6 : 0.35);
+        sa.slamT = Math.min(sa.slamT, 0.6);
+        if(helped) s.sahurHelps++;
+        burst(sa.x, sa.y, "#ffb547", 16, 160); knock();
+        sahurBark(pickLine(BARKS.up), 2.4);
+      }
+    }
     const baseCD = (3.5 + s.biome*0.8) * sa.cdMult * (mode==="play" ? sa.degrade/Math.max(1,biome().sahurDrain||1)*(s.boss&&s.boss.final?sa.degrade:1) : 1);
-    sa.slamT -= dt;
-    if(sa.slamT <= 0 && sa.degrade < 50){
-      sa.slamT = Math.max(2.2, baseCD);
-      sa.anim = "attack"; sa.animT = 0; sa.animF = 0;
-      tung(); shake = Math.max(shake, 9);
-      state.texts.push({msg:"TUNG!", col:"#ffb547", x:sa.x, y:sa.y-40, t:0.7, big:true});
-      burst(sa.x, sa.y, "#ffb547", 18, 220);
-      if(p.beatBuff) p.buffT = 3;
-      s.enemies.forEach(e=>{
-        const d = Math.hypot(e.x-sa.x, e.y-sa.y);
-        if(d < sa.radius+e.r){ damageEnemy(e, 26, false);
-          const a = Math.atan2(e.y-sa.y, e.x-sa.x); e.x += Math.cos(a)*40; e.y += Math.sin(a)*40; }
-      });
-      if(s.boss && Math.hypot(s.boss.x-sa.x, s.boss.y-sa.y) < sa.radius+s.boss.r)
-        damageEnemy(s.boss, 26, false);
-      sa.ring = 0.4;
+    if(!sa.down) sa.slamT -= dt;
+    if(sa.slamT <= 0 && sa.degrade < 50 && !sa.down){
+      /* his TUNG lands on the music's beat: wait for the next beat line (never more than ~1 s) */
+      const bt = Music.beat();
+      if(sa.waitBeat === undefined || sa.waitBeat === null){ sa.waitBeat = bt ? bt.idx : -1; sa.waitT = 0; }
+      sa.waitT += dt;
+      const onLine = !bt || bt.idx > sa.waitBeat || sa.waitT > 1.1;
+      if(onLine){
+        sa.waitBeat = null;
+        sa.slamT = Math.max(2.2, baseCD);
+        sahurSlam(1, "TUNG!");
+        if(sa.triple){ sa.echoSlams = 2; sa.echoT = 0.2; }
+      }
+    }
+    if(sa.echoSlams > 0 && !sa.down){
+      sa.echoT -= dt;
+      if(sa.echoT <= 0){ sa.echoSlams--; sa.echoT = 0.2; sahurSlam(0.6, sa.echoSlams ? "TUNG TUNG!" : "TUNG TUNG TUNG!"); }
     }
     sa.ring = Math.max(0,(sa.ring||0)-dt);
+    /* barks */
+    if(s.bark){ s.bark.t -= dt; if(s.bark.t <= 0) s.bark = null; }
+    s.barkCD = Math.max(0, s.barkCD - dt);
+    s.lowBarkT = Math.max(0, s.lowBarkT - dt);
+    if(p.hp/p.maxHp < 0.3 && s.lowBarkT <= 0){ s.lowBarkT = 30; sahurBark(pickLine(BARKS.player_low), 2.6); }
+    if(s.biome >= 2 && !s.boss && Math.random() < dt/45) sahurBark(pickLine(BARKS.fading), 2.6);
   }
   /* staggered border spawning */
   if(s.spawnQueue.length){
@@ -1669,8 +2886,15 @@ function update(dt){
   s.pending = s.pending.filter(pd=>pd.t>0);
   /* enemies */
   s.enemies.forEach(e=>{
-    e.hitT = Math.max(0, e.hitT-dt); e.t -= dt;
+    e.hitT = Math.max(0, e.hitT-dt); e.t -= dt; e.sq = Math.max(0, (e.sq||0) - dt*7); e.born += dt;
+    if(e.kx || e.ky){
+      e.x += e.kx*dt; e.y += e.ky*dt;
+      const k = Math.pow(0.003, dt); e.kx *= k; e.ky *= k;
+      if(Math.abs(e.kx) + Math.abs(e.ky) < 8){ e.kx = 0; e.ky = 0; }
+    }
+    if(e.stun > 0){ e.stun -= dt; e.x = Math.max(e.r, Math.min(W-e.r, e.x)); e.y = Math.max(e.r, Math.min(H-e.r, e.y)); return; }
     const dxp = p.x-e.x, dyp = p.y-e.y, dist = Math.hypot(dxp,dyp)||1;
+    if(state.versus) return;     // everyone waits for the versus card
     if(e.ai==="chase" || e.ai==="tank"){ e.x += dxp/dist*e.speed*dt; e.y += dyp/dist*e.speed*dt; }
     if(e.ai==="shoot"){
       if(dist > 260){ e.x += dxp/dist*e.speed*dt; e.y += dyp/dist*e.speed*dt; }
@@ -1703,17 +2927,18 @@ function update(dt){
     }
     e.x = Math.max(e.r, Math.min(W-e.r, e.x)); e.y = Math.max(e.r, Math.min(H-e.r, e.y));
     if(dist < e.r + p.r) damagePlayer(e.dmg);
+    if(s.boss && Math.hypot(e.x-sa.x, e.y-sa.y) < e.r + sa.r) damageSahur(e.dmg*0.8);
   });
   const splits = [];
   s.enemies = s.enemies.filter(e=>{
     if(e.hp<=0){
-      burst(e.x,e.y,e.color,12);
+      onEnemyKilled(e);
       if(e.type==="golem") splits.push(e);   // a pivot never really dies
       return false;
     } return true; });
   splits.forEach(e=>{
-    spawnEnemyAt("slopling", e.x-16, e.y, e.sc||1);
-    spawnEnemyAt("slopling", e.x+16, e.y, e.sc||1);
+    spawnEnemyAt("slopling", e.x-16, e.y, e.sc||1, true);
+    spawnEnemyAt("slopling", e.x+16, e.y, e.sc||1, true);
     ftext("PIVOT!", e.x, e.y-26, "#ffb547");
   });
   /* boss */
@@ -1755,23 +2980,68 @@ function update(dt){
           setTimeout(()=>{ if(mode==="play" && state && state.boss===b) fireAimed(b.x,b.y,1,0,285,11); }, i*120);
         }
       }
+      if(pat==="snipe"){
+        /* a shot meant for Sahur, telegraphed by a red line; stand in it to block */
+        if(sa.alive && !sa.down) s.snipes.push({ t:SNIPE_WINDUP, n:b.id==="echo"?1:(b.final?4:3), dmg:b.final?13:11, spd:b.final?330:290 });
+        else fireAimed(b.x,b.y,3,0.2,240,10);
+      }
       if(pat==="offbeat"){ banner("...tung. tung... tung?  WRONG.");
         fireRadial(b.x,b.y, 16, 140, 12); tone(70,0.4,"sawtooth",0.2); }
       if(pat==="bigburst"){ fireRadial(b.x,b.y, 20, 150, 12);
         if(b.overextend){ b.vuln = true; b.vulnT = 4; banner("OVEREXTENDED - STRIKE NOW"); } }
     }
     if(Math.hypot(b.x-p.x,b.y-p.y) < b.r+p.r) damagePlayer(14);
+    if(Math.hypot(b.x-sa.x,b.y-sa.y) < b.r+sa.r) damageSahur(12);
     finalPhaseCheck();
   }
   /* bullets */
+  s.snipes.forEach(sn=>{ sn.t -= dt;
+    if(sn.t <= 0 && s.boss){
+      const b = s.boss, a = Math.atan2(sa.y-b.y, sa.x-b.x);
+      for(let i=0;i<sn.n;i++){ const aa = a + (i-(sn.n-1)/2)*0.07;
+        s.bullets.push({x:b.x,y:b.y,vx:Math.cos(aa)*sn.spd,vy:Math.sin(aa)*sn.spd,r:7,dmg:sn.dmg,t:6,snipe:true}); }
+      tone(240,0.12,"sawtooth",0.07);
+    } });
+  s.snipes = s.snipes.filter(sn=>sn.t>0 && s.boss);
   s.bullets.forEach(bl=>{ bl.x += bl.vx*dt; bl.y += bl.vy*dt; bl.t -= dt;
-    if(Math.hypot(bl.x-p.x,bl.y-p.y) < bl.r+p.r){ damagePlayer(bl.dmg); bl.t = 0; } });
+    if(Math.hypot(bl.x-p.x,bl.y-p.y) < bl.r+p.r){ damagePlayer(bl.dmg); bl.t = 0; }
+    else if(s.boss && sa.alive && !sa.down && Math.hypot(bl.x-sa.x,bl.y-(sa.y-14)) < bl.r+sa.r){ damageSahur(bl.dmg); bl.t = 0; } });
   s.bullets = s.bullets.filter(bl=> bl.t>0 && bl.x>-20 && bl.x<W+20 && bl.y>-20 && bl.y<H+20);
-  /* fx */
-  s.parts.forEach(pt=>{ pt.x+=pt.vx*dt; pt.y+=pt.vy*dt; pt.t-=dt; });
-  s.parts = s.parts.filter(pt=>pt.t>0);
-  s.texts.forEach(t=>{ t.t-=dt; t.y-=14*dt; });
-  s.texts = s.texts.filter(t=>t.t>0);
+  /* pickups: aura flies to you; rice heals you; a snack heals him */
+  const magR = 150 * (p.magnet || 1);
+  s.orbs.forEach(o=>{
+    o.t += dt;
+    const ddx = p.x-o.x, ddy = p.y-o.y, d = Math.hypot(ddx,ddy) || 1;
+    if(o.t > 0.35 && (d < magR || s.magnetAll)){
+      const acc = 900 + o.t*600; o.vx += ddx/d*acc*dt; o.vy += ddy/d*acc*dt;
+    }
+    const k = Math.pow(0.08, dt); o.vx *= k; o.vy *= k;
+    o.x += o.vx*dt; o.y += o.vy*dt;
+    if(d < p.r + 10 && o.t > 0.2){
+      o.dead = true;
+      if(o.kind === "rice"){ p.hp = Math.min(p.maxHp, p.hp + 14); numText("+14", p.x, p.y-26, "#3dff9d", true); tone(520,0.1,"triangle",0.06); tone(780,0.12,"triangle",0.05); }
+      else if(o.kind === "snack"){ sa.hp = Math.min(sa.maxHp, sa.hp + sa.maxHp*0.3); numText("SNACK", sa.x, sa.y-70, "#ffb547", true); tone(440,0.12,"triangle",0.06); }
+      else {
+        const mult = (s.modifier && s.modifier.id==="algorithm_boost") ? 1 : ((s.modifier && s.modifier.id==="ratiod") ? 1.5 : 1);
+        s.aura += o.v*mult; addScore(5*o.v*mult); gainTTT(0.004*o.v);
+        s.orbPitch = Math.min(24, (s.orbPitchT > 0 ? (s.orbPitch||0) + 1 : 0)); s.orbPitchT = 0.4;
+        tone(880*Math.pow(2, s.orbPitch/24), 0.04, "sine", 0.035);
+        if(s.aura >= 500) award("aura_farmer");
+      }
+    }
+  });
+  s.orbs = s.orbs.filter(o=>!o.dead);
+  s.orbPitchT = Math.max(0, (s.orbPitchT||0) - dt);
+  /* the boomerang bat */
+  if(s.bats) s.bats.forEach(bt=>{
+    bt.t += dt;
+    if(bt.t > bt.life*0.45){ const ddx = p.x-bt.x, ddy = p.y-bt.y, d = Math.hypot(ddx,ddy)||1; bt.vx += ddx/d*2600*dt; bt.vy += ddy/d*2600*dt; const sp = Math.hypot(bt.vx,bt.vy); if(sp > 640){ bt.vx *= 640/sp; bt.vy *= 640/sp; } if(d < 24) bt.t = 99; }
+    bt.x += bt.vx*dt; bt.y += bt.vy*dt;
+    s.enemies.forEach(e=>{ if(!bt.hit.has(e) && Math.hypot(e.x-bt.x,e.y-bt.y) < e.r+16){ bt.hit.add(e); damageEnemy(e, bt.dmg, true, {from:bt, knock:200}); } });
+    if(s.boss && !bt.hit.has(s.boss) && Math.hypot(s.boss.x-bt.x,s.boss.y-bt.y) < s.boss.r+16){ bt.hit.add(s.boss); damageEnemy(s.boss, bt.dmg, true); }
+  });
+  if(s.bats) s.bats = s.bats.filter(bt=>bt.t < bt.life*3 && bt.t < 50);
+  updateFx(dt);
   if(s.unlockFeed[0]) s.unlockFeed[0].t -= dt;
   while(s.unlockFeed[0] && s.unlockFeed[0].t <= 0) s.unlockFeed.shift();
   s.unlockFeed = s.unlockFeed.slice(0,5);
@@ -1786,6 +3056,21 @@ function drawEnemy(e, p){
   const now = performance.now();
   const col = e.hitT>0 ? "#ffffff" : e.color;
   ctx.save(); ctx.translate(e.x, e.y);
+  if(e.elite || e.rival){
+    const hue = (now/6) % 360;
+    const ec = e.rival ? "#6fbf4a" : (e.elite==="gold" ? "#ffd34d" : e.elite==="diamond" ? "#9ff3ff" : "hsl(" + hue + ",100%,65%)");
+    ctx.strokeStyle = ec; ctx.lineWidth = 3; ctx.globalAlpha = 0.85;
+    ctx.beginPath(); ctx.arc(0, 0, e.r + 7 + Math.sin(now/120)*2, 0, 7); ctx.stroke();
+    ctx.fillStyle = ec; ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.moveTo(-9, -e.r-10); ctx.lineTo(-9, -e.r-18); ctx.lineTo(-4, -e.r-13); ctx.lineTo(0, -e.r-20); ctx.lineTo(4, -e.r-13); ctx.lineTo(9, -e.r-18); ctx.lineTo(9, -e.r-10); ctx.closePath(); ctx.fill();
+    if(e.rival){ ctx.font = "700 11px Verdana, sans-serif"; ctx.textAlign = "center"; ctx.fillText(COPY.versus.patatam.name, 0, -e.r-26); }
+    /* elite HP sliver */
+    ctx.fillStyle = "#10141f"; ctx.fillRect(-e.r, e.r+8, e.r*2, 4);
+    ctx.fillStyle = ec; ctx.fillRect(-e.r, e.r+8, e.r*2*Math.max(0, e.hp/e.maxHp), 4);
+  }
+  const pop = Math.min(1, (e.born||1)/0.18), sq = e.sq || 0;
+  ctx.scale(pop*(1 + 0.28*sq), pop*(1 - 0.22*sq));
+  if(e.stun > 0){ ctx.fillStyle = "#ffb547"; ctx.font = "700 12px Verdana, sans-serif"; ctx.textAlign = "center"; ctx.fillText("* * *", 0, -e.r-6); }
   if(e.type==="slopling"){
     /* wobbly slop blob with a drip */
     const w = Math.sin(now/120 + e.x)*2;
@@ -1946,7 +3231,7 @@ function drawChallengeToast(feed){
   ctx.fillStyle = feed.col;
   ctx.font = "700 10px \"Verdana\",monospace";
   ctx.textAlign = "left";
-  ctx.fillText(feed.kind==="skill" ? "SKILL UNLOCKED" : "CHALLENGE COMPLETE", x+12, y+17);
+  ctx.fillText(feed.kind==="skill" ? "SKILL UNLOCKED" : (feed.kind==="ach" ? "HALL OF TUNG" : "CHALLENGE COMPLETE  +" + CHALLENGE_HP + " MAX HP"), x+12, y+17);
   ctx.fillStyle = "#e8e4d8";
   ctx.font = "11px \"Verdana\",monospace";
   ctx.fillText(feed.msg.replace("CHALLENGE: ","").replace(/^UNLOCKED [A-Z]+: /,"").slice(0, 28), x+12, y+34);
@@ -2005,9 +3290,16 @@ function drawChallengeHud(s){
   else drawChallengeToggle(s, 14 + offset);
 }
 
+let ultShown = false;
 function render(){
+  const ultReady = !!(state && mode==="play" && state.ttt >= 1 && !state.ult);
+  if(ultReady !== ultShown){ ultShown = ultReady; $("ultBtn").classList.toggle("ready", ultReady); }
+  ctx.setTransform(RS, 0, 0, RS, 0, 0);
   ctx.save();
-  if(shake > 0){ ctx.translate((Math.random()-.5)*shake, (Math.random()-.5)*shake); shake *= 0.88; if(shake<0.4) shake=0; }
+  if(shake > 0){
+    const sh = (reducedMotion() || !prefs.shake) ? Math.min(shake, 2) * 0.4 : Math.min(shake, 14);
+    ctx.translate((Math.random()-.5)*sh, (Math.random()-.5)*sh); shake *= 0.88; if(shake<0.4) shake=0;
+  }
   const bgc = (state && state.boss && state.boss.final) ? "#e9e9f2" : (state ? biome().bg : "#07090f");
   ctx.fillStyle = bgc; ctx.fillRect(-20,-20,W+40,H+40);
   const darkWorld = !(state && state.boss && state.boss.final);
@@ -2024,8 +3316,23 @@ function render(){
     ctx.beginPath(); ctx.arc(s.sahur.x, s.sahur.y, s.sahur.radius*(1-s.sahur.ring*1.5+0.4), 0, 7); ctx.stroke();
     ctx.globalAlpha = 1;
   }
+  /* shots meant for Sahur: a red line from the boss to him while it winds up */
+  if(s.boss && s.snipes.length && s.sahur.alive){
+    const b = s.boss, sa = s.sahur;
+    s.snipes.forEach(sn=>{
+      const k = 1 - sn.t/SNIPE_WINDUP;
+      ctx.save();
+      ctx.strokeStyle = "#ff4d5e"; ctx.globalAlpha = 0.25 + 0.55*k; ctx.lineWidth = 1 + 3*k;
+      ctx.setLineDash([10, 8]); ctx.lineDashOffset = -performance.now()/30;
+      ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(sa.x, sa.y-14); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#ff4d5e"; ctx.font = "700 18px \"Verdana\",monospace"; ctx.textAlign = "center";
+      ctx.fillText("!", sa.x, sa.y-74);
+      ctx.restore();
+    });
+  }
   /* bullets */
-  s.bullets.forEach(bl=>{ ctx.fillStyle = "#ff3df0";
+  s.bullets.forEach(bl=>{ ctx.fillStyle = bl.snipe ? "#ff4d5e" : "#ff3df0";
     ctx.beginPath(); ctx.arc(bl.x, bl.y, bl.r, 0, 7); ctx.fill(); });
   /* incoming spawn telegraphs at the borders */
   s.pending.forEach(pd=>{
@@ -2041,101 +3348,322 @@ function render(){
   /* enemies */
   s.enemies.forEach(e=> drawEnemy(e, p));
   /* boss */
-  if(s.boss){
+  if(s.boss && !(mode==="beats" && beats && beats.done)){
     const b = s.boss;
     drawBoss(b);
     /* boss hp bar */
     ctx.fillStyle = "#10141f"; ctx.fillRect(W/2-220, 24, 440, 14);
     ctx.fillStyle = b.color; ctx.fillRect(W/2-218, 26, 436*Math.max(0,b.hp/b.maxHp), 10);
-    ctx.fillStyle = "#e8e4d8"; ctx.font = "11px \"Verdana\",monospace"; ctx.textAlign = "center";
+    ctx.fillStyle = b.final ? "#1a1430" : "#e8e4d8"; ctx.font = "700 12px \"Verdana\",monospace"; ctx.textAlign = "center";
     ctx.fillText(b.name, W/2, 18);
     const limit = bossTimeLimit(b.id), under = s.bossTime <= limit;
-    ctx.fillStyle = under ? "#35e8ff" : "#ff4d5e";
+    ctx.fillStyle = under ? (b.final ? "#0a7c95" : "#35e8ff") : "#ff4d5e";
     ctx.font = "700 13px \"Verdana\",monospace";
     ctx.fillText("BOSS TIMER " + fmtTime(s.bossTime) + " / " + fmtTime(limit), W/2, 52);
   }
   /* sahur */
   if(s.sahur.alive){
     const sa = s.sahur;
-    const flick = (s.biome>=1 && Math.sin(sa.flicker*13)>0.96);
+    /* he fades more the closer you get to the core */
+    const flickRate = s.biome>=2 ? 0.9 : 0.96;
+    const flick = (s.biome>=1 && Math.sin(sa.flicker*13)>flickRate) || (s.boss && s.boss.final && s.phase>=3 && Math.random()<0.25);
     ctx.globalAlpha = flick ? 0.35 : 1;
     const set = sa.anim === "attack" ? SAHUR_IMGS.attack : SAHUR_IMGS.idle;
-    const img = set[Math.min(sa.animF, set.length-1)];
+    const img = sa.down ? SAHUR_IMGS.idle[0] : set[Math.min(sa.animF, set.length-1)];
     const DRAW_H = 92, DRAW_W = 92;             // on-screen size; source frames are square
     if(img && img.complete && img.naturalWidth > 0){
       ctx.save();
       ctx.translate(sa.x, sa.y + 6);            // +6: nudge feet to sit on the ground line
+      if(sa.down){ ctx.translate(0, -8); ctx.rotate(sa.facing * 1.45); }   // knocked flat
       ctx.scale(sa.facing, 1);
       ctx.drawImage(img, -DRAW_W/2, -DRAW_H + 14, DRAW_W, DRAW_H);
+      if(sa.hurtT > 0){ ctx.globalCompositeOperation = "source-atop"; ctx.globalAlpha = 0.5; ctx.fillStyle = "#ff4d5e";
+        ctx.fillRect(-DRAW_W/2, -DRAW_H + 14, DRAW_W, DRAW_H); }
       ctx.restore();
     } else {
       // fallback shape while the frame is still decoding (data-URI, so this is near-instant)
       ctx.fillStyle = "#b0743a"; ctx.fillRect(sa.x-10, sa.y-20, 20, 36);
     }
     ctx.globalAlpha = 1;
-    /* rhythm meter over his head */
-    const cd = Math.max(0, Math.min(1, 1 - sa.slamT/6));
-    ctx.fillStyle = "#10141f"; ctx.fillRect(sa.x-14, sa.y-56, 28, 4);
-    ctx.fillStyle = sa.degrade>50 ? "#ff4d5e" : "#ffb547";
-    ctx.fillRect(sa.x-14, sa.y-56, 28*cd, 4);
+    if(sa.down){
+      /* help ring: fills while you stand next to him */
+      const k = Math.min(1, sa.help / SAHUR_HELP_TIME);
+      const pulse = 0.5 + 0.5*Math.sin(performance.now()/160);
+      ctx.strokeStyle = "rgba(255,181,71," + (0.35 + 0.4*pulse) + ")"; ctx.lineWidth = 2;
+      ctx.setLineDash([6,6]); ctx.beginPath(); ctx.arc(sa.x, sa.y-10, SAHUR_HELP_R, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle = "#ffb547"; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(sa.x, sa.y-10, 30, -Math.PI/2, -Math.PI/2 + k*Math.PI*2); ctx.stroke();
+      ctx.fillStyle = "#ffb547"; ctx.font = "700 12px \"Verdana\",monospace"; ctx.textAlign = "center";
+      ctx.fillText(k > 0 ? "HELPING..." : "STAND BY HIM", sa.x, sa.y+66);
+    } else {
+      /* rhythm meter over his head */
+      const cd = Math.max(0, Math.min(1, 1 - sa.slamT/6));
+      ctx.fillStyle = "#10141f"; ctx.fillRect(sa.x-14, sa.y-56, 28, 4);
+      ctx.fillStyle = sa.degrade>50 ? "#ff4d5e" : "#ffb547";
+      ctx.fillRect(sa.x-14, sa.y-56, 28*cd, 4);
+    }
+    if(s.boss){
+      /* his HP, right over his head */
+      const k = Math.max(0, sa.hp/sa.maxHp);
+      ctx.fillStyle = "#10141f"; ctx.fillRect(sa.x-22, sa.y-64, 44, 6);
+      ctx.fillStyle = k > 0.35 ? "#3dff9d" : "#ff4d5e"; ctx.fillRect(sa.x-21, sa.y-63, 42*k, 4);
+    }
+    /* what he says */
+    if(s.bark){
+      const t = s.bark, alpha = Math.min(1, t.t*2.5, (t.max - t.t)*6 + 0.2);
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.font = "700 13px \"Verdana\",monospace"; ctx.textAlign = "center";
+      const tw = ctx.measureText(t.text).width + 20, bx = Math.max(tw/2+6, Math.min(W-tw/2-6, sa.x)), by = Math.max(30, sa.y - (sa.down ? 112 : 96));
+      ctx.fillStyle = "rgba(16,20,31,.92)"; ctx.strokeStyle = "#ffb547"; ctx.lineWidth = 1.5;
+      ctx.fillRect(bx-tw/2, by-17, tw, 26); ctx.strokeRect(bx-tw/2+0.5, by-16.5, tw-1, 25);
+      ctx.beginPath(); ctx.moveTo(Math.max(bx-tw/2+10, Math.min(bx+tw/2-10, sa.x))-6, by+9); ctx.lineTo(Math.max(bx-tw/2+10, Math.min(bx+tw/2-10, sa.x)), by+17); ctx.lineTo(Math.max(bx-tw/2+10, Math.min(bx+tw/2-10, sa.x))+6, by+9); ctx.closePath();
+      ctx.fillStyle = "#ffb547"; ctx.fill();
+      ctx.fillStyle = "#ffe2b0"; ctx.fillText(t.text, bx, by+1);
+      ctx.restore();
+    }
   }
-  /* player */
-  ctx.globalAlpha = p.inv>0 ? (Math.sin(performance.now()/40)>0?0.4:1) : 1;
-  ctx.fillStyle = "#e8e4d8";
-  ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
-  ctx.fillStyle = darkWorld ? "#07090f" : "#e8e4d8";
-  ctx.strokeStyle = "#07090f"; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.stroke();
+  /* player: afterimages from the dash, a squash on every swing */
+  s.ghosts.forEach(g=>{ ctx.globalAlpha = g.t*2.2; ctx.fillStyle = "#35e8ff"; ctx.beginPath(); ctx.arc(g.x, g.y, p.r, 0, 7); ctx.fill(); });
+  ctx.globalAlpha = p.inv>0 && p.dashT<=0 ? (Math.sin(performance.now()/40)>0?0.4:1) : 1;
+  const psq = p.squash || 0;
+  ctx.fillStyle = "#e8e4d8"; ctx.strokeStyle = "#07090f"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r*(1+0.18*psq), p.r*(1-0.14*psq), 0, 0, 7); ctx.fill(); ctx.stroke();
   ctx.fillStyle = "#07090f";
   ctx.fillRect(p.x-5+p.fx*3, p.y-5+p.fy*3, 3,4); ctx.fillRect(p.x+2+p.fx*3, p.y-5+p.fy*3, 3,4);
-  if(p.swing > 0){ ctx.strokeStyle = p.buffT>0 ? "#ff3df0" : "#e8e4d8";
+  if(p.swing > 0){ ctx.strokeStyle = p.onBeat>0 ? "#ffb547" : (p.buffT>0 ? "#ff3df0" : (darkWorld ? "#e8e4d8" : "#5b5470"));
     ctx.globalAlpha = p.swing; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(p.x, p.y, 80, 0, 7); ctx.stroke(); }
+    ctx.beginPath(); ctx.arc(p.x, p.y, 80*(p.reach||1)*(1.15-0.15*p.swing), 0, 7); ctx.stroke(); }
   ctx.globalAlpha = 1;
+  /* rings from horns, booms and slams */
+  s.waves.forEach(w=>{ const k = 1 - w.t/0.35; ctx.globalAlpha = Math.max(0, w.t*2.5); ctx.strokeStyle = w.col; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(w.x, w.y, w.max*Math.min(1,k*1.2), 0, 7); ctx.stroke(); });
+  ctx.globalAlpha = 1;
+  /* pickups */
+  const nowT = performance.now();
+  s.orbs.forEach(o=>{
+    const bob = Math.sin(nowT/160 + o.x)*2;
+    if(o.kind === "rice"){
+      ctx.fillStyle = "#f2ecdf"; ctx.fillRect(o.x-7, o.y-5+bob, 14, 10);
+      ctx.fillStyle = "#3dff9d"; ctx.fillRect(o.x-7, o.y-7+bob, 14, 3);
+    } else if(o.kind === "snack"){
+      ctx.fillStyle = "#ffb547"; ctx.beginPath(); ctx.arc(o.x, o.y+bob, 7, 0, 7); ctx.fill();
+      ctx.fillStyle = "#07090f"; ctx.fillRect(o.x-1, o.y-3+bob, 2, 6);
+    } else {
+      const r = 3.5 + Math.min(4, o.v*0.6);
+      ctx.fillStyle = "rgba(53,232,255,.25)"; ctx.fillRect(o.x-r-2, o.y-r-2+bob, (r+2)*2, (r+2)*2);
+      ctx.fillStyle = o.v > 1 ? "#ffd34d" : "#35e8ff";
+      ctx.beginPath(); ctx.moveTo(o.x, o.y-r+bob); ctx.lineTo(o.x+r, o.y+bob); ctx.lineTo(o.x, o.y+r+bob); ctx.lineTo(o.x-r, o.y+bob); ctx.closePath(); ctx.fill();
+    }
+  });
+  /* the boomerang bat */
+  (s.bats||[]).forEach(bt=>{ ctx.save(); ctx.translate(bt.x, bt.y); ctx.rotate(bt.t*22);
+    ctx.fillStyle = "#b0743a"; ctx.fillRect(-18, -3, 36, 6); ctx.fillStyle = "#7a4e24"; ctx.fillRect(10, -4.5, 9, 9); ctx.restore(); });
+  /* home runs: launched enemies spin away and shrink into a twinkle */
+  s.flyers.forEach(f=>{ const k = Math.max(0.05, 1 - f.t*0.85);
+    ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.rot); ctx.scale(k, k);
+    ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(0, 0, f.r, 0, 7); ctx.fill();
+    ctx.fillStyle = "#07090f"; ctx.font = "700 10px Verdana, sans-serif"; ctx.textAlign = "center"; ctx.fillText("x  x", 0, 3);
+    ctx.restore(); });
+  /* SHADOWBANNED: only a pool of light around the two of you */
+  if(s.modifier && s.modifier.id === "shadowbanned" && !s.boss){
+    const cx = (p.x + s.sahur.x)/2, cy = (p.y + s.sahur.y)/2;
+    const g = ctx.createRadialGradient(cx, cy, 90, cx, cy, 260);
+    g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,.93)");
+    ctx.fillStyle = g; ctx.fillRect(-20,-20,W+40,H+40);
+  }
   /* particles + floating text */
   s.parts.forEach(pt=>{ ctx.globalAlpha = pt.t*2; ctx.fillStyle = pt.col;
     ctx.fillRect(pt.x, pt.y, 4,4); });
   ctx.globalAlpha = 1;
   s.texts.forEach(t=>{ ctx.globalAlpha = Math.min(1, t.t*2);
-    ctx.fillStyle = t.col; ctx.font = (t.big?"700 20px":"12px")+" \"Verdana\",monospace";
-    ctx.textAlign = "center"; ctx.fillText(t.msg, t.x, t.y); });
+    const sz = t.huge ? 46 * (1 + Math.max(0, t.t-1.3)*1.5) : (t.num ? Math.round(14*(t.pop||1)*(t.t > 0.6 ? 1.25 : 1)) : (t.big ? 20 : 12));
+    ctx.font = "700 " + sz + "px \"Verdana\",monospace";
+    ctx.textAlign = "center"; ctx.lineJoin = "round";
+    if(t.big || t.huge){ const w = ctx.measureText(t.msg).width; if(w > W-24){ ctx.font = "700 " + Math.floor(sz*(W-24)/w) + "px \"Verdana\",monospace"; } }
+    ctx.strokeStyle = "rgba(7,9,15,.85)"; ctx.lineWidth = t.big ? 5 : 3; ctx.strokeText(t.msg, t.x, t.y);
+    ctx.fillStyle = t.col; ctx.fillText(t.msg, t.x, t.y); });
   ctx.globalAlpha = 1;
-  /* HUD */
+  /* HUD (in portrait it sits at the top, clear of the thumbs) */
+  const hudDy = W < H ? 132 - H : 0;
+  ctx.save(); ctx.translate(0, hudDy);
   ctx.textAlign = "left";
   ctx.fillStyle = "#10141f"; ctx.fillRect(16, H-42, 208, 26);
   ctx.fillStyle = p.hp/p.maxHp > 0.3 ? "#3dff9d" : "#ff4d5e";
   ctx.fillRect(18, H-40, 204*Math.max(0,p.hp/p.maxHp), 22);
   ctx.fillStyle = "#07090f"; ctx.font = "12px \"Verdana\",monospace";
   ctx.fillText("HP " + Math.max(0,Math.round(p.hp)) + "/" + p.maxHp, 26, H-25);
-  ctx.fillStyle = "#8b8fa3"; ctx.font = "11px \"Verdana\",monospace";
-  ctx.fillText(s.relics.length ? "UPGRADES: "+s.relics.join(" | ") : "", 16, H-52);
+  /* the beat light: flashes on every beat of the music, swing when it flashes */
+  const bt = Music.beat();
+  const beatK = bt ? Math.max(0, 1 - bt.phase*3.2) : 0;
+  ctx.fillStyle = "#10141f"; ctx.fillRect(232, H-42, 48, 26);
+  ctx.fillStyle = bt ? "rgba(255,181,71," + (0.18 + 0.82*beatK) + ")" : "#232a3d";
+  ctx.beginPath(); ctx.arc(246, H-29, 6 + 3*beatK, 0, 7); ctx.fill();
+  ctx.fillStyle = bt ? "#e8e4d8" : "#5d6275"; ctx.font = "700 9px \"Verdana\",monospace";
+  ctx.fillText("BEAT", 256, H-25);
+  if(s.boss && s.sahur.alive){
+    const sa = s.sahur, k = Math.max(0, sa.hp/sa.maxHp);
+    ctx.fillStyle = "#10141f"; ctx.fillRect(288, H-42, 168, 26);
+    ctx.fillStyle = sa.down ? "#5d6275" : (k > 0.35 ? "#ffb547" : "#ff4d5e");
+    ctx.fillRect(290, H-40, 164*k, 22);
+    ctx.fillStyle = sa.down ? "#ffb547" : "#07090f"; ctx.font = "700 11px \"Verdana\",monospace";
+    ctx.fillText(sa.down ? "SAHUR DOWN - STAND BY HIM" : "SAHUR " + Math.ceil(sa.hp) + "/" + sa.maxHp, 298, H-25);
+  }
+  /* TRIPLE T meter: three segments, like three knocks */
+  const ready = s.ttt >= 1, tp = performance.now();
+  for(let i=0;i<3;i++){
+    const segK = Math.max(0, Math.min(1, s.ttt*3 - i));
+    ctx.fillStyle = "#10141f"; ctx.fillRect(16 + i*70, H-62, 66, 14);
+    ctx.fillStyle = ready ? (Math.sin(tp/90)>0 ? "#ffe2b0" : "#ffb547") : "#b0743a";
+    ctx.fillRect(18 + i*70, H-60, 62*segK, 10);
+  }
+  ctx.fillStyle = ready ? "#ffb547" : (darkWorld ? "#8b8fa3" : "#4a4660"); ctx.font = "700 11px \"Verdana\",monospace"; ctx.textAlign = "left";
+  ctx.fillText(ready ? (COARSE ? "TRIPLE T READY - TAP IT" : "TRIPLE T READY - PRESS E") : "TRIPLE T", 232, H-50);
+  ctx.restore();
+  /* score, top left beside the pause button */
+  ctx.textAlign = "left"; ctx.font = "700 14px \"Verdana\",monospace";
+  ctx.fillStyle = darkWorld ? "#e8e4d8" : "#1a1430";
+  ctx.fillText(s.score.toLocaleString(), 66, 26);
+  ctx.font = "700 10px \"Verdana\",monospace"; ctx.fillStyle = "#35e8ff";
+  ctx.fillText("AURA " + Math.floor(s.aura), 66, 41);
+  /* combo, counted like the chant */
+  if(s.combo >= 3){
+    const tier = COMBO_TIERS.filter(t=>s.combo >= t.n).pop();
+    const pop = 1 + (s.comboPop||0)*0.35, cx = W - 20, cy = W > H ? 190 : 260;
+    ctx.save(); ctx.textAlign = "right"; ctx.globalAlpha = Math.min(1, s.comboT*1.5);
+    ctx.font = "700 " + Math.round(30*pop) + "px \"Press Start 2P\",monospace";
+    ctx.lineJoin = "round"; ctx.strokeStyle = "#07090f"; ctx.lineWidth = 6;
+    ctx.strokeText("x" + s.combo, cx, cy); ctx.fillStyle = s.combo >= 25 ? "#ff3df0" : (s.combo >= 9 ? "#ffb547" : "#e8e4d8"); ctx.fillText("x" + s.combo, cx, cy);
+    if(tier){ ctx.font = "700 12px \"Verdana\",monospace"; ctx.lineWidth = 4; ctx.strokeText(tier.label, cx, cy+20); ctx.fillText(tier.label, cx, cy+20); }
+    ctx.fillStyle = "#10141f"; ctx.fillRect(cx-110, cy+28, 110, 3);
+    ctx.fillStyle = "#ffb547"; ctx.fillRect(cx-110*(s.comboT/COMBO_TIME), cy+28, 110*(s.comboT/COMBO_TIME), 3);
+    ctx.restore();
+  }
+  /* this room's modifier */
+  if(s.modifier && s.modCard > 0){
+    const a = Math.min(1, s.modCard*2, (3.2 - s.modCard)*4);
+    ctx.save(); ctx.globalAlpha = a; ctx.textAlign = "center";
+    const cw = Math.min(W-40, 460), cx = W/2, cy = H*0.3;
+    ctx.fillStyle = "rgba(16,20,31,.92)"; ctx.fillRect(cx-cw/2, cy-34, cw, 60);
+    ctx.strokeStyle = "#ff3df0"; ctx.lineWidth = 2; ctx.strokeRect(cx-cw/2+1, cy-33, cw-2, 58);
+    ctx.fillStyle = "#ff3df0"; ctx.font = "700 18px \"Verdana\",monospace"; ctx.fillText(s.modifier.name, cx, cy-8);
+    ctx.fillStyle = "#e8e4d8"; ctx.font = "13px \"Verdana\",monospace"; ctx.fillText(s.modifier.line, cx, cy+14);
+    ctx.restore();
+  } else if(s.modifier){
+    ctx.textAlign = "left"; ctx.font = "700 10px \"Verdana\",monospace"; ctx.fillStyle = "#ff3df0";
+    ctx.fillText(s.modifier.name, 66, 56);
+  }
+  /* tutorial chip */
+  if(s.tut && mode === "play"){
+    const T = (COARSE ? COPY.tutorial.touch : COPY.tutorial.desktop);
+    const key = {move:"move", swing:"swing", beat:"swing_on_beat", dash:"dash", ult:"triple_t_ready", help:"help_up"}[s.tut.k];
+    const item = T[key];
+    if(item){
+      const pulse = 0.75 + 0.25*Math.sin(performance.now()/180);
+      ctx.save(); ctx.textAlign = "center"; ctx.font = "700 16px \"Verdana\",monospace";
+      const msg = item.t + "   " + item.key, tw = ctx.measureText(msg).width + 30, cy = W > H ? 86 : 196;
+      ctx.globalAlpha = Math.min(1, s.tut.t*3);
+      ctx.fillStyle = "rgba(16,20,31,.9)"; ctx.fillRect(W/2-tw/2, cy-20, tw, 30);
+      ctx.strokeStyle = "rgba(255,181,71," + pulse + ")"; ctx.lineWidth = 2; ctx.strokeRect(W/2-tw/2+1, cy-19, tw-2, 28);
+      ctx.fillStyle = "#ffb547"; ctx.fillText(item.t, W/2 - ctx.measureText("   " + item.key).width/2, cy);
+      ctx.fillStyle = "#e8e4d8"; ctx.fillText("   " + item.key, W/2 + ctx.measureText(item.t).width/2, cy);
+      ctx.restore();
+      /* the beat lesson: a ring that pulses on every beat around you */
+      if(s.tut.k === "beat"){ const b2 = Music.beat(); if(b2){ ctx.strokeStyle = "rgba(255,181,71," + (1-b2.phase) + ")"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(p.x, p.y, 30 + b2.phase*60, 0, 7); ctx.stroke(); } }
+    }
+  }
+  /* versus card: powerscaling, before every boss (and the rival) */
+  if(s.versus){
+    const v = COPY.versus[s.versus.id], vt = s.versus.t, a = Math.min(1, vt*4, (s.versus.dur - vt)*4);
+    if(v){
+      ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.textAlign = "center";
+      const slide = Math.max(0, 1 - vt*5) * W;
+      ctx.fillStyle = "rgba(7,9,15,.9)"; ctx.fillRect(0, H/2-110, W, 220);
+      ctx.fillStyle = "#ffb547"; ctx.fillRect(0, H/2-112, W, 3); ctx.fillRect(0, H/2+109, W, 3);
+      const small = W < 700;
+      ctx.font = "700 " + (small ? 15 : 22) + "px \"Press Start 2P\",monospace";
+      ctx.fillStyle = "#ffb547"; ctx.fillText("SAHUR", W/2 - (small ? 80 : 110) - slide, H/2-70);
+      ctx.fillStyle = "#e8e4d8"; ctx.fillText("VS", W/2 + (small ? 50 : 70), H/2-70);
+      ctx.fillStyle = "#ff4d5e";
+      let fs = small ? 13 : 18; ctx.font = "700 " + fs + "px \"Press Start 2P\",monospace";
+      while(ctx.measureText(v.name).width > W-40 && fs > 8){ fs--; ctx.font = "700 " + fs + "px \"Press Start 2P\",monospace"; }
+      ctx.fillText(v.name, W/2 + slide, H/2-38);
+      ctx.fillStyle = "#b8bdcc"; ctx.font = "italic 14px Verdana, sans-serif"; ctx.fillText(v.sub, W/2, H/2-12);
+      ctx.font = "700 14px \"Verdana\",monospace";
+      v.rows.forEach((r,i)=>{ if(vt > 0.35 + i*0.3){ ctx.fillStyle = i===2 ? "#ff3df0" : "#e8e4d8"; ctx.fillText(r, W/2, H/2 + 22 + i*26); } });
+      ctx.restore();
+    }
+  }
   drawChallengeHud(s);
   ctx.textAlign = "right";
-  ctx.fillText(biome().name + (s.boss ? "" : "  |  ROOM "+(s.room+1)+"/"+biome().rooms), W-16, H-25);
+  const atCore = s.biome >= BIOMES.length;
+  ctx.font = "11px \"Verdana\",monospace";
+  ctx.fillText(atCore ? "THE CORE" : biome().name + (s.boss || s.room >= biome().rooms ? "" : "  |  ROOM "+(s.room+1)+"/"+biome().rooms), W-16, W < H ? 152 : H-25);
+  /* TRIPLE T broadcast */
+  if(s.ult){
+    const u = s.ult, k = Math.min(1, u.t*4, (2.7-u.t)*4), bar = 64*Math.max(0,k);
+    ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(0,0,W,H);
+    const sa = s.sahur, g = ctx.createRadialGradient(sa.x, sa.y-30, 20, sa.x, sa.y-30, 180);
+    g.addColorStop(0, "rgba(255,226,176,.28)"); g.addColorStop(1, "rgba(255,226,176,0)");
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = "#07090f"; ctx.fillRect(0, 0, W, bar); ctx.fillRect(0, H-bar, W, bar);
+    if(k > 0.6){
+      ctx.textAlign = "left"; ctx.fillStyle = "#ff4d5e"; ctx.fillRect(16, 18, 54, 22);
+      ctx.fillStyle = "#fff"; ctx.font = "700 12px Verdana, sans-serif"; ctx.fillText("LIVE", 26, 34);
+      ctx.fillStyle = "#ffb547"; ctx.font = "700 14px \"Press Start 2P\",monospace"; ctx.fillText(W < 700 ? "PINCH HITTER" : "PINCH HITTER  -  TRIPLE T", 84, 36);
+      ctx.textAlign = "center"; ctx.fillStyle = "#e8e4d8"; ctx.font = "italic 700 " + (W < 700 ? 13 : 16) + "px Verdana, sans-serif";
+      ctx.fillText(u.done ? u.cap2 : u.cap, W/2, H - bar/2 + 6);
+    }
+    ctx.textAlign = "center"; ctx.font = "700 34px \"Press Start 2P\",monospace";
+    for(let i=0;i<u.step && !u.done;i++){
+      ctx.lineJoin = "round"; ctx.strokeStyle = "#07090f"; ctx.lineWidth = 7;
+      ctx.strokeText("TUNG", W/2 + (i-1)*(W < 700 ? 150 : 200), H*0.36); ctx.fillStyle = "#ffb547"; ctx.fillText("TUNG", W/2 + (i-1)*(W < 700 ? 150 : 200), H*0.36);
+    }
+  }
   /* beats finale */
   if(mode === "beats"){
-    ctx.fillStyle = "rgba(233,233,242,"+Math.min(0.85, beats.t/5)+")";
+    const whiteK = beats.done ? Math.min(0.95, 0.55 + beats.endT*0.3) : 0.25 + beats.n*0.12;
+    ctx.fillStyle = "rgba(233,233,242,"+whiteK+")";
     ctx.fillRect(-20,-20,W+40,H+40);
-    ctx.fillStyle = "#07090f"; ctx.font = "38px \"Press Start 2P\",monospace"; ctx.textAlign = "center";
-    for(let i=0;i<beats.n;i++) ctx.fillText("TUNG", W/2, 200 + i*80);
-    if(beats.n===3 && beats.t>5){ ctx.font="16px \"Verdana\",monospace";
-      ctx.fillText("...", W/2, 480); }
+    ctx.textAlign = "center";
+    /* his calls on the left, your answers on the right */
+    for(let i=0;i<beats.calls;i++){
+      ctx.fillStyle = "#b0743a"; ctx.font = "26px \"Press Start 2P\",monospace";
+      ctx.fillText("TUNG", W/2-W*0.18, 170 + i*90);
+    }
+    for(let i=0;i<beats.n;i++){
+      ctx.fillStyle = "#07090f"; ctx.font = "34px \"Press Start 2P\",monospace";
+      ctx.fillText("TUNG", W/2+W*0.18, 174 + i*90);
+    }
+    if(beats.called && !beats.done){
+      const pulse = 0.5 + 0.5*Math.sin(performance.now()/120);
+      ctx.fillStyle = "rgba(7,9,15,.88)"; ctx.fillRect(W/2-190, H-62, 380, 44);
+      ctx.strokeStyle = "rgba(255,181,71," + (0.5 + 0.5*pulse) + ")"; ctx.lineWidth = 2; ctx.strokeRect(W/2-189, H-61, 378, 42);
+      ctx.fillStyle = "#ffb547"; ctx.font = "700 18px \"Verdana\",monospace";
+      ctx.fillText(matchMedia("(pointer:coarse)").matches ? "ANSWER HIM  -  TAP" : "ANSWER HIM  -  SPACE", W/2, H-33);
+    }
   }
-  if(flash > 0){ ctx.fillStyle = "rgba(255,255,255,"+flash+")";
+  if(flash > 0){ ctx.fillStyle = "rgba(255,255,255,"+(reducedMotion() ? Math.min(flash, 0.25) : flash)+")";
     ctx.fillRect(-20,-20,W+40,H+40); flash *= 0.86; if(flash<0.02) flash=0; }
   ctx.restore();
 }
 
 /* ---------- main loop ---------- */
 function loop(now){
-  const dt = Math.min(0.033, (now-last)/1000); last = now;
+  let dt = Math.min(0.033, (now-last)/1000); last = now;
   tickTyper(dt);
   tickCutscene(dt);
-  if(mode==="play" && state) update(dt);
+  if(state && state.slowT > 0){ state.slowT -= dt; dt *= 0.35; }
+  if(hitStop > 0) hitStop -= dt;            // a few frames of freeze sell every big hit
+  else if(mode==="play" && state) update(dt);
   if(mode==="beats") tickBeats(dt);
   render();
   requestAnimationFrame(loop);
 }
+fitArena();
+addEventListener("resize", fitArena);
+addEventListener("orientationchange", ()=>setTimeout(fitArena, 120));
+/* never keep playing in a hidden tab */
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden && mode==="play") pauseGame(); });
 requestAnimationFrame(loop);
 </script>
 </body>
