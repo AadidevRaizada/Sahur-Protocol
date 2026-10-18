@@ -1,0 +1,75 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+  body { margin: 0; background: #fff; font-family: "Segoe UI", Arial, sans-serif; }
+  .fig { display: inline-block; padding: 24px; background: #fff; }
+  #flow { width: 1100px; } #loop { width: 1700px; } #mind { width: 1600px; }
+  .mm { position: relative; display: grid; grid-template-columns: 1fr 260px 1fr; gap: 70px; align-items: center; }
+  .mm .col { display: grid; gap: 26px; }
+  .mmlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .hub { width: 260px; height: 260px; border-radius: 50%; background: #ffb547; display: flex; align-items: center; justify-content: center; text-align: center; font: 800 30px "Segoe UI", Arial; color: #1b1424; box-shadow: 0 0 0 8px #fff4e0, 0 0 0 11px #c77a12; position: relative; }
+  .br { border: 3px solid var(--c); border-radius: 14px; padding: 12px 18px; background: #fff; position: relative; }
+  .br b { display: inline-block; background: var(--c); color: #fff; font: 700 22px "Segoe UI", Arial; padding: 4px 14px; border-radius: 8px; margin-bottom: 6px; }
+  .br ul { margin: 0; padding-left: 22px; font: 19px/1.45 "Segoe UI", Arial; color: #222; }
+  h3 { margin: 0 0 10px; font: 600 20px "Segoe UI", Arial; color: #222; }
+</style>
+</head><body>
+
+<div class="fig" id="flow"><pre class="mermaid">
+flowchart TD
+  A([Title screen]) --> B{Save exists?}
+  B -- "CONTINUE" --> R
+  B -- "WAKE UP" --> C[["Prologue cutscene<br/>(skippable)"]]
+  C --> D[/"FIRST UPGRADE<br/>pick 1 of 3 skills"/]
+  D --> R["Combat room n/3<br/>room modifier rolls<br/>(not in biome 1, room 1)"]
+  R --> E{"Player HP = 0?"}
+  E -- yes --> SW{"Second Wind<br/>left?"}
+  SW -- yes --> R
+  SW -- no --> GO(["ABSORBED<br/>grade + RETRY CHECKPOINT"])
+  GO --> R
+  E -- "no, room cleared" --> F{"Room 3 done?"}
+  F -- no --> U[/"CHOOSE AN UPGRADE<br/>3 cards / BRAINROT GOD evo"/] --> R
+  F -- yes --> V["Versus card"] --> BOSS["Biome boss<br/>Echo / Scraper / Valuation<br/>protect Sahur"]
+  BOSS --> BC[/"BIOME CLEAR<br/>grade D to S+"/] --> CS[["Biome cutscene"]] --> SR[/"SIGNAL ROLL<br/>unlock 1 skill"/]
+  SR --> G{"Biome 3 done?"}
+  G -- "no, next biome" --> R
+  G -- yes --> CI[["Core intro"]] --> FU[/"FINAL UPGRADE"/] --> BB["THE AI BUBBLE<br/>Phase 1 HYPE, Phase 2 SCALE"]
+  BB --> P3["Phase 3 COLLAPSE<br/>Sahur's TUNG stops"] --> SAC[["Sacrifice cutscene"]]
+  SAC --> ANS["Answer Sahur's 3 TUNG calls<br/>(player input)"] --> EP[["Dawn epilogue<br/>knock 3 times"]] --> EC[["EPILOGUE I card<br/>TO BE CONTINUED"]] --> WIN(["WE WON.<br/>BUT AT WHAT COST."])
+</pre></div>
+
+<div class="fig" id="loop"><pre class="mermaid">
+flowchart LR
+  M["Move and dash"] --> S["Swing<br/>(on the beat = x1.3)"]
+  S --> T["Sahur's TUNG<br/>lands on the beat"]
+  T --> C["Combo climbs<br/>score x up to 3"]
+  C --> O["Aura orbs and<br/>TRIPLE T charge"]
+  O --> X["TRIPLE T home run<br/>(when meter is full)"]
+  X --> K["Room clear"]
+  C --> K
+  K --> P["Pick an upgrade<br/>build toward evolutions"]
+  P --> M
+</pre></div>
+
+<div class="fig" id="mind"><div class="mm">
+<svg class="mmlines"></svg>
+<div class="col"><div class="br" style="--c:#8e44ad"><b>Story</b><ul><li>3:07 AM, the feed scrolls itself</li><li>Sahur wakes you with 3 knocks</li><li>Three broken places</li><li>Sacrifice and dawn</li><li>Epilogue I: sequel tease</li></ul></div><div class="br" style="--c:#2e6fd8"><b>Characters</b><ul><li>YOU, the sleeper</li><li>Sahur a.k.a. Triple T</li><li>Echo · The Scraper · The Valuation</li><li>The AI Bubble</li><li>Rival: GRR GRR PATATAM</li></ul></div><div class="br" style="--c:#c77a12"><b>Mechanics</b><ul><li>Move, swing, dash</li><li>On-beat bonus (x1.3)</li><li>TRIPLE T ultimate</li><li>Protect Sahur</li><li>Combo counter</li></ul></div></div>
+<div class="hub">SAHUR<br>PROTOCOL</div>
+<div class="col"><div class="br" style="--c:#1f9d55"><b>Progression</b><ul><li>17 skills, 5 rarities</li><li>4 BRAINROT GOD evolutions</li><li>Elites and chests</li><li>10 room modifiers</li><li>13 challenges · Hall of TUNG</li></ul></div><div class="br" style="--c:#d6336c"><b>Feel</b><ul><li>Hit-stop, knockback, shake</li><li>Synth music per biome</li><li>Choir finale</li><li>Grades D to S+</li></ul></div><div class="br" style="--c:#0b8a8a"><b>Access</b><ul><li>One HTML file, any browser</li><li>Portrait and landscape</li><li>CHILL / NORMAL / SPICY</li><li>Auto-swing, shake off</li><li>Skippable scenes</li></ul></div></div>
+</div></div>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'base', flowchart: { curve: 'basis', htmlLabels: true },
+    themeVariables: { primaryColor: '#fff4e0', primaryBorderColor: '#c77a12', primaryTextColor: '#1b1424', lineColor: '#6b4fa0', fontSize: '17px', fontFamily: 'Segoe UI, Arial' } });
+</script>
+<script>
+  addEventListener('load', () => {
+    const mm = document.querySelector('.mm'), svg = mm.querySelector('svg'), r0 = mm.getBoundingClientRect();
+    const h = mm.querySelector('.hub').getBoundingClientRect(), cx = h.left + h.width / 2 - r0.left, cy = h.top + h.height / 2 - r0.top;
+    svg.innerHTML = [...mm.querySelectorAll('.br')].map((b) => { const r = b.getBoundingClientRect(), left = r.left - r0.left > cx;
+      const x = left ? r.left - r0.left : r.right - r0.left, y = r.top - r0.top + r.height / 2;
+      return `<path d="M${cx},${cy} C${(cx + x) / 2},${cy} ${(cx + x) / 2},${y} ${x},${y}" stroke="${getComputedStyle(b).getPropertyValue('--c')}" stroke-width="6" fill="none"/>`; }).join('');
+  });
+</script>
+</body></html>

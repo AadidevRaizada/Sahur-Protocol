@@ -1,0 +1,877 @@
+{
+  "ranAt": "2026-10-18T09:49:45.434Z",
+  "browser": "Chrome/155.0.8059.84 headless, puppeteer-core 23.11.1",
+  "results": [
+    {
+      "id": "TC-01",
+      "scenario": "Start New Game",
+      "expected": "Prologue → FIRST UPGRADE (3 cards) → biome 1 room 1/3, no modifier",
+      "observed": "scene prologue; \"FIRST UPGRADE\" with 3 cards (pool 14 skills); play in biome 1 room 1/3, 5 enemies queued/alive, modifier none, music \"forest\" (beat clock running: true)",
+      "verdict": "Pass",
+      "evidence": {
+        "fu": {
+          "title": "FIRST UPGRADE",
+          "sub": "Nine core skills are already in your pool. Choose one to begin the run.",
+          "n": 3,
+          "pool": 14
+        },
+        "r1": {
+          "biome": 0,
+          "room": 0,
+          "boss": false,
+          "mod": null,
+          "queued": 5,
+          "music": "forest",
+          "beat": true
+        }
+      }
+    },
+    {
+      "id": "TC-02",
+      "scenario": "Advance the prologue",
+      "expected": "1st press completes the typing line, 2nd press advances",
+      "observed": "no save so no confirm (false); scene \"prologue\" line 0 typing true; Space → typing false on line 0; Space → line 1",
+      "verdict": "Pass",
+      "evidence": {
+        "c0": {
+          "m": "cutscene",
+          "id": "prologue",
+          "i": 0,
+          "typing": true,
+          "confirm": false
+        },
+        "c1": {
+          "i": 0,
+          "typing": false
+        },
+        "c2": {
+          "i": 1,
+          "typing": true
+        }
+      }
+    },
+    {
+      "id": "TC-03",
+      "scenario": "Move and attack (v3: hold to swing)",
+      "expected": "8-way normalised move; holding Space keeps swinging (one per cooldown); one swing per tap",
+      "observed": "D 0.4 s → 92 px; W+D → 66/66 px (diag 94 px); holding Space 1.0 s → 3 swings (cooldown 0.38 s); 3 taps → 3 swings",
+      "verdict": "Pass",
+      "evidence": {
+        "straight": 92.18250000000069,
+        "dx": 66.29656403709805,
+        "dy": 66.29656403709745,
+        "held": 3,
+        "taps": 3
+      }
+    },
+    {
+      "id": "TC-04",
+      "scenario": "Clear Room",
+      "expected": "ROOM CLEAR then CHOOSE AN UPGRADE with up to 3 distinct cards showing level x/max",
+      "observed": "\"CHOOSE AN UPGRADE\" with 3 cards: Thick Skin (Level 0/3 -> 1/3) | Sharp Take (Level 0/3 -> 1/3) | Mixtape '07 (Level 0/3 -> 1/3); distinct true",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-05",
+      "scenario": "Fight Boss: Echo",
+      "expected": "Versus card, boss, BIOME CLEAR, cutscene, SIGNAL ROLL, biome 2",
+      "observed": "rooms 2 and 3 cleared (room 3 modifier TRENDING; rival cameo: PATATAM 260 HP, versus \"patatam\"); boss echo in room 4 with versus card \"echo\"; defeat → BIOME CLEAR → cutscene biome1_end → \"SIGNAL ROLL\" → biome 2, room 1",
+      "verdict": "Pass",
+      "evidence": {
+        "bossIn": {
+          "room": 3,
+          "boss": "echo",
+          "versus": "echo"
+        },
+        "bc": "biome1_end",
+        "sr": "SIGNAL ROLL",
+        "b2": {
+          "biome": 1,
+          "room": 0
+        }
+      }
+    },
+    {
+      "id": "TC-06",
+      "scenario": "Fight Boss: Valuation",
+      "expected": "\"NOT YET\" until its big burst opens a 4 s window",
+      "observed": "valuation: hit before burst 560→560 (\"NOT YET\" true); window opened after its burst; hit in window 560→550; closed after 4 s: true",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-07",
+      "scenario": "Pause, resume, main menu",
+      "expected": "Esc freezes the world; RESUME; MAIN MENU shows CONTINUE",
+      "observed": "Esc → pause (overlay flex); frozen 0.6 s: true; RESUME → play; MAIN MENU → title, CONTINUE display block",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-08",
+      "scenario": "Continue Game",
+      "expected": "Saved biome/room, skills, evolutions, score and HP restored",
+      "observed": "save: biome 2 room 1, HP 115, score 5000, evolutions [THREE-PEAT]; restored: biome 2 room 1, HP 115, score 5000; skills+evolutions identical: true",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-09",
+      "scenario": "New game over a save",
+      "expected": "\"START OVER?\" confirm naming the checkpoint; Esc and KEEP MY RUN keep it; ERASE AND WAKE UP erases it",
+      "observed": "save existed true; WAKE UP → confirm shown true \"START OVER?\": \"Starting a new run erases your checkpoint in HYPE CYCLE FOREST, room 1. This cannot be undone.\" (mode title); Esc → closed true, save kept true; KEEP MY RUN → save kept true, mode title; ERASE AND WAKE UP → cutscene \"prologue\", save present false",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-10",
+      "scenario": "HP reaches 0",
+      "expected": "ABSORBED with grade; RETRY CHECKPOINT; save kept",
+      "observed": "mode end, \"ABSORBED\" with grade D, button \"RETRY CHECKPOINT\", save kept true; button → play",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-11",
+      "scenario": "HP 0 with Second Wind",
+      "expected": "Revive at 50% HP",
+      "observed": "revives 1→0; HP 58/116; mode stays play",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-12",
+      "scenario": "Mute and volume persist",
+      "expected": "M mutes everything; volume slider scales; both survive a reload (sahurProtocolAudioV1)",
+      "observed": "M → muted true, music gain 0, choir volume 0, button \"Music and sound: Off\"; clicked slider at 30% → master 0.29 (stored {\"muted\":true,\"volume\":0.29}); after reload: muted true, master 0.29, slider 29, button \"Music and sound: Off\"",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-13",
+      "scenario": "Touch layout, then reload",
+      "expected": "Joystick size kept after reload",
+      "observed": "coarse pointer true; joystick size set to 160 px → stored {\"stickSize\":160,\"stickLeft\":8,\"stickBottom\":8,\"attackSize\":92,\"moveMode\":\"joystick\"}; after reload 160 px (slider 160, CSS 160px)",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-14",
+      "scenario": "Phone in portrait (v3: plays in 540×960)",
+      "expected": "No ROTATE DEVICE overlay; arena 540×960; player starts at 62% height; world runs",
+      "observed": "ROTATE DEVICE display \"none\" on load, \"none\" in play; arena 540×960 (portrait class true, backing store 780×1387, on screen 390×693 CSS px); player starts at y 595.2 (62%); after 2.5 s mode play, 2 enemies, all inside the arena true",
+      "verdict": "Pass"
+    },
+    {
+      "id": "TC-15",
+      "scenario": "Touch controls: SWING, DASH, TRIPLE T, stick",
+      "expected": "Taps on the on-screen buttons swing/dash/ult; stick drag moves; auto-swing on by default on touch",
+      "observed": "auto-swing default true; SWING tap → swings +1; DASH tap → dashes +1; meter full → TRIPLE T pill ready true (display block); pill tap → ult true; stick drag right 0.5 s → player x 300→418.54",
+      "verdict": "Pass"
+    },
+    {
+      "id": "SKIP-01",
+      "scenario": "SKIP SCENE button skips a cutscene",
+      "expected": "Prologue ends at once and FIRST UPGRADE opens",
+      "observed": "clicked SKIP on line 2/11; \"FIRST UPGRADE\" open after 29 ms; cutscene overlay visible: false",
+      "verdict": "Pass",
+      "evidence": {
+        "before": {
+          "i": 1,
+          "n": 11
+        },
+        "dt": 29,
+        "ch": {
+          "title": "FIRST UPGRADE",
+          "cutVisible": false
+        }
+      }
+    },
+    {
+      "id": "COPY-01",
+      "scenario": "FIRST UPGRADE subtitle vs the real pool",
+      "expected": "Subtitle should match the number of skills in the starting pool",
+      "observed": "subtitle \"Nine core skills are already in your pool. Choose one to begin the run.\"; starting pool has 14 unlocked skills (17 total, 3 locked)",
+      "verdict": "Fail"
+    },
+    {
+      "id": "MOD-01",
+      "scenario": "No modifier in biome 1 room 1",
+      "expected": "state.modifier is null in the first room",
+      "observed": "modifier at biome 1 room 1: null",
+      "verdict": "Pass"
+    },
+    {
+      "id": "MOD-02",
+      "scenario": "Room modifier rolls",
+      "expected": "Every room except biome 1 room 1 rolls one; never the same twice in a row; SPONSORED never rolls; 9 possible",
+      "observed": "biome 1 room 1 ×50: 0 modifiers; 600 later room starts: 0 without a modifier, 0 back-to-back repeats, 9 distinct (shadowbanned 66, beat_drop 64, patch_notes 70, ratiod 64, algorithm_boost 55, lag_spike 70, trending 64, golden_hour 74, touch_grass 73); boss rooms: 0 modifiers",
+      "verdict": "Pass",
+      "evidence": {
+        "firstNonNull": 0,
+        "nulls": 0,
+        "repeats": 0,
+        "counts": {
+          "shadowbanned": 66,
+          "beat_drop": 64,
+          "patch_notes": 70,
+          "ratiod": 64,
+          "algorithm_boost": 55,
+          "lag_spike": 70,
+          "trending": 64,
+          "golden_hour": 74,
+          "touch_grass": 73
+        },
+        "bossMods": 0
+      }
+    },
+    {
+      "id": "MOD-03",
+      "scenario": "TRENDING: \"More of them. More score.\"",
+      "expected": "Enemy count ×1.5 (biome 1 room 2: 6 → 9) and score ×1.5 (the modifier's own effect text says \"score x1.5\")",
+      "observed": "biome 1 room 2 spawn queue: 6 without TRENDING, 9 with it (count part works); score for one identical kill: 10 without, 10 with TRENDING (no score bonus)",
+      "verdict": "Fail",
+      "evidence": {
+        "cnt": {
+          "trending": 9,
+          "other": 6
+        },
+        "sNone": 10,
+        "sTr": 10
+      }
+    },
+    {
+      "id": "BEAT-01",
+      "scenario": "On-beat swing deals x1.3 (Music.beat())",
+      "expected": "Swing within ±0.11 s of a beat line: 13 → 16.9 dmg, counted ON BEAT; mid-beat swing: 13 dmg",
+      "observed": "beat length 0.58 s (104 BPM forest); presses timed to the beat line → dmg [16.9, 16.9, 16.9, 16.9], counted on-beat 4/4; presses mid-beat → dmg [13, 13, 13, 13], counted on-beat 0/4; ratio 1.3",
+      "verdict": "Pass",
+      "evidence": {
+        "on": [
+          {
+            "phase": 0.9624888888888936,
+            "beatLen": 0.5769230769230769,
+            "dmg": 16.9,
+            "swung": 1,
+            "onBeat": 1
+          },
+          {
+            "phase": 0.9655111111111161,
+            "beatLen": 0.5769230769230769,
+            "dmg": 16.9,
+            "swung": 1,
+            "onBeat": 1
+          },
+          {
+            "phase": 0.9731555555555609,
+            "beatLen": 0.5769230769230769,
+            "dmg": 16.9,
+            "swung": 1,
+            "onBeat": 1
+          },
+          {
+            "phase": 0.9576888888888941,
+            "beatLen": 0.5769230769230769,
+            "dmg": 16.9,
+            "swung": 1,
+            "onBeat": 1
+          }
+        ],
+        "off": [
+          {
+            "phase": 0.4321777777777811,
+            "beatLen": 0.5769230769230769,
+            "dmg": 13,
+            "swung": 1,
+            "onBeat": 0
+          },
+          {
+            "phase": 0.4213333333333278,
+            "beatLen": 0.5769230769230769,
+            "dmg": 13,
+            "swung": 1,
+            "onBeat": 0
+          },
+          {
+            "phase": 0.42435555555554494,
+            "beatLen": 0.5769230769230769,
+            "dmg": 13,
+            "swung": 1,
+            "onBeat": 0
+          },
+          {
+            "phase": 0.4319999999999844,
+            "beatLen": 0.5769230769230769,
+            "dmg": 13,
+            "swung": 1,
+            "onBeat": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "BEAT-02",
+      "scenario": "BEAT DROP modifier (\"On the beat, it counts twice\")",
+      "expected": "On-screen card promises a doubled on-beat bonus, so an on-beat swing should deal more than 16.9",
+      "observed": "under BEAT DROP, on-beat swings dealt [16.9, 16.9, 16.9], the same as without the modifier (16.9); the modifier changes nothing",
+      "verdict": "Fail",
+      "evidence": [
+        {
+          "phase": 0.9573333333333096,
+          "beatLen": 0.5769230769230769,
+          "dmg": 16.9,
+          "swung": 1,
+          "onBeat": 1
+        },
+        {
+          "phase": 0.9603555555555268,
+          "beatLen": 0.5769230769230769,
+          "dmg": 16.9,
+          "swung": 1,
+          "onBeat": 1
+        },
+        {
+          "phase": 0.967999999999968,
+          "beatLen": 0.5769230769230769,
+          "dmg": 16.9,
+          "swung": 1,
+          "onBeat": 1
+        }
+      ]
+    },
+    {
+      "id": "DASH-01",
+      "scenario": "Dash with i-frames (Shift)",
+      "expected": "~125 px burst, 0.28 s invulnerability; a bullet on the player mid-dash does no damage, the same bullet later does",
+      "observed": "dash moved 130.03 px; i-frames at dash start 0.27 s; bullet placed on player mid-dash: HP 100→100; same bullet 1.3 s later: HP 100→70",
+      "verdict": "Pass",
+      "evidence": {
+        "dist": 130.02599999999893,
+        "inv": {
+          "inv": 0.273,
+          "hp": 100
+        },
+        "after": {
+          "x": 430.02599999999893,
+          "hp": 100,
+          "dashes": 1
+        },
+        "ctl": 100,
+        "ctlAfter": 70
+      }
+    },
+    {
+      "id": "COMBO-01",
+      "scenario": "Combo counter tiers and 2.6 s reset",
+      "expected": "Labels at 3/6/9 hits; multiplier 1+combo/30; combo back to 0 ≈2.6 s after the last hit",
+      "observed": "held Space 4.3 s on the dummy → combo 11, tiers reached 3 \"TUNG TUNG TUNG\", 6 \"SIX TUNG. NO NOTES\", 9 \"SAHUUUR\"; score multiplier ×1.37 (formula 1+11/30 = 1.37); combo reset to 0 2.58 s after the last hit",
+      "verdict": "Pass",
+      "evidence": {
+        "peak": {
+          "combo": 11,
+          "mult": 1.3666666666666667,
+          "best": 11,
+          "tiers": [
+            3,
+            6,
+            9
+          ],
+          "labels": [
+            "TUNG TUNG TUNG",
+            "SIX TUNG. NO NOTES",
+            "SAHUUUR"
+          ]
+        },
+        "reset": 2.5754000000003727
+      }
+    },
+    {
+      "id": "ULT-01",
+      "scenario": "TRIPLE T only with a full meter",
+      "expected": "E with meter < 1 does nothing",
+      "observed": "meter 0.5: E → ult active false, uses 0",
+      "verdict": "Pass"
+    },
+    {
+      "id": "ULT-02",
+      "scenario": "TRIPLE T home run in a room",
+      "expected": "Full meter + E: 2.7 s sequence, 3 knocks, every enemy launched (counted as kills), player invulnerable throughout",
+      "observed": "4 enemies; E → ult ran ~2.86 s, step sequence 0→1→2→3→3D→end; damagePlayer(50) during ult: HP 70→70; afterwards enemies 0, kills +4, home runs +4, meter 0, Hall gained: triple_t_trio",
+      "verdict": "Pass",
+      "evidence": {
+        "b": {
+          "kills": 1,
+          "hr": 0,
+          "n": 4,
+          "hall": []
+        },
+        "a": {
+          "kills": 5,
+          "hr": 4,
+          "n": 0,
+          "flyers": 4,
+          "hall": [
+            "triple_t_trio"
+          ],
+          "uses": 1,
+          "ttt": 0
+        },
+        "steps": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "3D",
+          "end"
+        ],
+        "inv": {
+          "before": 70,
+          "after": 70
+        }
+      }
+    },
+    {
+      "id": "ULT-03",
+      "scenario": "TRIPLE T damages a boss by max(90, 17% max HP)",
+      "expected": "Echo (320 HP): exactly 90 damage",
+      "observed": "Echo HP 320→230 (−90; 17% would be 54.4)",
+      "verdict": "Pass",
+      "evidence": {
+        "b": {
+          "hp": 320,
+          "max": 320
+        },
+        "a": 230
+      }
+    },
+    {
+      "id": "ULT-04",
+      "scenario": "TRIPLE T pierces the Valuation's guard",
+      "expected": "While \"NOT YET\": home run still deals max(90, 17% × 560 = 95.2)",
+      "observed": "guard up (vuln false); HP 550→454.8 (−95.2)",
+      "verdict": "Pass"
+    },
+    {
+      "id": "ULT-05",
+      "scenario": "TRIPLE T on the AI Bubble",
+      "expected": "17% of 1350 = 229.5 damage",
+      "observed": "Bubble HP 1350→1120.5 (−229.5)",
+      "verdict": "Pass"
+    },
+    {
+      "id": "SAHUR-01",
+      "scenario": "Sahur knocked down in a boss fight, helped up by standing near him",
+      "expected": "0 HP → \"SAHUR IS DOWN\"; standing within 64 px for 1.4 s → up at 60% HP, SAHUR SAVES +1",
+      "observed": "down true (HP 0/96, \"SAHUR IS DOWN\" shown true); player stood 30 px away → up after 1.41 s at 57.6/96 HP (60%); sahurHelps 0→1",
+      "verdict": "Pass",
+      "evidence": {
+        "d": {
+          "down": true,
+          "hp": 0,
+          "max": 96,
+          "text": true,
+          "helps": 0
+        },
+        "dt": 1.414,
+        "a": {
+          "hp": 57.599999999999994,
+          "max": 96,
+          "helps": 1,
+          "wasDown": true
+        }
+      }
+    },
+    {
+      "id": "SAHUR-02",
+      "scenario": "Sahur gets up on his own; no TRIPLE T while he is down",
+      "expected": "Away from him: up after 10 s at 35% HP; E while down → \"HE CAN'T BAT RIGHT NOW\"",
+      "observed": "E while he was down → ult false, toast shown true; with the player kept away he got up after 10.03 s at 35% HP",
+      "verdict": "Pass",
+      "evidence": {
+        "u": {
+          "ult": false,
+          "toast": true
+        },
+        "dt": 10.025,
+        "a": {
+          "hp": 33.599999999999994,
+          "max": 96
+        }
+      }
+    },
+    {
+      "id": "ELITE-01",
+      "scenario": "Elite drops a chest that levels a skill",
+      "expected": "Gold elite (HP ×2.6) killed by swings → \"GOLD CHEST\" toast, +1 level on a random skill",
+      "observed": "spawned gold elite slopling with 78 HP (base 30); killed by held swings; elites killed 0→1; total skill levels 0→1; on-screen: GOLD CHEST. Shiny. Take it. / + Sahur Snack",
+      "verdict": "Pass",
+      "evidence": {
+        "s": {
+          "elite": "gold",
+          "hp": 78,
+          "lv": 0,
+          "killed": 0
+        },
+        "a": {
+          "lv": 1,
+          "levels": {
+            "Sahur Snack": 1
+          },
+          "killed": 1,
+          "toasts": [
+            "GOLD CHEST. Shiny. Take it.",
+            "+ Sahur Snack"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EVO-01",
+      "scenario": "Evolution card when both recipe skills ≥ 2",
+      "expected": "BRAINROT GOD card (THREE-PEAT) appears in the next pick, replaces the 3rd card; taking it awards Hall \"BRAINROT GOD\"",
+      "observed": "cards offered: THREE-PEAT [EVO] | Faster Rhythm | Wider Bat; took it → evolutions [THREE-PEAT], sahur.triple true, Hall \"evolved\" true; next TUNG texts: TUNG!, TUNG TUNG!, TUNG TUNG TUNG!; next room 2 rolled modifier: GOLDEN HOUR",
+      "verdict": "Pass",
+      "evidence": {
+        "cards": [
+          {
+            "nm": "THREE-PEAT",
+            "evo": true
+          },
+          {
+            "nm": "Faster Rhythm",
+            "evo": false
+          },
+          {
+            "nm": "Wider Bat",
+            "evo": false
+          }
+        ],
+        "a": {
+          "evo": [
+            "THREE-PEAT"
+          ],
+          "triple": true,
+          "hall": true,
+          "room": 1,
+          "mod": "GOLDEN HOUR"
+        },
+        "tt": [
+          "TUNG!",
+          "TUNG TUNG!",
+          "TUNG TUNG TUNG!"
+        ]
+      }
+    },
+    {
+      "id": "EVO-02",
+      "scenario": "FAMILY MEAL (\"Big heal on room clear, for you and Sahur\")",
+      "expected": "Room clear heals the player 30% of max HP; Sahur is healed too",
+      "observed": "player HP 30 → 65.2 on room clear (= +4 from the \"First room\" challenge + 31.2 FAMILY MEAL, i.e. 30% of max 104; \"FAMILY MEAL\" text true); Sahur HP set to 10 was back at 120/120 one frame later (outside boss fights the game refills him every frame), so the \"and Sahur\" half has nothing to heal and is not implemented",
+      "verdict": "Observed",
+      "evidence": {
+        "b": {
+          "max": 100,
+          "smax": 120,
+          "fm": true
+        },
+        "a": {
+          "hp": 65.2,
+          "max": 104,
+          "sa": 120,
+          "fmText": true
+        },
+        "sMid": 120
+      }
+    },
+    {
+      "id": "CHAL-01",
+      "scenario": "Challenge completion gives +4 max HP",
+      "expected": "First room clear completes \"First room\" → max HP +4",
+      "observed": "max HP 100→104; challenges 0→1 (first_room); feed: THREE UP, THREE DOWN / CHALLENGE: First room",
+      "verdict": "Pass",
+      "evidence": {
+        "max": 104,
+        "ch": [
+          "first_room"
+        ],
+        "toast": [
+          "THREE UP, THREE DOWN",
+          "CHALLENGE: First room"
+        ]
+      }
+    },
+    {
+      "id": "GRADE-01",
+      "scenario": "Grade computed and shown on BIOME CLEAR",
+      "expected": "Results card shows a grade that matches the gradeRun() point formula, stats and COPY SCORE",
+      "observed": "\"BIOME CLEAR\" grade S \"SECRET TIER\" (formula: 9 pts → S; inputs {\"combo\":13,\"onPct\":38,\"sahurNeverDown\":false,\"under\":true,\"hpPct\":99,\"elites\":1,\"ttt\":2}); score 5,000 NEW BEST; stats TUNGS 12 · BEST COMBO 13 · ON-BEAT % 38% · AURA 12 · SAHUR SAVES 1 · TIME 0:47; COPY SCORE → COPIED!; button CONTINUE",
+      "verdict": "Pass",
+      "evidence": {
+        "g": {
+          "title": "BIOME CLEAR",
+          "shown": "S",
+          "name": "SECRET TIER",
+          "stats": [
+            "TUNGS 12",
+            "BEST COMBO 13",
+            "ON-BEAT % 38%",
+            "AURA 12",
+            "SAHUR SAVES 1",
+            "TIME 0:47"
+          ],
+          "score": "5,000 NEW BEST",
+          "pts": 9,
+          "exp": "S",
+          "parts": {
+            "combo": 13,
+            "onPct": 38,
+            "sahurNeverDown": false,
+            "under": true,
+            "hpPct": 99,
+            "elites": 1,
+            "ttt": 2
+          },
+          "btn": "CONTINUE"
+        },
+        "shareTxt": "COPIED!"
+      }
+    },
+    {
+      "id": "DIFF-01",
+      "scenario": "Difficulty multipliers (Options → CHILL / NORMAL / SPICY)",
+      "expected": "Damage taken ×0.5/×1/×1.35; enemy HP ×0.85/×1/×1.35; Sahur HP ×1.5/×1/×1; score ×0.7/×1/×1.6; copy mentions enemy speed changes",
+      "observed": "CHILL: 20-dmg bullet took 10 HP, slopling HP 25.5, slopling speed 95, Sahur max 180, kill score 7 (saved pref \"chill\"); NORMAL: 20-dmg bullet took 20 HP, slopling HP 30, slopling speed 95, Sahur max 120, kill score 10 (saved pref \"normal\"); SPICY: 20-dmg bullet took 27 HP, slopling HP 40.5, slopling speed 95, Sahur max 120, kill score 17 (saved pref \"spicy\"); enemy speed identical on all three: true",
+      "verdict": "Pass",
+      "evidence": {
+        "chill": {
+          "line": "Slower enemies. Sahur gets up faster. Vibes.",
+          "taken": 10,
+          "enemyHp": 25.5,
+          "enemySpeed": 95,
+          "sahurMax": 180,
+          "scoreKill": 7,
+          "comboMult": 1.03,
+          "saved": "chill"
+        },
+        "normal": {
+          "line": "The intended walk. Three knocks, no mercy.",
+          "taken": 20,
+          "enemyHp": 30,
+          "enemySpeed": 95,
+          "sahurMax": 120,
+          "scoreKill": 10,
+          "comboMult": 1.03,
+          "saved": "normal"
+        },
+        "spicy": {
+          "line": "Faster enemies, no free heals. Sahur says good luck.",
+          "taken": 27,
+          "enemyHp": 40.5,
+          "enemySpeed": 95,
+          "sahurMax": 120,
+          "scoreKill": 17,
+          "comboMult": 1.03,
+          "saved": "spicy"
+        }
+      }
+    },
+    {
+      "id": "DIFF-02",
+      "scenario": "Difficulty copy vs behaviour",
+      "expected": "CHILL line says \"Slower enemies\"; SPICY says \"Faster enemies, no free heals\"",
+      "observed": "CHILL \"Slower enemies. Sahur gets up faster. Vibes.\" / SPICY \"Faster enemies, no free heals. Sahur says good luck.\"; measured slopling speed 95 / 95 / 95 px/s (no change); Sahur self-recovery is the constant SAHUR_SELF_UP = 10 s on every difficulty; rice-drop chance has no difficulty term",
+      "verdict": "Fail",
+      "evidence": {
+        "chill": {
+          "line": "Slower enemies. Sahur gets up faster. Vibes.",
+          "taken": 10,
+          "enemyHp": 25.5,
+          "enemySpeed": 95,
+          "sahurMax": 180,
+          "scoreKill": 7,
+          "comboMult": 1.03,
+          "saved": "chill"
+        },
+        "normal": {
+          "line": "The intended walk. Three knocks, no mercy.",
+          "taken": 20,
+          "enemyHp": 30,
+          "enemySpeed": 95,
+          "sahurMax": 120,
+          "scoreKill": 10,
+          "comboMult": 1.03,
+          "saved": "normal"
+        },
+        "spicy": {
+          "line": "Faster enemies, no free heals. Sahur says good luck.",
+          "taken": 27,
+          "enemyHp": 40.5,
+          "enemySpeed": 95,
+          "sahurMax": 120,
+          "scoreKill": 17,
+          "comboMult": 1.03,
+          "saved": "spicy"
+        }
+      }
+    },
+    {
+      "id": "HALL-01",
+      "scenario": "Hall of TUNG persists across reload",
+      "expected": "sahurProtocolHallV1 survives; title shows \"HALL OF TUNG n/12\" and BEST score",
+      "observed": "stored ids [triple_t_trio, evolved, clean_room, first_answer], runs 2, wins 1, bestScore 5000; after reload in memory 4 ids; title \"DIFFICULTY: NORMAL  |  BEST 5,000  |  HALL OF TUNG 4/12\"",
+      "verdict": "Pass"
+    },
+    {
+      "id": "FIN-00",
+      "scenario": "Bubble collapse (phase 3)",
+      "expected": "Below 33%: music stops, Bubble invulnerable, TRIPLE T refused, Sahur drains to 0 over 6.5 s, sacrifice after 7 s",
+      "observed": "phase 2 at 60%: true; phase 3 at 30%: music \"null\", hit 405→405; E → ult false, \"HE CAN'T BAT RIGHT NOW\" true; Sahur HP 100% → 49.78% at 3.25 s; cutscene \"sacrifice\" after 7.02 s",
+      "verdict": "Pass",
+      "evidence": {
+        "p2": 2,
+        "c1": {
+          "music": null,
+          "vuln": false,
+          "before": 405,
+          "after": 405,
+          "sa": 1
+        },
+        "ref": {
+          "ult": false,
+          "toast": true
+        },
+        "half": 0.4978461538461551,
+        "tc": 7.018,
+        "sac": "sacrifice"
+      }
+    },
+    {
+      "id": "FIN-01",
+      "scenario": "Finale needs 3 answers; auto-answers after 5 s",
+      "expected": "Sahur calls, Space answers; 2 answers do not end it; a missed call is answered for you after 5 s; 3rd answer pops the Bubble",
+      "observed": "answer 1 (Space) → n 1, done false; no press on call 2 → auto-answered after 4.98 s (n 2, done false); answer 3 (Space) → n 3, done true, Sahur alive false",
+      "verdict": "Pass",
+      "evidence": {
+        "log": [
+          {
+            "n": 1,
+            "done": false
+          },
+          {
+            "n": 2,
+            "done": false,
+            "alive": true
+          },
+          {
+            "n": 3,
+            "done": true,
+            "alive": false
+          }
+        ],
+        "auto": 4.983
+      }
+    },
+    {
+      "id": "E2E",
+      "scenario": "Finale end to end; victory deletes save",
+      "expected": "epilogue (3 knocks) → epilogue_card → \"WE WON.\"; save deleted; CONTINUE hidden; FIRST ANSWER in Hall",
+      "observed": "cutscene epilogue (knock prompt seen: \"SPACE / TAP TO KNOCK   2 / 3\") → epilogue_card → \"WE WON.\" grade C (\"AGAIN - FOR HIM\"); save present false; CONTINUE after reload: none; Hall: triple_t_trio, evolved, clean_room, first_answer",
+      "verdict": "Pass",
+      "evidence": {
+        "t": "WE WON.",
+        "b": "AGAIN - FOR HIM",
+        "grade": "C",
+        "save": null,
+        "hall": [
+          "triple_t_trio",
+          "evolved",
+          "clean_room",
+          "first_answer"
+        ]
+      }
+    },
+    {
+      "id": "X-01",
+      "scenario": "Storage blocked",
+      "expected": "Every localStorage call throws: game still runs; CONTINUE stays hidden; no uncaught errors",
+      "observed": "new run, prologue, upgrade, room clear, mute toggle, pause, main menu, difficulty change all worked (mode title, diff spicy); CONTINUE display none; uncaught errors 0",
+      "verdict": "Pass"
+    },
+    {
+      "id": "X-02",
+      "scenario": "Auto-pause when the tab is hidden",
+      "expected": "visibilitychange to hidden during play → mode \"pause\" with the pause overlay",
+      "observed": "real tab switch (another tab brought to front): document.hidden true → mode pause, pause overlay true, checkpoint saved true",
+      "verdict": "Pass"
+    },
+    {
+      "id": "X-03",
+      "scenario": "Reduced motion caps shake and removes hit-stop",
+      "expected": "prefers-reduced-motion: shake offset ≤ 0.4 px (cap 0.8) and no hit-stop; normal: offsets up to 7 px and hit-stop on hits",
+      "observed": "normal: max shake offset 6.94 px over 133 frames, max hit-stop 0.03 s; reduced motion: max offset 0.4 px over 122 frames, max hit-stop 0 s",
+      "verdict": "Pass",
+      "evidence": {
+        "normal": {
+          "maxOff": 6.942241451885446,
+          "n": 133,
+          "hs": 0.033100000000000365
+        },
+        "rm": {
+          "maxOff": 0.3999793307430344,
+          "n": 122,
+          "hs": 0
+        }
+      }
+    }
+  ],
+  "perf": [
+    {
+      "id": "PERF-D",
+      "setup": "Desktop 1280×720, DPR 1, no throttle; biome 3, 28 live enemies, holding swing + moving",
+      "frames": 1440,
+      "avg": 6.944930555555555,
+      "p95": 7,
+      "max": 7.200000000000728,
+      "over33": 0,
+      "over50": 0,
+      "costAvg": 0.5989583333333334,
+      "costP95": 0.900000000372529,
+      "costMax": 1.900000000372529,
+      "costOver16": 0,
+      "avgEnemies": 28,
+      "avgObjects": 65.45315752949341,
+      "mode": "play"
+    },
+    {
+      "id": "PERF-M",
+      "setup": "Mobile emulation 844×390 landscape, DPR 2, touch, CPU throttled 4×; biome 3, 28 live enemies, SWING held + auto-swing",
+      "frames": 1421,
+      "avg": 7.037649542575652,
+      "p95": 7.099999999998545,
+      "max": 20.799999999999272,
+      "over33": 0,
+      "over50": 0,
+      "costAvg": 2.8961998592258644,
+      "costP95": 4.199999999254942,
+      "costMax": 11.599999999627471,
+      "costOver16": 0,
+      "avgEnemies": 28,
+      "avgObjects": 69.57594936708861,
+      "mode": "play"
+    }
+  ],
+  "pageErrors": [],
+  "assists": [
+    "Skill loadout reset to empty (state.skillLevels = {} then the game's applySkillLoadout()) before damage / difficulty measurements, so crit, lifesteal and damage bonuses cannot skew the numbers.",
+    "A stunned high-HP \"dummy\" golem (spawned with the game's spawnEnemyAt, never elite) is pinned 40 px from the player as a swing target; Sahur's TUNG is held off (slamT) while damage is being measured.",
+    "BEAT-02: state.modifier set to the BEAT DROP entry from COPY.modifiers to test its effect without waiting for a random roll.",
+    "Room-1 mechanic tests: state.rivalPending is held true so the emptied room does not auto-clear between measurements (released before the TRIPLE T home run).",
+    "ELITE-01: Math.random was stubbed for one spawnEnemyAt() call so the 4.5% elite roll and the tier roll come up \"gold\"; the elite is stunned and pinned in reach.",
+    "EVO-01: Wider Bat and Faster Rhythm set to level 2 directly (the recipe for THREE-PEAT) before the room clear.",
+    "ULT tests: TRIPLE T meter set to 1.0 (state.ttt = 1) instead of farming ~90 hits; ULT-02 adds 4 sloplings near the player as targets.",
+    "Rooms fast-forwarded by emptying the spawn queue and killing enemies through the game's own damageEnemy() (so checkClear/onEnemyKilled run normally).",
+    "Boss fights: player armor set to 0.99 so the harness survives while it measures (damage-taken tests use a fresh loadout instead).",
+    "SAHUR-01/02: Sahur knocked down with the game's damageSahur(); the player is teleported 30 px from him (help) or 350 px away (self-recovery).",
+    "Bosses fast-forwarded: boss HP set to 5, then one damageEnemy() hit so onBossDown() and the results screen run normally.",
+    "TC-06/ULT-04: jumped to the Valuation with state.biome = 2, state.room = 3 and the game's startRoom().",
+    "Finale: jumped to The Core with state.biome = 3 and the game's startFinalBoss(); Bubble HP set to 60% then 30% of max to trigger phases 2 and 3.",
+    "X-03: the canvas context's setTransform/translate were wrapped (read-only instrumentation) to record the per-frame shake offset; shake set to 14 (the cap) repeatedly; hitStop read after a real swing on the dummy.",
+    "MOD-02/03: room starts were sampled by calling the game's startRoom()/pickModifier() in a loop with window.setTimeout stubbed out (so PATCH NOTES chests and barks are not queued); the kill-score comparison sets state.modifier directly.",
+    "EVO-02: the FAMILY MEAL evolution was added to state.evolutions directly (then applySkillLoadout()); player HP set to 30 and Sahur HP to 10 just before a fast-forwarded room clear.",
+    "Performance load generator: biome 3 room 3 via startRoom(), then a 250 ms interval tops the arena up to 28 live enemies (spawnEnemyAt at border points) and refills player HP so the 10 s sample is continuous combat.",
+    "TC-13: the joystick-size slider value was set and an input event dispatched (a tap on the range track did not move it in emulation).",
+    "TC-15: the room is emptied (and held open with rivalPending) so auto-swing does not fire on its own while taps are counted."
+  ]
+}

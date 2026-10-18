@@ -1,0 +1,107 @@
+# Black-box test run: Sahur Protocol v3
+
+Run: 2026-10-18T09:49:45.434Z · Chrome/155.0.8059.84 (headless) via puppeteer-core 23.11.1 · unmodified `Sahur_Protocol.html` (v3, commit 9e2f789) · harness `gamedesign/scripts/blackbox-v3.js`
+
+**Result: 45 cases: 40 Pass, 4 Fail, 1 Observed.** "Observed" marks a case where the game behaves consistently but differs from its own on-screen copy (see Findings).
+
+| ID | Scenario | Expected | Observed (concrete values) | Verdict |
+|---|---|---|---|---|
+| TC-01 | Start New Game | Prologue → FIRST UPGRADE (3 cards) → biome 1 room 1/3, no modifier | scene prologue; "FIRST UPGRADE" with 3 cards (pool 14 skills); play in biome 1 room 1/3, 5 enemies queued/alive, modifier none, music "forest" (beat clock running: true) | Pass |
+| TC-02 | Advance the prologue | 1st press completes the typing line, 2nd press advances | no save so no confirm (false); scene "prologue" line 0 typing true; Space → typing false on line 0; Space → line 1 | Pass |
+| TC-03 | Move and attack (v3: hold to swing) | 8-way normalised move; holding Space keeps swinging (one per cooldown); one swing per tap | D 0.4 s → 92 px; W+D → 66/66 px (diag 94 px); holding Space 1.0 s → 3 swings (cooldown 0.38 s); 3 taps → 3 swings | Pass |
+| TC-04 | Clear Room | ROOM CLEAR then CHOOSE AN UPGRADE with up to 3 distinct cards showing level x/max | "CHOOSE AN UPGRADE" with 3 cards: Thick Skin (Level 0/3 -> 1/3) / Sharp Take (Level 0/3 -> 1/3) / Mixtape '07 (Level 0/3 -> 1/3); distinct true | Pass |
+| TC-05 | Fight Boss: Echo | Versus card, boss, BIOME CLEAR, cutscene, SIGNAL ROLL, biome 2 | rooms 2 and 3 cleared (room 3 modifier TRENDING; rival cameo: PATATAM 260 HP, versus "patatam"); boss echo in room 4 with versus card "echo"; defeat → BIOME CLEAR → cutscene biome1_end → "SIGNAL ROLL" → biome 2, room 1 | Pass |
+| TC-06 | Fight Boss: Valuation | "NOT YET" until its big burst opens a 4 s window | valuation: hit before burst 560→560 ("NOT YET" true); window opened after its burst; hit in window 560→550; closed after 4 s: true | Pass |
+| TC-07 | Pause, resume, main menu | Esc freezes the world; RESUME; MAIN MENU shows CONTINUE | Esc → pause (overlay flex); frozen 0.6 s: true; RESUME → play; MAIN MENU → title, CONTINUE display block | Pass |
+| TC-08 | Continue Game | Saved biome/room, skills, evolutions, score and HP restored | save: biome 2 room 1, HP 115, score 5000, evolutions [THREE-PEAT]; restored: biome 2 room 1, HP 115, score 5000; skills+evolutions identical: true | Pass |
+| TC-09 | New game over a save | "START OVER?" confirm naming the checkpoint; Esc and KEEP MY RUN keep it; ERASE AND WAKE UP erases it | save existed true; WAKE UP → confirm shown true "START OVER?": "Starting a new run erases your checkpoint in HYPE CYCLE FOREST, room 1. This cannot be undone." (mode title); Esc → closed true, save kept true; KEEP MY RUN → save kept true, mode title; ERASE AND WAKE UP → cutscene "prologue", save present false | Pass |
+| TC-10 | HP reaches 0 | ABSORBED with grade; RETRY CHECKPOINT; save kept | mode end, "ABSORBED" with grade D, button "RETRY CHECKPOINT", save kept true; button → play | Pass |
+| TC-11 | HP 0 with Second Wind | Revive at 50% HP | revives 1→0; HP 58/116; mode stays play | Pass |
+| TC-12 | Mute and volume persist | M mutes everything; volume slider scales; both survive a reload (sahurProtocolAudioV1) | M → muted true, music gain 0, choir volume 0, button "Music and sound: Off"; clicked slider at 30% → master 0.29 (stored {"muted":true,"volume":0.29}); after reload: muted true, master 0.29, slider 29, button "Music and sound: Off" | Pass |
+| TC-13 | Touch layout, then reload | Joystick size kept after reload | coarse pointer true; joystick size set to 160 px → stored {"stickSize":160,"stickLeft":8,"stickBottom":8,"attackSize":92,"moveMode":"joystick"}; after reload 160 px (slider 160, CSS 160px) | Pass |
+| TC-14 | Phone in portrait (v3: plays in 540×960) | No ROTATE DEVICE overlay; arena 540×960; player starts at 62% height; world runs | ROTATE DEVICE display "none" on load, "none" in play; arena 540×960 (portrait class true, backing store 780×1387, on screen 390×693 CSS px); player starts at y 595.2 (62%); after 2.5 s mode play, 2 enemies, all inside the arena true | Pass |
+| TC-15 | Touch controls: SWING, DASH, TRIPLE T, stick | Taps on the on-screen buttons swing/dash/ult; stick drag moves; auto-swing on by default on touch | auto-swing default true; SWING tap → swings +1; DASH tap → dashes +1; meter full → TRIPLE T pill ready true (display block); pill tap → ult true; stick drag right 0.5 s → player x 300→418.54 | Pass |
+| SKIP-01 | SKIP SCENE button skips a cutscene | Prologue ends at once and FIRST UPGRADE opens | clicked SKIP on line 2/11; "FIRST UPGRADE" open after 29 ms; cutscene overlay visible: false | Pass |
+| COPY-01 | FIRST UPGRADE subtitle vs the real pool | Subtitle should match the number of skills in the starting pool | subtitle "Nine core skills are already in your pool. Choose one to begin the run."; starting pool has 14 unlocked skills (17 total, 3 locked) | Fail |
+| MOD-01 | No modifier in biome 1 room 1 | state.modifier is null in the first room | modifier at biome 1 room 1: null | Pass |
+| MOD-02 | Room modifier rolls | Every room except biome 1 room 1 rolls one; never the same twice in a row; SPONSORED never rolls; 9 possible | biome 1 room 1 ×50: 0 modifiers; 600 later room starts: 0 without a modifier, 0 back-to-back repeats, 9 distinct (shadowbanned 66, beat_drop 64, patch_notes 70, ratiod 64, algorithm_boost 55, lag_spike 70, trending 64, golden_hour 74, touch_grass 73); boss rooms: 0 modifiers | Pass |
+| MOD-03 | TRENDING: "More of them. More score." | Enemy count ×1.5 (biome 1 room 2: 6 → 9) and score ×1.5 (the modifier's own effect text says "score x1.5") | biome 1 room 2 spawn queue: 6 without TRENDING, 9 with it (count part works); score for one identical kill: 10 without, 10 with TRENDING (no score bonus) | Fail |
+| BEAT-01 | On-beat swing deals x1.3 (Music.beat()) | Swing within ±0.11 s of a beat line: 13 → 16.9 dmg, counted ON BEAT; mid-beat swing: 13 dmg | beat length 0.58 s (104 BPM forest); presses timed to the beat line → dmg [16.9, 16.9, 16.9, 16.9], counted on-beat 4/4; presses mid-beat → dmg [13, 13, 13, 13], counted on-beat 0/4; ratio 1.3 | Pass |
+| BEAT-02 | BEAT DROP modifier ("On the beat, it counts twice") | On-screen card promises a doubled on-beat bonus, so an on-beat swing should deal more than 16.9 | under BEAT DROP, on-beat swings dealt [16.9, 16.9, 16.9], the same as without the modifier (16.9); the modifier changes nothing | Fail |
+| DASH-01 | Dash with i-frames (Shift) | ~125 px burst, 0.28 s invulnerability; a bullet on the player mid-dash does no damage, the same bullet later does | dash moved 130.03 px; i-frames at dash start 0.27 s; bullet placed on player mid-dash: HP 100→100; same bullet 1.3 s later: HP 100→70 | Pass |
+| COMBO-01 | Combo counter tiers and 2.6 s reset | Labels at 3/6/9 hits; multiplier 1+combo/30; combo back to 0 ≈2.6 s after the last hit | held Space 4.3 s on the dummy → combo 11, tiers reached 3 "TUNG TUNG TUNG", 6 "SIX TUNG. NO NOTES", 9 "SAHUUUR"; score multiplier ×1.37 (formula 1+11/30 = 1.37); combo reset to 0 2.58 s after the last hit | Pass |
+| ULT-01 | TRIPLE T only with a full meter | E with meter < 1 does nothing | meter 0.5: E → ult active false, uses 0 | Pass |
+| ULT-02 | TRIPLE T home run in a room | Full meter + E: 2.7 s sequence, 3 knocks, every enemy launched (counted as kills), player invulnerable throughout | 4 enemies; E → ult ran ~2.86 s, step sequence 0→1→2→3→3D→end; damagePlayer(50) during ult: HP 70→70; afterwards enemies 0, kills +4, home runs +4, meter 0, Hall gained: triple_t_trio | Pass |
+| ULT-03 | TRIPLE T damages a boss by max(90, 17% max HP) | Echo (320 HP): exactly 90 damage | Echo HP 320→230 (−90; 17% would be 54.4) | Pass |
+| ULT-04 | TRIPLE T pierces the Valuation's guard | While "NOT YET": home run still deals max(90, 17% × 560 = 95.2) | guard up (vuln false); HP 550→454.8 (−95.2) | Pass |
+| ULT-05 | TRIPLE T on the AI Bubble | 17% of 1350 = 229.5 damage | Bubble HP 1350→1120.5 (−229.5) | Pass |
+| SAHUR-01 | Sahur knocked down in a boss fight, helped up by standing near him | 0 HP → "SAHUR IS DOWN"; standing within 64 px for 1.4 s → up at 60% HP, SAHUR SAVES +1 | down true (HP 0/96, "SAHUR IS DOWN" shown true); player stood 30 px away → up after 1.41 s at 57.6/96 HP (60%); sahurHelps 0→1 | Pass |
+| SAHUR-02 | Sahur gets up on his own; no TRIPLE T while he is down | Away from him: up after 10 s at 35% HP; E while down → "HE CAN'T BAT RIGHT NOW" | E while he was down → ult false, toast shown true; with the player kept away he got up after 10.03 s at 35% HP | Pass |
+| ELITE-01 | Elite drops a chest that levels a skill | Gold elite (HP ×2.6) killed by swings → "GOLD CHEST" toast, +1 level on a random skill | spawned gold elite slopling with 78 HP (base 30); killed by held swings; elites killed 0→1; total skill levels 0→1; on-screen: GOLD CHEST. Shiny. Take it. / + Sahur Snack | Pass |
+| EVO-01 | Evolution card when both recipe skills ≥ 2 | BRAINROT GOD card (THREE-PEAT) appears in the next pick, replaces the 3rd card; taking it awards Hall "BRAINROT GOD" | cards offered: THREE-PEAT [EVO] / Faster Rhythm / Wider Bat; took it → evolutions [THREE-PEAT], sahur.triple true, Hall "evolved" true; next TUNG texts: TUNG!, TUNG TUNG!, TUNG TUNG TUNG!; next room 2 rolled modifier: GOLDEN HOUR | Pass |
+| EVO-02 | FAMILY MEAL ("Big heal on room clear, for you and Sahur") | Room clear heals the player 30% of max HP; Sahur is healed too | player HP 30 → 65.2 on room clear (= +4 from the "First room" challenge + 31.2 FAMILY MEAL, i.e. 30% of max 104; "FAMILY MEAL" text true); Sahur HP set to 10 was back at 120/120 one frame later (outside boss fights the game refills him every frame), so the "and Sahur" half has nothing to heal and is not implemented | Observed |
+| CHAL-01 | Challenge completion gives +4 max HP | First room clear completes "First room" → max HP +4 | max HP 100→104; challenges 0→1 (first_room); feed: THREE UP, THREE DOWN / CHALLENGE: First room | Pass |
+| GRADE-01 | Grade computed and shown on BIOME CLEAR | Results card shows a grade that matches the gradeRun() point formula, stats and COPY SCORE | "BIOME CLEAR" grade S "SECRET TIER" (formula: 9 pts → S; inputs {"combo":13,"onPct":38,"sahurNeverDown":false,"under":true,"hpPct":99,"elites":1,"ttt":2}); score 5,000 NEW BEST; stats TUNGS 12 · BEST COMBO 13 · ON-BEAT % 38% · AURA 12 · SAHUR SAVES 1 · TIME 0:47; COPY SCORE → COPIED!; button CONTINUE | Pass |
+| DIFF-01 | Difficulty multipliers (Options → CHILL / NORMAL / SPICY) | Damage taken ×0.5/×1/×1.35; enemy HP ×0.85/×1/×1.35; Sahur HP ×1.5/×1/×1; score ×0.7/×1/×1.6; copy mentions enemy speed changes | CHILL: 20-dmg bullet took 10 HP, slopling HP 25.5, slopling speed 95, Sahur max 180, kill score 7 (saved pref "chill"); NORMAL: 20-dmg bullet took 20 HP, slopling HP 30, slopling speed 95, Sahur max 120, kill score 10 (saved pref "normal"); SPICY: 20-dmg bullet took 27 HP, slopling HP 40.5, slopling speed 95, Sahur max 120, kill score 17 (saved pref "spicy"); enemy speed identical on all three: true | Pass |
+| DIFF-02 | Difficulty copy vs behaviour | CHILL line says "Slower enemies"; SPICY says "Faster enemies, no free heals" | CHILL "Slower enemies. Sahur gets up faster. Vibes." / SPICY "Faster enemies, no free heals. Sahur says good luck."; measured slopling speed 95 / 95 / 95 px/s (no change); Sahur self-recovery is the constant SAHUR_SELF_UP = 10 s on every difficulty; rice-drop chance has no difficulty term | Fail |
+| HALL-01 | Hall of TUNG persists across reload | sahurProtocolHallV1 survives; title shows "HALL OF TUNG n/12" and BEST score | stored ids [triple_t_trio, evolved, clean_room, first_answer], runs 2, wins 1, bestScore 5000; after reload in memory 4 ids; title "DIFFICULTY: NORMAL  /  BEST 5,000  /  HALL OF TUNG 4/12" | Pass |
+| FIN-00 | Bubble collapse (phase 3) | Below 33%: music stops, Bubble invulnerable, TRIPLE T refused, Sahur drains to 0 over 6.5 s, sacrifice after 7 s | phase 2 at 60%: true; phase 3 at 30%: music "null", hit 405→405; E → ult false, "HE CAN'T BAT RIGHT NOW" true; Sahur HP 100% → 49.78% at 3.25 s; cutscene "sacrifice" after 7.02 s | Pass |
+| FIN-01 | Finale needs 3 answers; auto-answers after 5 s | Sahur calls, Space answers; 2 answers do not end it; a missed call is answered for you after 5 s; 3rd answer pops the Bubble | answer 1 (Space) → n 1, done false; no press on call 2 → auto-answered after 4.98 s (n 2, done false); answer 3 (Space) → n 3, done true, Sahur alive false | Pass |
+| E2E | Finale end to end; victory deletes save | epilogue (3 knocks) → epilogue_card → "WE WON."; save deleted; CONTINUE hidden; FIRST ANSWER in Hall | cutscene epilogue (knock prompt seen: "SPACE / TAP TO KNOCK   2 / 3") → epilogue_card → "WE WON." grade C ("AGAIN - FOR HIM"); save present false; CONTINUE after reload: none; Hall: triple_t_trio, evolved, clean_room, first_answer | Pass |
+| X-01 | Storage blocked | Every localStorage call throws: game still runs; CONTINUE stays hidden; no uncaught errors | new run, prologue, upgrade, room clear, mute toggle, pause, main menu, difficulty change all worked (mode title, diff spicy); CONTINUE display none; uncaught errors 0 | Pass |
+| X-02 | Auto-pause when the tab is hidden | visibilitychange to hidden during play → mode "pause" with the pause overlay | real tab switch (another tab brought to front): document.hidden true → mode pause, pause overlay true, checkpoint saved true | Pass |
+| X-03 | Reduced motion caps shake and removes hit-stop | prefers-reduced-motion: shake offset ≤ 0.4 px (cap 0.8) and no hit-stop; normal: offsets up to 7 px and hit-stop on hits | normal: max shake offset 6.94 px over 133 frames, max hit-stop 0.03 s; reduced motion: max offset 0.4 px over 122 frames, max hit-stop 0 s | Pass |
+
+## Performance sample
+
+Frame times measured in-page with `requestAnimationFrame` timestamps over 10 s of continuous combat. Headless Chrome renders the 2D canvas without a visible window, so absolute numbers are indicative only; the throttled run approximates a mid-range phone.
+
+"Frame interval" is the time between rAF callbacks (headless Chrome is not locked to a 60 Hz display, so it can exceed 60 fps). "Game loop cost" is the JavaScript time of each `loop()` call (update + render draw calls; rasterisation and compositing are not included), measured by wrapping `requestAnimationFrame`. The 60 fps budget is 16.7 ms.
+
+| ID | Setup | Frames in 10 s | Avg interval (ms) | ≈ FPS | p95 interval | Worst interval | Intervals > 33 ms | Loop cost avg (ms) | Loop cost p95 | Loop cost worst | Avg live objects |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| PERF-D | Desktop 1280×720, DPR 1, no throttle; biome 3, 28 live enemies, holding swing + moving | 1440 | 6.94 | 144 | 7 | 7.2 | 0 | 0.6 | 0.9 | 1.9 | 65 |
+| PERF-M | Mobile emulation 844×390 landscape, DPR 2, touch, CPU throttled 4×; biome 3, 28 live enemies, SWING held + auto-swing | 1421 | 7.04 | 142 | 7.1 | 20.8 | 0 | 2.9 | 4.2 | 11.6 | 70 |
+
+## Console errors across the whole run
+
+Uncaught exceptions: **0**. console.error messages: **0**.
+
+## Setup assists used
+
+Input is real wherever practical (DOM clicks, key presses/holds, touch taps/drags). These state changes were made through `page.evaluate()` to reach a precondition quickly or to measure; none changes game code.
+
+- Skill loadout reset to empty (state.skillLevels = {} then the game's applySkillLoadout()) before damage / difficulty measurements, so crit, lifesteal and damage bonuses cannot skew the numbers.
+- A stunned high-HP "dummy" golem (spawned with the game's spawnEnemyAt, never elite) is pinned 40 px from the player as a swing target; Sahur's TUNG is held off (slamT) while damage is being measured.
+- BEAT-02: state.modifier set to the BEAT DROP entry from COPY.modifiers to test its effect without waiting for a random roll.
+- Room-1 mechanic tests: state.rivalPending is held true so the emptied room does not auto-clear between measurements (released before the TRIPLE T home run).
+- ELITE-01: Math.random was stubbed for one spawnEnemyAt() call so the 4.5% elite roll and the tier roll come up "gold"; the elite is stunned and pinned in reach.
+- EVO-01: Wider Bat and Faster Rhythm set to level 2 directly (the recipe for THREE-PEAT) before the room clear.
+- ULT tests: TRIPLE T meter set to 1.0 (state.ttt = 1) instead of farming ~90 hits; ULT-02 adds 4 sloplings near the player as targets.
+- Rooms fast-forwarded by emptying the spawn queue and killing enemies through the game's own damageEnemy() (so checkClear/onEnemyKilled run normally).
+- Boss fights: player armor set to 0.99 so the harness survives while it measures (damage-taken tests use a fresh loadout instead).
+- SAHUR-01/02: Sahur knocked down with the game's damageSahur(); the player is teleported 30 px from him (help) or 350 px away (self-recovery).
+- Bosses fast-forwarded: boss HP set to 5, then one damageEnemy() hit so onBossDown() and the results screen run normally.
+- TC-06/ULT-04: jumped to the Valuation with state.biome = 2, state.room = 3 and the game's startRoom().
+- Finale: jumped to The Core with state.biome = 3 and the game's startFinalBoss(); Bubble HP set to 60% then 30% of max to trigger phases 2 and 3.
+- X-03: the canvas context's setTransform/translate were wrapped (read-only instrumentation) to record the per-frame shake offset; shake set to 14 (the cap) repeatedly; hitStop read after a real swing on the dummy.
+- MOD-02/03: room starts were sampled by calling the game's startRoom()/pickModifier() in a loop with window.setTimeout stubbed out (so PATCH NOTES chests and barks are not queued); the kill-score comparison sets state.modifier directly.
+- EVO-02: the FAMILY MEAL evolution was added to state.evolutions directly (then applySkillLoadout()); player HP set to 30 and Sahur HP to 10 just before a fast-forwarded room clear.
+- Performance load generator: biome 3 room 3 via startRoom(), then a 250 ms interval tops the arena up to 28 live enemies (spawnEnemyAt at border points) and refills player HP so the 10 s sample is continuous combat.
+- TC-13: the joystick-size slider value was set and an input event dispatched (a tap on the range track did not move it in emulation).
+- TC-15: the room is emptied (and held open with rivalPending) so auto-swing does not fire on its own while taps are counted.
+
+## Findings
+
+Copy-vs-code mismatches and other issues confirmed at runtime in this pass. No crashes, soft-locks or uncaught errors were found: 0 uncaught exceptions and 0 console errors across all 7 pages, including the storage-blocked run.
+
+1. **BEAT DROP does nothing (BEAT-02, Fail).** The card says "On the beat, it counts twice", but an on-beat swing under BEAT DROP dealt 16.9, the same ×1.3 as without it. The modifier still rolls (64 of 600 sampled room starts in MOD-02), so about 1 room in 9 shows a promise the game does not keep.
+2. **TRENDING gives no extra score (MOD-03, Fail).** The enemy count does go up ×1.5 (6 → 9 in biome 1 room 2), but an identical kill scored 10 with and without TRENDING. The line "More score" and the effect text "score x1.5" are not implemented.
+3. **Difficulty copy promises things the code never changes (DIFF-02, Fail).** The CHILL line says "Slower enemies. Sahur gets up faster" and the SPICY line says "Faster enemies, no free heals". Slopling speed measured 95 px/s on all three difficulties, Sahur's self-recovery is the constant 10 s, and rice drops have no difficulty term. The real multipliers all work as coded (DIFF-01: damage taken 10/20/27 from a 20-damage bullet, slopling HP 25.5/30/40.5, Sahur max HP 180/120/120, kill score 7/10/17).
+4. **"Nine core skills" subtitle is wrong (COPY-01, Fail).** The FIRST UPGRADE subtitle says nine skills are in the pool, but the starting pool has 14 (17 total, 3 locked).
+5. **FAMILY MEAL heals only the player (EVO-02, Observed).** It heals exactly 30% of max HP on room clear. The "for you and Sahur" half has nothing to act on: outside boss fights the game refills Sahur's HP every frame (set to 10, back at 120/120 one frame later). This is harmless, but the description over-promises.
+6. **Minor harness note, not a game bug.** On the emulated phone, a tap on the joystick-size range track did not move the slider, so TC-13 set the value by script. Persistence itself passed. Real-device slider dragging was not tested.
+
+Confirmed working as the fact sheet describes, among the riskier v3 systems: the ×1.3 on-beat window (4/4 on, 0/4 off), dash i-frames (0.27 s, a bullet mid-dash did no damage), the TRIPLE T floor of max(90, 17%) (Echo −90, Valuation −95.2 through its guard, Bubble −229.5), Sahur help-up (1.41 s → 60%) and self-recovery (10.03 s → 35%), the combo reset (2.58 s), the 5 s finale auto-answer (4.98 s), the "START OVER?" confirm, and the persistence of mute, volume and the Hall of TUNG.
+
+Performance: in 10 s of 28-enemy combat no frame interval exceeded 33 ms on desktop or on the 4× CPU-throttled phone emulation. The game loop's JavaScript cost averaged 0.6 ms on desktop and 2.9 ms on throttled mobile (worst 11.6 ms), well inside the 16.7 ms budget for 60 fps. Headless rendering leaves out real GPU and compositor cost, so a test on a physical low-end phone is still advisable.

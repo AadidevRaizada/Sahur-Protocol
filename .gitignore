@@ -22,3 +22,6 @@ marketing/video/*/public/audio/preview_mix.wav
 Thumbs.db
 *.log
 !marketing/video/*/STATUS-*.log
+
+# built deliverables (contain SAP IDs; share them directly, not via the public repo)
+gamedesign/deliverables/
