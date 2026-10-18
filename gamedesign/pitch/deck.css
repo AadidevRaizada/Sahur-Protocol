@@ -116,3 +116,18 @@ body.export #hud, body.export #hint { display: none; }
   box-shadow: 0 8px 0 #9a5a08; cursor: pointer; animation: pulse 1.8s infinite; }
 .btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #9a5a08; }
 .btn.ghost { background: transparent; color: var(--amber); border: 3px solid var(--amber); box-shadow: none; animation: none; }
+
+/* ── smart board / touch ─────────────────────────────────────── */
+html, body { touch-action: manipulation; overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; }
+#dock { position: fixed; left: 0; right: 0; bottom: 14px; z-index: 160; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 18px; pointer-events: none; opacity: .22; transition: opacity .4s; }
+#dock.awake { opacity: 1; }
+#dock .tools, #dock .arrows { display: flex; gap: 12px; align-items: center; pointer-events: auto; }
+#dock button { width: 64px; height: 64px; border-radius: 16px; border: 2px solid rgba(255,181,71,.55); background: rgba(12,9,22,.82); color: var(--amber); font-size: 28px; cursor: pointer; }
+#dock button.big { width: 96px; height: 96px; font-size: 40px; background: rgba(255,181,71,.18); }
+#dock button:active { transform: scale(.92); background: var(--amber); color: #0b0714; }
+#dockNum { font-family: "VT"; font-size: 26px; color: rgba(232,228,216,.7); min-width: 70px; text-align: center; }
+#hint { display: none; }
+body.export #dock { display: none; }
+html, body, #stage { overscroll-behavior-x: none; }
+#stage, #dock { touch-action: none; }   /* swipes are ours, not the browser's back/forward gesture */

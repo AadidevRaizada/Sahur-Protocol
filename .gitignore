@@ -25,3 +25,4 @@ Thumbs.db
 
 # built deliverables (contain SAP IDs; share them directly, not via the public repo)
 gamedesign/deliverables/
+!gamedesign/pitch/media/trailer.mp4

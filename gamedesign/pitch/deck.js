@@ -61,7 +61,7 @@
     s.classList.add('on');
     steps(s).forEach((el) => el.classList.toggle('shown', fromBack));
     bar.style.width = `${((i + 1) / slides.length) * 100}%`;
-    location.hash = s.id;
+    history.replaceState(null, '', '#' + s.id);   // no history entries, so a swipe can't navigate the page away
     hooks[s.id]?.enter?.(s, fromBack);
   };
   const next = () => {
@@ -94,11 +94,52 @@
     else if (k === 'f' || k === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
     else if (k === 'm' || k === 'M') setMuted(!muted);
   });
-  // click on empty area of a slide = next (buttons/interactive elements opt out)
-  stage.addEventListener('click', (e) => {
-    if (e.target.closest('button,a,video,iframe,.interactive,[data-click]')) return;
-    ac(); next();
+  // ── touch / smart board: tap empty area = next, swipe left/right = next/back, on-screen dock
+  const OPT_OUT = 'button,a,video,iframe,.interactive,[data-click]';
+  let down = null, swiped = false;
+  stage.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY, t: Date.now() }; swiped = false; });
+  // taps and swipes are read from pointer events (not 'click'): a board's touch layer can swallow quick repeated clicks as a double-tap
+  stage.addEventListener('pointerup', (e) => {
+    if (!down) return;
+    const dx = e.clientX - down.x, dy = e.clientY - down.y, quick = Date.now() - down.t < 900;
+    down = null;
+    if (e.target.closest('iframe,.interactive')) return;
+    if (Math.abs(dx) > 90 && Math.abs(dx) > Math.abs(dy) * 1.5 && quick) { swiped = true; ac(); dx < 0 ? next() : prev(); return; }
+    if (Math.hypot(dx, dy) < 14 && !e.target.closest(OPT_OUT)) { ac(); next(); }
   });
+  addEventListener('contextmenu', (e) => e.preventDefault());   // long-press on a board opens a menu otherwise
+
+  const fs = () => { const p = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); p?.catch?.(() => {}); };
+  const dock = document.createElement('div');
+  dock.id = 'dock';
+  dock.innerHTML = `
+    <div class="tools"><button data-a="fs" title="Full screen">⛶</button><button data-a="mute" title="Sound on/off">🔊</button><button data-a="notes" title="Speaker notes">📝</button><button data-a="home" title="First slide">⏮</button></div>
+    <div class="arrows"><button data-a="prev" title="Back">◀</button><span id="dockNum"></span><button data-a="next" class="big" title="Next">▶</button></div>`;
+  document.body.appendChild(dock);
+  const muteBtn = dock.querySelector('[data-a="mute"]');
+  dock.addEventListener('pointerup', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    e.preventDefault();
+    ac();
+    const a = b.dataset.a;
+    if (a === 'next') next(); else if (a === 'prev') prev(); else if (a === 'home') show(0);
+    else if (a === 'fs') fs();
+    else if (a === 'mute') { setMuted(!muted); muteBtn.textContent = muted ? '🔇' : '🔊'; }
+    else if (a === 'notes') dispatchEvent(new KeyboardEvent('keydown', { key: 'n' }));
+    wake();
+  });
+  // dock fades out after a few idle seconds and comes back on any touch/move
+  let idle;
+  const wake = () => { dock.classList.add('awake'); clearTimeout(idle); idle = setTimeout(() => dock.classList.remove('awake'), 4000); };
+  ['pointerdown', 'pointermove', 'keydown'].forEach((ev) => addEventListener(ev, wake, { passive: true }));
+  wake();
+  const numEl = dock.querySelector('#dockNum');
+  new MutationObserver(() => { numEl.textContent = `${cur + 1} / ${slides.length}`; }).observe(bar, { attributes: true });
+  window.DECK.next = next; window.DECK.prev = prev;
+
+  // A back-swipe or the browser's Back button must never leave the deck: keep one guard entry and turn "back" into prev().
+  history.pushState({ deckGuard: true }, '', location.href);
+  addEventListener('popstate', () => { history.pushState({ deckGuard: true }, '', location.href); if (!swiped) prev(); swiped = false; });
 
   const start = slides.findIndex((s) => '#' + s.id === location.hash);
   show(start >= 0 ? start : 0);

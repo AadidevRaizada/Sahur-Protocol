@@ -26,5 +26,17 @@
       "source": "/",
       "destination": "/Sahur_Protocol.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/presentation",
+      "destination": "/gamedesign/pitch/Sahur_Protocol_Pitch",
+      "permanent": false
+    },
+    {
+      "source": "/presentation/",
+      "destination": "/gamedesign/pitch/Sahur_Protocol_Pitch",
+      "permanent": false
+    }
   ]
 }

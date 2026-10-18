@@ -210,3 +210,4 @@ p.center { margin: 0 auto 50px; text-align: center; }
 .skillcards { gap: 12px; }
 .skill { padding: 10px 20px; }
 .skill b { font-size: 30px; }
+#notesPanel { bottom: 124px; max-height: 30vh; }

@@ -86,6 +86,9 @@
     },
   };
 
+  // keycaps are tappable on a touch board
+  $$('.key[data-k]').forEach((el) => el.addEventListener('pointerdown', (e) => { e.preventDefault(); H.loop.key({ key: el.dataset.k }); }));
+
   // ═══ 6 · sahur
   const BARKS = ['They call me Triple T. Watch.', 'You swing like you scroll. Tiny.', 'It copy everything. Be original.', 'Little sleepy. Help me up?', 'Is only moss. Takes time.', 'Bring shoes.', 'Always three. Two is rumor.'];
   $('#sahurPoke').addEventListener('click', () => {
@@ -154,7 +157,7 @@
   const setCombo = (n, sound = true) => {
     combo = n; const el = $('#comboN'); el.textContent = 'x' + n; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
     const tier = [...TIERS].reverse().find(([k]) => n >= k);
-    $('#comboL').textContent = n === 0 ? 'CLICK / PRESS J TO HIT' : tier ? tier[1] : '...';
+    $('#comboL').textContent = n === 0 ? 'TAP / PRESS J TO HIT' : tier ? tier[1] : '...';
     $('#comboL').classList.toggle('rainbow', n >= 60);
     $$('#ladder li').forEach((li) => li.classList.toggle('hit', n >= +li.dataset.n));
     if (sound && n) { D().blip(330 * Math.pow(2, Math.min(n, 12) / 12), 0.06, 'square', 0.08); if (TIERS.some(([k]) => k === n)) D().TUNG(0.5); }
@@ -162,7 +165,7 @@
     if (n) requestAnimationFrame(() => { bar.style.transition = 'width 2.6s linear'; bar.style.width = '0'; });
   };
   const hit = () => { clearTimeout(comboT); setCombo(combo + 1); comboT = setTimeout(() => setCombo(0, false), 2600); };
-  $('#comboBox').addEventListener('mousedown', (e) => { e.preventDefault(); hit(); });
+  $('#comboBox').addEventListener('pointerdown', (e) => { e.preventDefault(); hit(); });
   H.feel = {
     enter() { setCombo(0, false); },
     key(e) { if (e.key === 'j' || e.key === 'J') { if (!e.repeat) hit(); return true; } },
