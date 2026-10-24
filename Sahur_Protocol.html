@@ -1231,28 +1231,38 @@ function saveProgress(){
   if(data) storageSet(SAVE_KEY, JSON.stringify(data));
   updateContinueButton();
 }
+/* a whole number clamped to [lo, hi]; anything that is not a number falls back to dflt */
+function saveInt(v, lo, hi, dflt){
+  const n = Math.floor(Number(v));
+  return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : dflt;
+}
 function loadProgress(){
   const raw = storageGet(SAVE_KEY);
   if(!raw) return null;
+  /* FIX (Expt 10, E1): an unreadable save is deleted, so CONTINUE never stays as a dead button */
+  const discard = ()=>{ storageRemove(SAVE_KEY); return null; };
   try{
     const data = JSON.parse(raw);
-    if(!data || data.v !== 1) return null;
+    if(!data || typeof data !== "object" || data.v !== 1) return discard();
     const s = newRun();
-    s.biome = Math.max(0, Math.min(BIOMES.length, data.biome || 0));
-    s.room = Math.max(0, data.room || 0);
+    /* FIX (E2): biome and room are validated numbers, never NaN or out of range */
+    s.biome = saveInt(data.biome, 0, BIOMES.length, 0);
+    s.room = saveInt(data.room, 0, BIOMES[Math.min(s.biome, BIOMES.length-1)].rooms, 0);
     s.relics = Array.isArray(data.relics) ? data.relics : [];
     s.skillLevels = data.skillLevels && typeof data.skillLevels==="object" ? data.skillLevels : {};
     s.unlockedSkills = new Set(Array.isArray(data.unlockedSkills) ? data.unlockedSkills : DEFAULT_UNLOCKED_SKILLS);
     s.completedChallenges = new Set(Array.isArray(data.completedChallenges) ? data.completedChallenges : []);
-    s.roomsCleared = data.roomsCleared || 0;
-    s.speedBosses = data.speedBosses || 0;
+    s.roomsCleared = saveInt(data.roomsCleared, 0, 1e6, 0);
+    s.speedBosses = saveInt(data.speedBosses, 0, 1e6, 0);
     s.evolutions = Array.isArray(data.evolutions) ? data.evolutions : [];
-    s.score = data.score || 0; s.aura = data.aura || 0; s.bestCombo = data.bestCombo || 0;
+    s.score = saveInt(data.score, 0, 1e12, 0); s.aura = saveInt(data.aura, 0, 1e12, 0); s.bestCombo = saveInt(data.bestCombo, 0, 1e6, 0);
     state = s;
     applySkillLoadout();
-    state.player.hp = Math.min(state.player.maxHp, Math.max(1, data.playerHp || state.player.maxHp));
+    /* FIX (E3): a missing or non-numeric HP restores full HP instead of NaN */
+    const hp = Number(data.playerHp);
+    state.player.hp = Number.isFinite(hp) && hp > 0 ? Math.min(state.player.maxHp, Math.max(1, hp)) : state.player.maxHp;
     return state;
-  }catch(e){ return null; }
+  }catch(e){ return discard(); }
 }
 function updateContinueButton(){
   const b = $("continueBtn");
